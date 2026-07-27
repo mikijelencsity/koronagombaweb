@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preloader — 10 extrém koncepció</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --cream-deep:#F2EADD; --cream-line:#E3D8C6;
+  --ink:#16110D; --ink-soft:#6B6053;
+  --green:#3DA35D; --green-deep:#216B37; --green-wash:#E8F3EA;
+  --red:#D93A2B;
+  --n-cyan:#35D6F5; --n-lime:#D9E34E; --n-coral:#FF5F6D; --n-purple:#B08DE0; --n-orange:#F79457;
+  --font-display:'Bricolage Grotesque', system-ui, sans-serif;
+  --font-ui:'Archivo', system-ui, sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#E9E2D6; color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; }
+.page{ max-width:1340px; margin:0 auto; padding:44px clamp(16px,3vw,36px) 90px; }
+h1{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.9rem,4vw,3rem); line-height:.95; letter-spacing:-.035em; text-transform:uppercase; }
+.sub{ color:var(--ink-soft); margin-top:10px; font-size:14.5px; line-height:1.6; max-width:74ch; }
+.bar{ margin:24px 0 32px; }
+.bar button{ font-family:var(--font-ui); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; cursor:pointer;
+  border:1.5px solid var(--ink); background:var(--ink); color:var(--cream); padding:11px 20px; border-radius:100px; }
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:26px; }
+.card{ background:var(--cream); border:1.5px solid #D7CCBA; border-radius:22px; overflow:hidden; box-shadow:0 12px 28px rgba(22,17,13,.09); }
+.card__top{ display:flex; align-items:baseline; gap:10px; padding:16px 18px 10px; }
+.card__no{ font-family:var(--font-display); font-weight:800; font-size:12px; background:var(--red); color:var(--cream); border-radius:100px; padding:4px 10px; }
+.card__name{ font-family:var(--font-display); font-weight:800; font-size:16px; letter-spacing:-.02em; }
+.card__note{ padding:0 18px 14px; font-size:12.5px; line-height:1.55; color:var(--ink-soft); }
+.stage{ position:relative; height:270px; overflow:hidden; background:var(--ink); cursor:pointer; }
+.stage::after{ content:"kattints — újrajátszás"; position:absolute; right:10px; bottom:8px; z-index:99;
+  font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:rgba(250,246,239,.42); }
+.site{ position:absolute; inset:0; background:var(--cream); display:grid; place-items:center; gap:6px; align-content:center; }
+.site b{ font-family:var(--font-display); font-weight:800; font-size:26px; letter-spacing:-.03em; text-transform:uppercase; }
+.site s{ text-decoration:none; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--ink-soft); }
+.pl{ position:absolute; inset:0; z-index:5; }
+
+/* =============== 11 — GOO: összeolvadó cseppek =============== */
+.g1{ background:var(--ink); filter:url(#goo); }
+.g1 .b{ position:absolute; left:50%; top:50%; width:64px; height:64px; margin:-32px; border-radius:50%; background:var(--n-lime);
+  animation:gooIn 2.5s var(--ease) forwards; }
+@keyframes gooIn{
+  0%{ transform:translate(var(--dx),var(--dy)) scale(1); }
+  70%{ transform:translate(0,0) scale(1.05); }
+  100%{ transform:translate(0,0) scale(3.4); }
+}
+.g1w{ animation:fadeOut .5s var(--ease) 2.6s forwards; }
+@keyframes fadeOut{ to{ opacity:0; visibility:hidden; } }
+
+/* =============== 12 — RUGALMAS FÜGGÖNY (path morph) =============== */
+.g2{ background:transparent; }
+.g2 svg{ position:absolute; inset:0; width:100%; height:100%; }
+.g2 path{ fill:var(--green-deep); }
+.g2 b{ position:absolute; inset:0; display:grid; place-items:center; color:var(--cream);
+  font-family:var(--font-display); font-weight:800; font-size:32px; letter-spacing:-.03em;
+  animation:cUp 1s var(--ease) 1.4s forwards; }
+@keyframes cUp{ to{ opacity:0; transform:translateY(-40px); } }
+
+/* =============== 13 — SPLIT-FLAP =============== */
+.g3{ background:#0E0B08; display:grid; place-items:center; animation:fadeOut .45s var(--ease) 3.1s forwards; }
+.g3 .flaps{ display:flex; gap:5px; }
+.g3 .f{ width:42px; height:58px; border-radius:5px; background:#221B14; color:var(--cream); position:relative;
+  display:grid; place-items:center; font-family:var(--font-display); font-weight:800; font-size:26px;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.8), 0 4px 10px rgba(0,0,0,.5); overflow:hidden; }
+.g3 .f::after{ content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(0,0,0,.75); }
+.g3 .f.flip{ animation:flap .09s linear; }
+@keyframes flap{ 50%{ transform:rotateX(-32deg); filter:brightness(.6); } }
+
+/* =============== 14 — VONALRAJZ → KITÖLTÉS =============== */
+.g4{ background:var(--cream); display:grid; place-items:center; animation:fadeOut .5s var(--ease) 3.2s forwards; }
+.g4 svg{ width:150px; height:150px; }
+.g4 .st{ fill:none; stroke:var(--ink); stroke-width:1.6; stroke-dasharray:420; stroke-dashoffset:420;
+  animation:drawIt 1.9s var(--ease) forwards; }
+.g4 .fl{ opacity:0; animation:fadeIn .8s var(--ease) 1.85s forwards; }
+@keyframes drawIt{ to{ stroke-dashoffset:0; } }
+@keyframes fadeIn{ to{ opacity:1; } }
+.g4 b{ position:absolute; bottom:34px; left:0; right:0; text-align:center; font-size:10px; letter-spacing:.3em;
+  text-transform:uppercase; color:var(--ink-soft); opacity:0; animation:fadeIn .7s var(--ease) 2.3s forwards; }
+
+/* =============== 15 — HALFTONE FELOLDÁS =============== */
+.g5{ background:transparent; }
+.g5 .dots{ position:absolute; inset:0; background:var(--ink);
+  -webkit-mask-image:radial-gradient(circle at center, #000 var(--r,72%), transparent 0);
+          mask-image:radial-gradient(circle at center, #000 var(--r,72%), transparent 0);
+  -webkit-mask-size:16px 16px; mask-size:16px 16px;
+  animation:dissolve 2.6s var(--ease) .5s forwards; }
+@property --r{ syntax:'<percentage>'; initial-value:72%; inherits:false; }
+@keyframes dissolve{ to{ --r:0%; } }
+.g5 b{ position:absolute; inset:0; display:grid; place-items:center; color:var(--n-lime); z-index:2;
+  font-family:var(--font-display); font-weight:800; font-size:32px; letter-spacing:-.03em;
+  animation:cOut .6s var(--ease) 1.9s forwards; }
+@keyframes cOut{ to{ opacity:0; } }
+
+/* =============== 16 — MARQUEE-ALAGÚT =============== */
+.g6{ background:var(--red); overflow:hidden; animation:zoomOut .8s var(--ease) 2.6s forwards; }
+.g6 .ln{ display:flex; width:max-content; font-family:var(--font-display); font-weight:800; font-size:30px;
+  letter-spacing:-.02em; color:var(--cream); white-space:nowrap; opacity:.9; }
+.g6 .ln span{ padding:0 14px; }
+.g6 .ln:nth-child(odd){ animation:mLeft 6s linear infinite; }
+.g6 .ln:nth-child(even){ animation:mRight 8s linear infinite; color:rgba(250,246,239,.42); }
+.g6 .rows{ position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; gap:2px; }
+@keyframes mLeft{ to{ transform:translateX(-50%); } }
+@keyframes mRight{ from{ transform:translateX(-50%); } to{ transform:translateX(0); } }
+@keyframes zoomOut{ to{ transform:scale(6); opacity:0; } }
+
+/* =============== 17 — SCRAMBLE DEKÓDOLÁS =============== */
+.g7{ background:#0B0907; display:grid; place-items:center; animation:fadeOut .45s var(--ease) 3s forwards; }
+.g7 b{ font-family:var(--font-display); font-weight:800; font-size:34px; letter-spacing:.02em; color:var(--n-cyan); }
+.g7 s{ position:absolute; bottom:30px; text-decoration:none; font-size:9.5px; letter-spacing:.3em;
+  text-transform:uppercase; color:rgba(250,246,239,.4); }
+
+/* =============== 18 — GOMBAKALAP ÍRISZ =============== */
+.g8{ background:var(--green-deep);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 12c-21 0-34 14-34 27 0 5 4 8 10 8h48c6 0 10-3 10-8 0-13-13-27-34-27Zm-8 39v22c0 8 16 8 16 0V51Z' fill='%23000'/%3E%3C/svg%3E") no-repeat center;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 12c-21 0-34 14-34 27 0 5 4 8 10 8h48c6 0 10-3 10-8 0-13-13-27-34-27Zm-8 39v22c0 8 16 8 16 0V51Z' fill='%23000'/%3E%3C/svg%3E") no-repeat center;
+  -webkit-mask-size:1400% 1400%; mask-size:1400% 1400%;
+  animation:iris 2.7s var(--ease) .4s forwards; }
+@keyframes iris{
+  0%{ -webkit-mask-size:1400% 1400%; mask-size:1400% 1400%; }
+  38%{ -webkit-mask-size:130% 130%; mask-size:130% 130%; }
+  100%{ -webkit-mask-size:0% 0%; mask-size:0% 0%; }
+}
+.g8w{ background:var(--ink); animation:fadeOut .4s var(--ease) 2.9s forwards; }
+
+/* =============== 19 — FERDE DOMINÓ =============== */
+.g9 i{ position:absolute; top:-20%; bottom:-20%; width:26%; background:var(--ink); transform:skewX(-11deg) translateY(0);
+  animation:domino .85s cubic-bezier(.7,0,.2,1) forwards; }
+.g9 i:nth-child(1){ left:-4%;  animation-delay:1.5s; background:var(--green-deep); }
+.g9 i:nth-child(2){ left:21%;  animation-delay:1.62s; background:var(--green); }
+.g9 i:nth-child(3){ left:46%;  animation-delay:1.74s; background:var(--n-lime); }
+.g9 i:nth-child(4){ left:71%;  animation-delay:1.86s; background:var(--n-orange); }
+.g9 i:nth-child(5){ left:96%;  animation-delay:1.98s; background:var(--red); width:30%; }
+@keyframes domino{ to{ transform:skewX(-11deg) translateY(-135%); } }
+.g9 b{ position:absolute; inset:0; display:grid; place-items:center; z-index:6; color:var(--cream); mix-blend-mode:difference;
+  font-family:var(--font-display); font-weight:800; font-size:32px; letter-spacing:-.03em;
+  animation:cOut .5s var(--ease) 1.7s forwards; }
+
+/* =============== 20 — 3D FORGÓ SZÁMLÁLÓ =============== */
+.g10{ background:var(--ink); display:grid; place-items:center; perspective:900px; animation:fadeOut .45s var(--ease) 3.1s forwards; }
+.g10 .cube{ width:150px; height:96px; position:relative; transform-style:preserve-3d;
+  animation:roll 2.6s cubic-bezier(.7,0,.2,1) forwards; }
+.g10 .fc{ position:absolute; inset:0; display:grid; place-items:center; backface-visibility:hidden;
+  font-family:var(--font-display); font-weight:800; font-size:40px; color:var(--cream);
+  border:1.5px solid rgba(250,246,239,.2); border-radius:14px; background:rgba(250,246,239,.05); }
+.g10 .f1{ transform:rotateX(0deg)    translateZ(48px); }
+.g10 .f2{ transform:rotateX(-90deg)  translateZ(48px); }
+.g10 .f3{ transform:rotateX(-180deg) translateZ(48px); }
+.g10 .f4{ transform:rotateX(-270deg) translateZ(48px); color:var(--n-lime); }
+@keyframes roll{ 0%{ transform:rotateX(0); } 100%{ transform:rotateX(-1080deg); } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="goo">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/>
+    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"/>
+  </filter>
+</svg>
+
+<div class="page">
+  <h1>Preloader — 10 extrém</h1>
+  <p class="sub">Ezek már nem „töltősáv” kategória: folyadék-fizika, path-morf, split-flap tábla, halftone-feloldás, alagút-zoom. Kattints bármelyikre az újrajátszáshoz.</p>
+  <div class="bar"><button id="all">Mind újrajátszása</button></div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">11</span><span class="card__name">Goo — összeolvadó cseppek</span></div>
+      <p class="card__note">SVG gooey szűrő: szétszórt cseppek folyadékként összefolynak középen, majd az egész felület elönti a képernyőt. Nagyon nem szokványos, és pont a blob-nyelv csúcsra járatva.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g1w"><div class="g1" data-goo></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">12</span><span class="card__name">Rugalmas függöny</span></div>
+      <p class="card__note">A takarólap alja gumiszerűen megnyúlik és visszapattan, ahogy felhúzódik — élő SVG path-morf, nem CSS. Ez a klasszikus Awwwards-mozdulat.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g2"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path data-curtain d="M0,0 L100,0 L100,100 Q50,100 0,100 Z"/></svg><b>KORONA</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">13</span><span class="card__name">Split-flap tábla</span></div>
+      <p class="card__note">Retró repülőtéri kijelző: a betűk pörögnek, amíg ki nem áll a név. Hangos, mechanikus, emlékezetes.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g3"><div class="flaps" data-flap="KORONA"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">14</span><span class="card__name">Vonalrajz → kitöltés</span></div>
+      <p class="card__note">A korona-logó körvonala megrajzolódik, aztán befut alá a szín. Prémium, kézműves, csendes — pont a márka hangja.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g4">
+          <svg viewBox="0 0 34 34">
+            <g class="fl"><path d="M3 22 L3 10 L9.5 15.5 L17 5 L24.5 15.5 L31 10 L31 22 Z" fill="#D93A2B"/>
+              <rect x="3" y="24" width="28" height="4" rx="1.6" fill="#16110D"/></g>
+            <path class="st" d="M3 22 L3 10 L9.5 15.5 L17 5 L24.5 15.5 L31 10 L31 22 Z"/>
+            <path class="st" style="animation-delay:.5s" d="M3 24 h28 v4 h-28 Z"/>
+          </svg>
+          <b>Gombaipari Egyesülés</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">15</span><span class="card__name">Halftone feloldás</span></div>
+      <p class="card__note">A sötét takaró pöttyökre esik szét, és a pöttyök szépen elfogynak — mint egy nyomdai raszter, ami elpárolog.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g5"><div class="dots"></div><b>KORONA</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">16</span><span class="card__name">Marquee-alagút</span></div>
+      <p class="card__note">Ellentétes irányba futó névsorok töltik ki a képernyőt, majd az egész beleránt a képbe egy zoommal. Merész, zajos, fiatalos.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g6"><div class="rows" data-rows></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">17</span><span class="card__name">Scramble dekódolás</span></div>
+      <p class="card__note">Véletlen karakterekből áll össze betűnként a név, alatta futó státuszsor. Techy, precíz — jól áll egy auditált, szabványokra épülő cégnek.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g7"><b data-scramble="KORONA">......</b><s data-status>init</s></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">18</span><span class="card__name">Gombakalap írisz</span></div>
+      <p class="card__note">A teljes takaró egy gomba alakú lyukká szűkül, majd eltűnik — az egész képernyő a logó formáján keresztül nyílik meg.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g8w"><div class="g8" style="position:absolute; inset:0"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">19</span><span class="card__name">Ferde dominó</span></div>
+      <p class="card__note">Öt megdöntött hasáb rántja fel magát egymás után, a név közben difference-módban ég bele a színekbe.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g9"><i></i><i></i><i></i><i></i><i></i><b>KORONA</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__top"><span class="card__no">20</span><span class="card__name">3D forgó számláló</span></div>
+      <p class="card__note">Egy valódi 3D hasáb pörög a tengelye körül, oldalain a töltési állapottal. Testes, tapintható, drága hatás.</p>
+      <div class="stage"><div class="site"><b>Korona</b><s>Gombaipari Egyesülés</s></div>
+        <div class="pl g10"><div class="cube">
+          <div class="fc f1">0%</div><div class="fc f2">33%</div><div class="fc f3">66%</div><div class="fc f4">100%</div>
+        </div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var CH = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@%&';
+
+function goo(el){
+  el.innerHTML = '';
+  for(var i=0;i<9;i++){
+    var b=document.createElement('div'); b.className='b';
+    var a=(i/9)*Math.PI*2, R=150;
+    b.style.setProperty('--dx',(Math.cos(a)*R)+'px');
+    b.style.setProperty('--dy',(Math.sin(a)*R*0.7)+'px');
+    b.style.animationDelay=(i*0.04)+'s';
+    b.style.background = ['#D9E34E','#4FD97A','#35D6F5','#F79457'][i%4];
+    el.appendChild(b);
+  }
+}
+
+function curtain(path){
+  var t0=null, DUR=2200;
+  function frame(ts){
+    if(!t0) t0=ts;
+    var p=Math.min(1,(ts-t0)/DUR);
+    var e=1-Math.pow(1-p,3);                    // fő felhúzás
+    var y=100-e*120;                            // alsó él
+    var wob=Math.sin(p*Math.PI)*38*(1-p);       // gumizás
+    var c=y+wob;
+    path.setAttribute('d','M0,'+(y-100)+' L100,'+(y-100)+' L100,'+y+' Q50,'+c+' 0,'+y+' Z');
+    if(p<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function splitflap(el){
+  var target=el.dataset.flap; el.innerHTML='';
+  target.split('').forEach(function(ch,i){
+    var f=document.createElement('div'); f.className='f'; f.textContent='A'; el.appendChild(f);
+    var n=0, steps=14+i*6;
+    var iv=setInterval(function(){
+      n++; f.textContent = n>=steps ? ch : CH[Math.floor(Math.random()*CH.length)];
+      f.classList.remove('flip'); void f.offsetWidth; f.classList.add('flip');
+      if(n>=steps) clearInterval(iv);
+    }, 70);
+  });
+}
+
+function rows(el){
+  el.innerHTML='';
+  for(var r=0;r<7;r++){
+    var d=document.createElement('div'); d.className='ln';
+    var inner=''; for(var i=0;i<12;i++) inner+='<span>KORONA</span>';
+    d.innerHTML=inner+inner; d.style.animationDelay=(-r*0.7)+'s';
+    el.appendChild(d);
+  }
+}
+
+function scramble(el, status){
+  var t=el.dataset.scramble, done=0;
+  var iv=setInterval(function(){
+    var out='';
+    for(var i=0;i<t.length;i++) out += i<done ? t[i] : CH[Math.floor(Math.random()*CH.length)];
+    el.textContent=out;
+    if(status) status.textContent = 'betöltés ' + Math.round(done/t.length*100) + '%';
+  }, 45);
+  var iv2=setInterval(function(){ done++; if(done>t.length){ clearInterval(iv); clearInterval(iv2); el.textContent=t; if(status) status.textContent='kész'; } }, 340);
+}
+
+function play(stage){
+  var pl=stage.querySelector('.pl');
+  var clone=pl.cloneNode(true); pl.replaceWith(clone);
+  var g=clone.querySelector('[data-goo]'); if(g) goo(g);
+  var c=clone.querySelector('[data-curtain]'); if(c) curtain(c);
+  var f=clone.querySelector('[data-flap]'); if(f) splitflap(f);
+  var r=clone.querySelector('[data-rows]'); if(r) rows(r);
+  var s=clone.querySelector('[data-scramble]'); if(s) scramble(s, clone.querySelector('[data-status]'));
+}
+
+document.querySelectorAll('.stage').forEach(function(s){
+  s.addEventListener('click', function(){ play(s); });
+  play(s);
+});
+document.getElementById('all').addEventListener('click', function(){
+  document.querySelectorAll('.stage').forEach(play);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preloader — 5 award-grade koncepció</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --cream-deep:#F2EADD; --cream-line:#E3D8C6;
+  --ink:#16110D; --ink-soft:#6B6053;
+  --green:#3DA35D; --green-deep:#216B37; --green-wash:#E8F3EA;
+  --red:#D93A2B;
+  --n-cyan:#35D6F5; --n-lime:#D9E34E; --n-coral:#FF5F6D; --n-purple:#B08DE0; --n-orange:#F79457;
+  --font-display:'Bricolage Grotesque', system-ui, sans-serif;
+  --font-ui:'Archivo', system-ui, sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --expo:cubic-bezier(.86,0,.07,1);
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#E4DCCE; color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; }
+.page{ max-width:1180px; margin:0 auto; padding:48px clamp(16px,3vw,32px) 100px; }
+h1{ font-family:var(--font-display); font-weight:800; font-size:clamp(2rem,4.4vw,3.4rem); line-height:.92; letter-spacing:-.04em; text-transform:uppercase; }
+.sub{ color:var(--ink-soft); margin-top:12px; font-size:15px; line-height:1.65; max-width:70ch; }
+.bar{ margin:26px 0 40px; }
+.bar button{ font-family:var(--font-ui); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; cursor:pointer;
+  border:none; background:var(--ink); color:var(--cream); padding:13px 24px; border-radius:100px; box-shadow:0 4px 0 0 var(--green-deep); }
+
+.case{ margin-bottom:52px; }
+.case__bar{ display:flex; align-items:baseline; gap:12px; margin-bottom:8px; flex-wrap:wrap; }
+.case__no{ font-family:var(--font-display); font-weight:800; font-size:13px; background:var(--ink); color:var(--cream); border-radius:100px; padding:5px 12px; }
+.case__name{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.15rem,2vw,1.55rem); letter-spacing:-.025em; }
+.case__note{ color:var(--ink-soft); font-size:13.5px; line-height:1.6; max-width:88ch; margin-bottom:16px; }
+.beats{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.beat{ font-size:10px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-soft);
+  border:1.4px solid var(--cream-line); background:var(--cream); border-radius:100px; padding:6px 12px; }
+
+.stage{ position:relative; height:min(62vh,470px); border-radius:20px; overflow:hidden; cursor:pointer;
+  box-shadow:0 22px 50px rgba(22,17,13,.16); background:var(--cream); }
+.stage::after{ content:"kattints — újrajátszás"; position:absolute; right:14px; bottom:11px; z-index:99;
+  font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:rgba(22,17,13,.35); mix-blend-mode:difference; }
+
+/* a mögötte lévő "kész oldal" */
+.site{ position:absolute; inset:0; background:var(--cream); display:grid; place-items:center; align-content:center; gap:10px;
+  background-image:radial-gradient(ellipse 60% 50% at 50% 45%, #FFFDF8 0%, transparent 70%); }
+.site h3{ font-family:var(--font-display); font-weight:800; font-size:clamp(2rem,5vw,3.4rem); line-height:.9;
+  letter-spacing:-.04em; text-transform:uppercase; text-align:center; }
+.site h3 em{ display:block; font-style:normal; color:var(--green-deep); }
+.site p{ font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--ink-soft); }
+.pl{ position:absolute; inset:0; z-index:5; overflow:hidden; }
+
+/* ============================================================
+   A — KINETIKUS TIPO-VÁLTÓ + OSZLOPOS ELHÚZÁS
+   ============================================================ */
+.A{ background:var(--ink); }
+.A .win{ position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); height:clamp(70px,11vw,120px); overflow:hidden; }
+.A .roll{ animation:aRoll 3.4s var(--expo) forwards; }
+.A .roll b{ display:flex; align-items:center; justify-content:center; height:clamp(70px,11vw,120px);
+  font-family:var(--font-display); font-weight:800; font-size:clamp(2.6rem,9vw,6.4rem); line-height:1;
+  letter-spacing:-.05em; text-transform:uppercase; color:var(--cream); }
+.A .roll b:nth-child(2){ color:var(--n-lime); }
+.A .roll b:nth-child(3){ color:var(--n-orange); }
+.A .roll b:nth-child(4){ color:var(--cream); }
+@keyframes aRoll{
+  0%,12%   { transform:translateY(0); }
+  22%,34%  { transform:translateY(-100%); }
+  44%,56%  { transform:translateY(-200%); }
+  66%,100% { transform:translateY(-300%); }
+}
+.A .rule{ position:absolute; left:6%; right:6%; bottom:64px; height:1.5px; background:rgba(250,246,239,.18); }
+.A .rule i{ display:block; height:100%; width:0; background:var(--cream); animation:aRule 3.4s var(--ease) forwards; }
+@keyframes aRule{ to{ width:100%; } }
+.A .pct{ position:absolute; right:6%; bottom:78px; font-family:var(--font-display); font-weight:800; font-size:14px;
+  letter-spacing:.04em; color:var(--cream); }
+.A .tag{ position:absolute; left:6%; top:36px; font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:rgba(250,246,239,.5); }
+.A .cols{ position:absolute; inset:0; display:flex; z-index:3; pointer-events:none; }
+.A .cols i{ flex:1; background:var(--ink); transform:translateY(0); animation:aCol 1.05s var(--expo) forwards; }
+.A .cols i:nth-child(1){ animation-delay:3.45s; } .A .cols i:nth-child(2){ animation-delay:3.53s; }
+.A .cols i:nth-child(3){ animation-delay:3.61s; } .A .cols i:nth-child(4){ animation-delay:3.69s; }
+.A .cols i:nth-child(5){ animation-delay:3.77s; } .A .cols i:nth-child(6){ animation-delay:3.85s; }
+@keyframes aCol{ to{ transform:translateY(-101%); } }
+.A .veil{ position:absolute; inset:0; background:var(--ink); z-index:2; animation:aVeil .01s linear 3.44s forwards; }
+@keyframes aVeil{ to{ opacity:0; } }
+
+/* ============================================================
+   B — TIPO-MASZK: a betűkön át nyílik meg az oldal
+   ============================================================ */
+.B{ background:var(--cream); }
+.B .fld{ position:absolute; inset:0; background:
+   radial-gradient(ellipse 50% 60% at 20% 30%, var(--n-lime) 0%, transparent 60%),
+   radial-gradient(ellipse 55% 55% at 78% 26%, var(--n-orange) 0%, transparent 62%),
+   radial-gradient(ellipse 60% 60% at 60% 82%, var(--green) 0%, transparent 62%),
+   radial-gradient(ellipse 50% 50% at 12% 84%, var(--n-cyan) 0%, transparent 60%),
+   var(--green-deep);
+  animation:bDrift 9s ease-in-out infinite alternate; }
+@keyframes bDrift{ to{ transform:scale(1.25) rotate(4deg); filter:hue-rotate(-12deg); } }
+.B .mask{ position:absolute; inset:0; background:var(--cream); z-index:2;
+  -webkit-mask:var(--mk) center / var(--ms,42%) no-repeat, linear-gradient(#000,#000);
+          mask:var(--mk) center / var(--ms,42%) no-repeat, linear-gradient(#000,#000);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  animation:bZoom 3.2s var(--expo) .55s forwards; }
+@keyframes bZoom{ 0%{ --ms:0%; } 22%{ --ms:42%; } 100%{ --ms:2600%; } }
+@property --ms{ syntax:'<percentage>'; initial-value:0%; inherits:true; }
+.B .cap{ position:absolute; left:0; right:0; bottom:44px; text-align:center; z-index:3;
+  font-size:10px; letter-spacing:.34em; text-transform:uppercase; color:var(--ink-soft);
+  animation:bCap .6s var(--ease) 2.4s forwards; }
+@keyframes bCap{ to{ opacity:0; } }
+.B .out{ position:absolute; inset:0; background:var(--cream); z-index:4; opacity:0; animation:bOut .5s linear 3.4s forwards; }
+@keyframes bOut{ to{ opacity:1; } }
+
+/* ============================================================
+   C — SZERKESZTŐSÉGI: sorok, vonal, majd hullám-átvezetés
+   ============================================================ */
+.C{ background:var(--cream-deep); }
+.C .lines{ position:absolute; left:clamp(24px,6vw,72px); top:50%; transform:translateY(-58%); }
+.C .ln{ overflow:hidden; }
+.C .ln span{ display:block; font-family:var(--font-display); font-weight:800;
+  font-size:clamp(1.8rem,5.4vw,3.8rem); line-height:1.02; letter-spacing:-.04em; text-transform:uppercase;
+  transform:translateY(105%); animation:cUp .9s var(--expo) forwards; }
+.C .ln:nth-child(1) span{ animation-delay:.25s; }
+.C .ln:nth-child(2) span{ animation-delay:.38s; color:var(--green-deep); }
+.C .ln:nth-child(3) span{ animation-delay:.51s; }
+@keyframes cUp{ to{ transform:translateY(0); } }
+.C .meta{ position:absolute; left:clamp(24px,6vw,72px); bottom:52px; display:flex; align-items:center; gap:16px;
+  font-size:10px; letter-spacing:.26em; text-transform:uppercase; color:var(--ink-soft); opacity:0;
+  animation:cFade .7s var(--ease) .9s forwards; }
+@keyframes cFade{ to{ opacity:1; } }
+.C .hair{ position:absolute; left:clamp(24px,6vw,72px); right:clamp(24px,6vw,72px); bottom:96px; height:1.4px; background:rgba(22,17,13,.14); }
+.C .hair i{ display:block; height:100%; width:0; background:var(--ink); animation:cLine 2.6s var(--ease) .5s forwards; }
+@keyframes cLine{ to{ width:100%; } }
+.C .wv{ position:absolute; left:0; right:0; bottom:-2px; height:0; z-index:3; }
+.C .wv svg{ position:absolute; left:0; bottom:0; width:200%; height:120px; }
+.C .wv .l1 path{ fill:var(--green-wash); } .C .wv .l2 path{ fill:var(--green); } .C .wv .l3 path{ fill:var(--green-deep); }
+.C .wv > div{ position:absolute; left:0; right:0; bottom:0; height:0; animation:cRise 1.5s var(--expo) 3.1s forwards; }
+.C .wv > div i{ position:absolute; left:0; right:0; bottom:0; top:0; }
+.C .wv .l1{ animation-delay:3.1s; } .C .wv .l1 i{ background:var(--green-wash); }
+.C .wv .l2{ animation-delay:3.24s; } .C .wv .l2 i{ background:var(--green); }
+.C .wv .l3{ animation-delay:3.38s; } .C .wv .l3 i{ background:var(--green-deep); }
+@keyframes cRise{ to{ height:160%; } }
+.C .fade{ position:absolute; inset:0; background:var(--green-deep); z-index:4; opacity:0; animation:cGone .45s linear 4.5s forwards; }
+@keyframes cGone{ 0%{ opacity:1; } 100%{ opacity:0; visibility:hidden; } }
+
+/* ============================================================
+   D — SZÍNRÉTEG-SÖPRÉS (5 réteg, ferdén, szavakkal)
+   ============================================================ */
+.D{ background:var(--cream); }
+.D .pan{ position:absolute; inset:-10% -14%; display:grid; place-items:center; transform:translateX(-115%) skewX(-7deg);
+  font-family:var(--font-display); font-weight:800; font-size:clamp(2rem,7vw,5rem); letter-spacing:-.045em; text-transform:uppercase;
+  animation:dSweep 1.5s var(--expo) forwards; }
+.D .p1{ background:var(--green-wash); color:var(--green-deep); animation-delay:.05s; }
+.D .p2{ background:var(--green);      color:var(--cream);      animation-delay:.42s; }
+.D .p3{ background:var(--n-lime);     color:var(--ink);        animation-delay:.79s; }
+.D .p4{ background:var(--n-orange);   color:var(--ink);        animation-delay:1.16s; }
+.D .p5{ background:var(--red);        color:var(--cream);      animation-delay:1.53s; }
+.D .p6{ background:var(--ink);        color:var(--cream);      animation-delay:1.9s; }
+@keyframes dSweep{
+  0%{ transform:translateX(-115%) skewX(-7deg); }
+  55%,100%{ transform:translateX(0) skewX(0deg); }
+}
+.D .last{ position:absolute; inset:0; background:var(--ink); z-index:7; transform:translateY(0);
+  animation:dLift 1.1s var(--expo) 3.1s forwards; }
+@keyframes dLift{ to{ transform:translateY(-101%); } }
+.D .lastword{ position:absolute; inset:0; z-index:8; display:grid; place-items:center; color:var(--cream);
+  font-family:var(--font-display); font-weight:800; font-size:clamp(2rem,7vw,5rem); letter-spacing:-.045em; text-transform:uppercase;
+  animation:dLift 1.1s var(--expo) 3.1s forwards; }
+
+/* ============================================================
+   E — SZÉTNYÍLÓ BLOB-SZÁJ (clip-path morf) + számláló
+   ============================================================ */
+.E{ background:var(--ink); }
+.E .lid{ position:absolute; left:-2%; right:-2%; z-index:2; background:var(--cream); }
+.E .lid--t{ top:-2%; height:54%; clip-path:polygon(0 0,100% 0,100% 100%,0 100%); animation:eT 1.4s var(--expo) 2.5s forwards; }
+.E .lid--b{ bottom:-2%; height:54%; animation:eB 1.4s var(--expo) 2.5s forwards; }
+.E .lid--t{ border-radius:0 0 50% 50% / 0 0 22% 22%; }
+.E .lid--b{ border-radius:50% 50% 0 0 / 22% 22% 0 0; }
+@keyframes eT{ to{ transform:translateY(-104%); } }
+@keyframes eB{ to{ transform:translateY(104%); } }
+.E .core{ position:absolute; inset:0; z-index:4; display:grid; place-items:center; gap:16px; align-content:center;
+  animation:eCore .55s var(--ease) 2.3s forwards; }
+@keyframes eCore{ to{ opacity:0; transform:scale(.94); } }
+
+.E .num{ font-family:var(--font-display); font-weight:800; font-size:clamp(3.4rem,13vw,9rem); line-height:.82;
+  letter-spacing:-.06em; color:var(--ink); }
+
+.E .word{ display:flex; gap:.06em; font-family:var(--font-display); font-weight:800; font-size:clamp(.95rem,2.4vw,1.5rem);
+  letter-spacing:.36em; text-transform:uppercase; color:var(--ink-soft); }
+.E .word span{ opacity:0; transform:translateY(14px); animation:eLetter .6s var(--ease) forwards; }
+@keyframes eLetter{ to{ opacity:1; transform:none; } }
+
+/* három egymásba forgó, színes gyűrű */
+.E .ring{ position:absolute; left:50%; top:50%; border-radius:50%; z-index:3; margin:0;
+  translate:-50% -50%; }
+.E .ring{ animation-name:eSpin, eRingOut; animation-duration:15s, .55s; animation-timing-function:linear, var(--ease);
+  animation-iteration-count:infinite, 1; animation-delay:0s, 2.3s; animation-fill-mode:none, forwards; }
+.E .r1{ width:min(74vw,352px); aspect-ratio:1; border:1.6px dashed var(--green); opacity:.55; }
+.E .r2{ width:min(60vw,286px); aspect-ratio:1; border:1.6px dotted var(--n-orange); opacity:.6; animation-duration:11s,.55s; animation-direction:reverse,normal; }
+.E .r3{ width:min(88vw,420px); aspect-ratio:1; border:1.6px solid rgba(217,58,43,.28); animation-duration:22s,.55s; }
+.E .r1::after, .E .r2::after{ content:""; position:absolute; top:-6px; left:50%; width:11px; height:11px; margin-left:-5.5px;
+  border-radius:50%; background:var(--n-lime); }
+.E .r2::after{ background:var(--red); top:auto; bottom:-6px; }
+@keyframes eSpin{ to{ transform:rotate(360deg); } }
+@keyframes eRingOut{ to{ opacity:0; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Preloader — 5 award-grade darab</h1>
+  <p class="sub">Ezek nem effektek, hanem koreográfiák: mindegyik 3–4 ütemből áll, saját ritmussal, és az oldal saját tipójával/palettájával dolgozik. Kattints bármelyikre az újrajátszáshoz.</p>
+  <div class="bar"><button id="all">Mind újrajátszása</button></div>
+
+  <!-- ================= A ================= -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">A</span><span class="case__name">Kinetikus tipó-váltó → oszlopos elhúzás</span></div>
+    <p class="case__note">A képernyő közepén egyetlen szó-ablak: a szavak függőlegesen görögnek egymásra, expo-easinggel — mindegyik egy pillanatra megáll, hogy elolvasd. Közben alul hajszálvékony vonal húzódik és fut a százalék. A végén a fekete felület hat oszlopra esik szét, és egymás után, késleltetve rántja fel magát.</p>
+    <div class="beats"><span class="beat">1 · szógörgetés</span><span class="beat">2 · vonal + számláló</span><span class="beat">3 · oszlopos elhúzás</span></div>
+    <div class="stage">
+      <div class="site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="pl A">
+        <div class="tag">Korona · 1993 óta</div>
+        <div class="win"><div class="roll"><b>Komposzt</b><b>Csíra</b><b>Friss gomba</b><b>Korona</b></div></div>
+        <div class="rule"><i></i></div>
+        <div class="pct" data-count>0</div>
+        <div class="veil"></div>
+        <div class="cols"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= B ================= -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">B</span><span class="case__name">Tipó-maszk — a betűkön át nyílik meg az oldal</span></div>
+    <p class="case__note">A krém felületbe a márkanév van kivágva, mögötte élő, sodródó színmező. A szó lassan felnagyul, amíg a betűformák be nem nyelik az egész képernyőt — és a lyukon keresztül már az oldal látszik. Ez a mozdulat az, amit a díjnyertes oldalakon látni.</p>
+    <div class="beats"><span class="beat">1 · színmező sodródik</span><span class="beat">2 · név kivágódik</span><span class="beat">3 · végtelen zoom a betűbe</span></div>
+    <div class="stage">
+      <div class="site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="pl B">
+        <div class="fld"></div>
+        <div class="mask" data-textmask="KORONA"></div>
+        <div class="cap">Betöltés · Korona Gombaipari Egyesülés</div>
+        <div class="out"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= C ================= -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">C</span><span class="case__name">Szerkesztőségi — sorok, hajszálvonal, hullám-átvezetés</span></div>
+    <p class="case__note">Balra zárt, tipográfiai nyitány: három sor úszik fel maszk mögül, alattuk vékony vonal rajzolódik végig a képernyőn. Amikor a vonal beér, alulról feljön az oldal saját háromrétegű hullámcsíkja, és az visz át a tartalomra. A preloader így nem eltűnik, hanem átvezet.</p>
+    <div class="beats"><span class="beat">1 · sorok felúsznak</span><span class="beat">2 · vonal végigfut</span><span class="beat">3 · hullám átvezet</span></div>
+    <div class="stage">
+      <div class="site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="pl C">
+        <div class="lines">
+          <div class="ln"><span>Komposzttól</span></div>
+          <div class="ln"><span>a konzervig</span></div>
+          <div class="ln"><span>egy kézben</span></div>
+        </div>
+        <div class="meta"><span>Korona</span><span>·</span><span>1993</span><span>·</span><span data-count>0</span></div>
+        <div class="hair"><i></i></div>
+        <div class="wv">
+          <div class="l1"><i></i></div><div class="l2"><i></i></div><div class="l3"><i></i></div>
+        </div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= D ================= -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">D</span><span class="case__name">Színréteg-söprés</span></div>
+    <p class="case__note">Hat teljes felületű színréteg söpör be egymás után ferdén, mindegyiken egy szó — a paletta végigmegy a márka teljes skáláján, zöldtől a vörösig. Az utolsó, tintafekete réteg egyben húzódik fel, és ott az oldal. Nyers, magabiztos, nagyon „nézd meg még egyszer”.</p>
+    <div class="beats"><span class="beat">1 · hat színréteg ferdén</span><span class="beat">2 · szavak rétegenként</span><span class="beat">3 · záró felhúzás</span></div>
+    <div class="stage">
+      <div class="site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="pl D">
+        <div class="pan p1">Komposzt</div>
+        <div class="pan p2">Csíra</div>
+        <div class="pan p3">Friss</div>
+        <div class="pan p4">Konzerv</div>
+        <div class="pan p5">Export</div>
+        <div class="pan p6">Korona</div>
+        <div class="last"></div>
+        <div class="lastword">Korona</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= E ================= -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">E</span><span class="case__name">Blob-száj — szétnyíló organikus lapok</span></div>
+    <p class="case__note">Középen óriási számláló fut fel 100-ig, körülötte lassan forgó szaggatott gyűrű, alatta ritkított betűközű felirat, ami betűnként áll össze. Amikor eléri a 100-at, a krém felület nem egyenesen, hanem két organikus, ívelt lapként nyílik szét — pontosan a site blob-nyelvén.</p>
+    <div class="beats"><span class="beat">1 · számláló + forgó gyűrű</span><span class="beat">2 · betűnkénti felirat</span><span class="beat">3 · íves szétnyílás</span></div>
+    <div class="stage">
+      <div class="site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="pl E">
+        <div class="lid lid--t"></div>
+        <div class="lid lid--b"></div>
+        <div class="ring r3"></div><div class="ring r1"></div><div class="ring r2"></div>
+        <div class="core">
+          <div class="num" data-count>0</div>
+          <div class="word" data-letters="Korona Gombaipari"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* számláló 0 → 100 */
+function counter(el, dur){
+  dur = dur || 2600; var t0=null;
+  function step(ts){ if(!t0) t0=ts;
+    var p=Math.min(1,(ts-t0)/dur);
+    el.textContent = Math.round((1-Math.pow(1-p,2.4))*100);
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* betűnkénti felirat */
+function letters(el){
+  var t=el.dataset.letters; el.innerHTML='';
+  t.split('').forEach(function(ch,i){
+    var s=document.createElement('span');
+    s.textContent = ch===' ' ? ' ' : ch;
+    s.style.animationDelay=(0.5+i*0.045)+'s';
+    el.appendChild(s);
+  });
+}
+
+/* szövegmaszk: a szó SVG-ként kivágva a krém lapból */
+function textmask(el){
+  var t = el.dataset.textmask;
+  var svg = "data:image/svg+xml,"+encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 160'>"+
+    "<text x='300' y='120' text-anchor='middle' font-family='Bricolage Grotesque, Archivo, sans-serif' "+
+    "font-size='140' font-weight='800' letter-spacing='-6' fill='black'>"+t+"</text></svg>");
+  el.style.setProperty('--mk', "url(\""+svg+"\")");
+}
+
+function play(stage){
+  var pl=stage.querySelector('.pl');
+  var clone=pl.cloneNode(true); pl.replaceWith(clone);
+  var c=clone.querySelector('[data-count]');   if(c) counter(c, clone.classList.contains('A') ? 3400 : 2400);
+  var l=clone.querySelector('[data-letters]'); if(l) letters(l);
+  var m=clone.querySelector('[data-textmask]');if(m) textmask(m);
+}
+
+document.querySelectorAll('.stage').forEach(function(s){
+  s.addEventListener('click', function(){ play(s); });
+  play(s);
+});
+document.getElementById('all').addEventListener('click', function(){
+  document.querySelectorAll('.stage').forEach(play);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szövegtipográfia — 10 irány</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500;6..72,600&family=Instrument+Serif:wght@400&family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&family=Familjen+Grotesk:wght@400;500;600;700&family=Unbounded:wght@300;400;500;600;700&family=Gloock&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --cream-deep:#F2EADD; --cream-line:#E3D8C6;
+  --ink:#16110D; --ink-soft:#6B6053;
+  --green:#3DA35D; --green-deep:#216B37; --green-wash:#E8F3EA;
+  --red:#D93A2B;
+  --n-lime:#D9E34E; --n-orange:#F79457; --n-cyan:#35D6F5;
+  --display:'Bricolage Grotesque', system-ui, sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#E9E2D6; color:var(--ink); font-family:'Archivo', system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+.page{ max-width:1240px; margin:0 auto; padding:48px clamp(16px,3vw,32px) 110px; }
+h1{ font-family:var(--display); font-weight:800; font-size:clamp(2rem,4.4vw,3.2rem); line-height:.92; letter-spacing:-.04em; text-transform:uppercase; }
+.sub{ color:var(--ink-soft); margin-top:12px; font-size:15px; line-height:1.65; max-width:74ch; }
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(440px,1fr)); gap:26px; margin-top:36px; }
+@media (max-width:520px){ .grid{ grid-template-columns:1fr; } }
+
+.card{ background:var(--cream); border:1.5px solid #D7CCBA; border-radius:22px; overflow:hidden;
+  box-shadow:0 14px 32px rgba(22,17,13,.09); display:flex; flex-direction:column; }
+.card__top{ display:flex; align-items:baseline; gap:10px; padding:16px 22px 6px; flex-wrap:wrap; }
+.card__no{ font-family:var(--display); font-weight:800; font-size:12px; background:var(--ink); color:var(--cream);
+  border-radius:100px; padding:4px 11px; }
+.card__font{ font-family:var(--display); font-weight:800; font-size:16px; letter-spacing:-.02em; }
+.card__tag{ font-size:9.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft);
+  border:1.3px solid var(--cream-line); border-radius:100px; padding:4px 10px; }
+.card__why{ padding:2px 22px 16px; font-size:12px; line-height:1.55; color:var(--ink-soft); }
+.card__demo{ padding:22px 22px 26px; border-top:1.5px solid var(--cream-line); background:#FFFDF8; flex:1; }
+
+/* a demó-blokk közös váza — a cím mindenhol a jelenlegi display font */
+.h{ font-family:var(--display); font-weight:800; font-size:clamp(1.4rem,2.4vw,2rem); line-height:.94;
+  letter-spacing:-.035em; text-transform:uppercase; margin-bottom:14px; }
+.kick{ font-size:9.5px; font-weight:700; letter-spacing:.26em; text-transform:uppercase; color:var(--green-deep); margin-bottom:10px; }
+
+/* ============ 01 — FRAUNCES (lágy, hullámzó talpas) ============ */
+.f1 p{ font-family:'Fraunces',serif; font-weight:400; font-size:18px; line-height:1.62;
+  font-variation-settings:'SOFT' 60,'WONK' 1; color:#2A2118; }
+.f1 p b{ font-weight:700; color:var(--ink); }
+
+/* ============ 02 — NEWSREADER + kiemelt első sor ============ */
+.f2 p{ font-family:'Newsreader',serif; font-weight:300; font-size:19.5px; line-height:1.58; color:#2A2118; }
+.f2 p::first-line{ font-weight:500; }
+.f2 .lead-in{ font-family:'Archivo',sans-serif; font-size:10px; font-weight:700; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--red); }
+
+/* ============ 03 — INSTRUMENT SERIF + iniciálé ============ */
+.f3 p{ font-family:'Instrument Serif',serif; font-weight:400; font-size:22px; line-height:1.42; color:#241C14; }
+.f3 p::first-letter{ float:left; font-size:66px; line-height:.82; padding:4px 10px 0 0; color:var(--green-deep); }
+
+/* ============ 04 — SYNE (arty grotesk) ============ */
+.f4 p{ font-family:'Syne',sans-serif; font-weight:400; font-size:16.5px; line-height:1.66; letter-spacing:-.005em; color:#2A2118; }
+.f4 p b{ font-weight:700; background:linear-gradient(transparent 62%, var(--n-lime) 0); }
+
+/* ============ 05 — SPACE GROTESK (technikás) ============ */
+.f5 p{ font-family:'Space Grotesk',sans-serif; font-weight:400; font-size:17px; line-height:1.68; color:#2A2118; }
+.f5 .rule{ display:block; width:44px; height:2px; background:var(--ink); margin:0 0 14px; }
+.f5 p b{ font-weight:700; color:var(--green-deep); }
+
+/* ============ 06 — SPACE MONO (adatlap) ============ */
+.f6 p{ font-family:'Space Mono',monospace; font-size:14.5px; line-height:1.78; color:#2A2118; }
+.f6 ul{ list-style:none; margin-top:14px; display:grid; gap:5px; }
+.f6 li{ font-family:'Space Mono',monospace; font-size:13px; color:var(--ink-soft);
+  display:flex; gap:10px; border-bottom:1px dashed var(--cream-line); padding-bottom:5px; }
+.f6 li b{ color:var(--ink); }
+
+/* ============ 07 — SORA (letisztult geometrikus) ============ */
+.f7 p{ font-family:'Sora',sans-serif; font-weight:300; font-size:16px; line-height:1.82; color:#33291F; }
+.f7 p b{ font-weight:600; color:var(--ink); }
+
+/* ============ 08 — EGY CSALÁD: BRICOLAGE ============ */
+.f8 p{ font-family:var(--display); font-weight:400; font-size:17px; line-height:1.68; color:#2A2118; }
+.f8 p b{ font-weight:700; }
+.f8 .h{ font-size:clamp(1.5rem,2.6vw,2.2rem); }
+
+/* ============ 09 — UNBOUNDED (nagyon karakteres) ============ */
+.f9 p{ font-family:'Unbounded',sans-serif; font-weight:300; font-size:14.5px; line-height:1.86;
+  letter-spacing:-.01em; color:#2A2118; }
+.f9 p b{ font-weight:600; color:var(--red); }
+
+/* ============ 10 — GLOOCK + FAMILJEN (kontrasztos páros) ============ */
+.f10 .h{ font-family:'Gloock',serif; font-weight:400; text-transform:none; letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3vw,2.5rem); line-height:1.02; }
+.f10 p{ font-family:'Familjen Grotesk',sans-serif; font-weight:400; font-size:17px; line-height:1.7; color:#2A2118; }
+.f10 p b{ font-weight:600; }
+
+/* összehasonlító sáv */
+.compare{ margin-top:60px; background:var(--ink); color:var(--cream); border-radius:22px; padding:30px 32px; }
+.compare h3{ font-family:var(--display); font-weight:800; font-size:1.3rem; letter-spacing:-.02em; margin-bottom:14px; }
+.compare p{ font-size:14.5px; line-height:1.7; color:#C9BFB1; max-width:80ch; }
+.compare strong{ color:var(--n-lime); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Szövegtipográfia — 10 irány</h1>
+  <p class="sub">Ugyanaz a bekezdés tízféle betűtípussal és stílussal. A címsor mindenhol marad a jelenlegi Bricolage Grotesque, hogy tisztán a <em>szövegtörzs</em> különbségét lásd. Mindegyik támogatja a magyar ékezeteket (ő, ű) — nézd meg a „legnagyobb termesztő felületén” részt.</p>
+
+  <div class="grid">
+
+    <!-- 01 -->
+    <div class="card f1">
+      <div class="card__top"><span class="card__no">01</span><span class="card__font">Fraunces</span><span class="card__tag">Lágy talpas</span></div>
+      <p class="card__why">Szándékosan „szabálytalan” talpas betű — a szárak enyhén hullámoznak, mint a blob-formák az oldalon. Meleg, kézműves, mezőgazdasági márkához tökéletes. Ez illik legjobban a hullámos elválasztókhoz.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. <b>Közép-Európa egyik legnagyobb termesztő felületén</b>, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 02 -->
+    <div class="card f2">
+      <div class="card__top"><span class="card__no">02</span><span class="card__font">Newsreader</span><span class="card__tag">Szerkesztőségi</span></div>
+      <p class="card__why">Magazinos, világos vonalú talpas. Vékony vágásban nagyon elegáns, és nagy méretben is szellős marad. Az első sor vastagabb — így a bekezdés magától „megnyílik”.</p>
+      <div class="card__demo">
+        <p class="kick lead-in">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. Közép-Európa egyik legnagyobb termesztő felületén, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 03 -->
+    <div class="card f3">
+      <div class="card__top"><span class="card__no">03</span><span class="card__font">Instrument Serif</span><span class="card__tag">Iniciáléval</span></div>
+      <p class="card__why">Erős kontrasztú, régies vágású talpas, nagy iniciáléval indítva. Nagyon „prémium élelmiszer”, kicsit könyv-hangulat. Rövid bekezdésekhez a legjobb, hosszú szöveghez fárasztó lehet.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. Közép-Európa egyik legnagyobb termesztő felületén, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 04 -->
+    <div class="card f4">
+      <div class="card__top"><span class="card__no">04</span><span class="card__font">Syne</span><span class="card__tag">Arty</span></div>
+      <p class="card__why">Galériás, kortárs grotesk szokatlan betűformákkal — azonnal látszik, hogy nem sablonoldal. A kulcsmondat alá lime kiemelő fut, mint egy szövegkiemelő filc.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. <b>Közép-Európa egyik legnagyobb termesztő felületén</b>, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 05 -->
+    <div class="card f5">
+      <div class="card__top"><span class="card__no">05</span><span class="card__font">Space Grotesk</span><span class="card__tag">Technikás</span></div>
+      <p class="card__why">Mérnöki, pontos, mégis barátságos. Jól áll egy szabványokra és auditokra épülő cégnek — a tanúsítványok szekció hangját viszi tovább a szövegtörzsbe is.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <span class="rule"></span>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. <b>Közép-Európa egyik legnagyobb termesztő felületén</b>, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 06 -->
+    <div class="card f6">
+      <div class="card__top"><span class="card__no">06</span><span class="card__font">Space Mono</span><span class="card__tag">Adatlap</span></div>
+      <p class="card__why">Írógépes, fix szélességű betű — a szöveg specifikációnak látszik, nem marketingnek. B2B nagykereskedelemben ez hitelesebb. Alá adatsorok is húzhatók, ugyanabban a nyelvben.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. Közép-Európa egyik legnagyobb termesztő felületén, saját komposzton, egész évben.</p>
+        <ul>
+          <li><b>Fajták</b> · 6</li>
+          <li><b>Termesztőfelület</b> · 20 ha</li>
+          <li><b>Szezon</b> · egész évben</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 07 -->
+    <div class="card f7">
+      <div class="card__top"><span class="card__no">07</span><span class="card__font">Sora</span><span class="card__tag">Letisztult</span></div>
+      <p class="card__why">Geometrikus, nagyon nyugodt betű, extra nagy sorközzel szedve. Nem harsog, hanem hagyja lélegezni a szöveget — a nagy, hangos címsorok mellé jó ellensúly.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. <b>Közép-Európa egyik legnagyobb termesztő felületén</b>, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 08 -->
+    <div class="card f8">
+      <div class="card__top"><span class="card__no">08</span><span class="card__font">Bricolage Grotesque</span><span class="card__tag">Egy család</span></div>
+      <p class="card__why">Nem hozunk be új betűt: ugyanaz a család adja a címet és a szöveget is, csak más vastagságban. Ez a legkarakteresebb önmagában, mert a Bricolage szövegméretben is szokatlan formájú — és nulla extra betöltés.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. <b>Közép-Európa egyik legnagyobb termesztő felületén</b>, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 09 -->
+    <div class="card f9">
+      <div class="card__top"><span class="card__no">09</span><span class="card__font">Unbounded</span><span class="card__tag">Nagyon karakteres</span></div>
+      <p class="card__why">A legmerészebb a listán — széles, sűrű, nagyon jellegzetes formák, ritkított sorközzel. Kis adagban zseniális (lead-ek, kiemelt mondatok), hosszú szövegtörzsre viszont sok.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. <b>Közép-Európa egyik legnagyobb termesztő felületén</b>, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="card f10">
+      <div class="card__top"><span class="card__no">10</span><span class="card__font">Gloock + Familjen Grotesk</span><span class="card__tag">Kontrasztos páros</span></div>
+      <p class="card__why">Itt a <em>címsor</em> is változik: vastag, kontrasztos talpas cím kisbetűvel szedve, alatta semleges, tiszta grotesk szöveg. Ez a legnagyobb váltás az oldal jelenlegi hangjához képest — divatlap-hatás.</p>
+      <div class="card__demo">
+        <p class="kick">Termékek</p>
+        <h3 class="h">Amit termesztünk</h3>
+        <p>Fehér és barna csiperke, portobello, laskagomba, shiitake, ördögszekér és shimeji. <b>Közép-Európa egyik legnagyobb termesztő felületén</b>, saját komposzton, egész évben.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="compare">
+    <h3>Ajánlás</h3>
+    <p>Ha egy irányt kell választani: <strong>01 · Fraunces</strong> — a lágy, hullámzó betűformák szó szerint ugyanazt mondják, mint a blob-elválasztók, a matrica-gomb és a jelvények, tehát az oldal egy nyelvet fog beszélni. Ha inkább a B2B hitelesség a cél, <strong>05 · Space Grotesk</strong> vagy <strong>06 · Space Mono</strong>. Ha semmi újat nem akarsz betölteni, <strong>08</strong> a legjobb kompromisszum. Szólj, melyik legyen, és az <em>összes</em> szövegtörzsre végigviszem az oldalon — lead, leírások, tanúsítvány-szövegek, rólunk, lábléc.</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menü — 5 koncepció</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --cream-deep:#F2EADD; --cream-line:#E3D8C6;
+  --ink:#16110D; --ink-soft:#6B6053;
+  --green:#3DA35D; --green-deep:#216B37; --green-wash:#E8F3EA;
+  --red:#D93A2B;
+  --n-cyan:#35D6F5; --n-lime:#D9E34E; --n-coral:#FF5F6D; --n-purple:#B08DE0; --n-orange:#F79457;
+  --font-display:'Bricolage Grotesque', system-ui, sans-serif;
+  --font-ui:'Archivo', system-ui, sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --expo:cubic-bezier(.86,0,.07,1);
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#E4DCCE; color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; }
+.page{ max-width:1180px; margin:0 auto; padding:46px clamp(16px,3vw,32px) 100px; }
+h1{ font-family:var(--font-display); font-weight:800; font-size:clamp(2rem,4.4vw,3.2rem); line-height:.92; letter-spacing:-.04em; text-transform:uppercase; }
+.sub{ color:var(--ink-soft); margin-top:12px; font-size:15px; line-height:1.65; max-width:70ch; }
+
+.case{ margin-top:46px; }
+.case__bar{ display:flex; align-items:baseline; gap:12px; margin-bottom:8px; flex-wrap:wrap; }
+.case__no{ font-family:var(--font-display); font-weight:800; font-size:13px; background:var(--ink); color:var(--cream); border-radius:100px; padding:5px 12px; }
+.case__name{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.1rem,2vw,1.5rem); letter-spacing:-.025em; }
+.case__note{ color:var(--ink-soft); font-size:13.5px; line-height:1.6; max-width:88ch; margin-bottom:14px; }
+
+/* ---------- a demó "böngészőablak" ---------- */
+.demo{ position:relative; height:min(70vh,540px); border-radius:20px; overflow:hidden; background:var(--cream);
+  box-shadow:0 22px 50px rgba(22,17,13,.16); isolation:isolate; }
+.demo__site{ position:absolute; inset:0; display:grid; place-items:center; align-content:center; gap:12px; padding:0 24px;
+  background:radial-gradient(ellipse 62% 52% at 50% 46%, #FFFDF8 0%, transparent 72%), var(--cream); }
+.demo__site h3{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.8rem,4.6vw,3.2rem); line-height:.88;
+  letter-spacing:-.04em; text-transform:uppercase; text-align:center; }
+.demo__site h3 em{ display:block; font-style:normal; color:var(--green-deep); }
+.demo__site p{ font-size:10px; letter-spacing:.26em; text-transform:uppercase; color:var(--ink-soft); }
+
+/* ---------- fejléc: logó bal, hamburger jobb ---------- */
+.bar{ position:absolute; top:0; left:0; right:0; z-index:60; display:flex; align-items:center; justify-content:space-between;
+  padding:18px clamp(16px,2.6vw,30px); }
+.bar__logo{ display:flex; align-items:center; gap:10px; }
+.bar__logo img{ width:40px; height:40px; object-fit:contain; display:block; }
+.bar__logo span{ font-family:var(--font-display); font-weight:800; font-size:17px; letter-spacing:-.02em; }
+.burger{ position:relative; z-index:70; width:56px; height:56px; border:none; cursor:pointer; border-radius:50%;
+  background:var(--ink); display:grid; place-items:center; gap:5px; align-content:center;
+  transition:transform .35s var(--ease), background .35s, border-radius .5s var(--ease); }
+.burger:hover{ transform:translateY(-3px); border-radius:46% 54% 52% 48% / 50%; }
+.burger i{ display:block; width:22px; height:2px; background:var(--cream); transition:transform .4s var(--ease), opacity .25s; }
+.demo.open .burger{ background:var(--cream); }
+.demo.open .burger i{ background:var(--ink); }
+.demo.open .burger i:nth-child(1){ transform:translateY(3.5px) rotate(45deg); }
+.demo.open .burger i:nth-child(2){ opacity:0; }
+.demo.open .burger i:nth-child(3){ transform:translateY(-3.5px) rotate(-45deg); }
+
+/* ---------- közös menütartalom ---------- */
+.mn{ position:absolute; inset:0; z-index:55; pointer-events:none; }
+.demo.open .mn{ pointer-events:auto; }
+.mn__list{ position:absolute; z-index:3; left:clamp(24px,6vw,84px); top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; gap:clamp(2px,.6vw,8px); list-style:none; }
+.mn__list li{ overflow:hidden; }
+.mn__list a{ display:block; font-family:var(--font-display); font-weight:800; text-decoration:none;
+  font-size:clamp(1.7rem,5.4vw,3.6rem); line-height:1.04; letter-spacing:-.04em; text-transform:uppercase;
+  transform:translateY(108%); transition:transform .75s var(--expo), color .3s; }
+.demo.open .mn__list a{ transform:translateY(0); }
+.mn__list li:nth-child(1) a{ transition-delay:.30s; } .mn__list li:nth-child(2) a{ transition-delay:.37s; }
+.mn__list li:nth-child(3) a{ transition-delay:.44s; } .mn__list li:nth-child(4) a{ transition-delay:.51s; }
+.mn__list li:nth-child(5) a{ transition-delay:.58s; }
+.mn__meta{ position:absolute; z-index:3; left:clamp(24px,6vw,84px); bottom:34px; display:flex; gap:18px; flex-wrap:wrap;
+  font-size:10px; letter-spacing:.22em; text-transform:uppercase; opacity:0; transition:opacity .5s var(--ease) .7s; }
+.demo.open .mn__meta{ opacity:1; }
+.mn__num{ font-family:var(--font-ui); font-size:10px; font-weight:700; letter-spacing:.2em; opacity:.45; margin-right:12px; }
+
+/* =========================================================
+   1 — BLOB-FÜGGÖNY
+   ========================================================= */
+.m1 .mn__sheet{ position:absolute; inset:0; z-index:2; background:var(--green-deep);
+  clip-path:ellipse(140% 0% at 50% 0%); transition:clip-path 1s var(--expo); }
+.demo.open .m1 .mn__sheet{ clip-path:ellipse(160% 150% at 50% 0%); }
+.m1 .mn__list a{ color:var(--cream); }
+.m1 .mn__list a:hover{ color:var(--n-lime); }
+.m1 .mn__meta{ color:rgba(250,246,239,.6); }
+.m1 .deco{ position:absolute; right:6%; top:50%; transform:translateY(-50%); z-index:3; width:min(30%,220px);
+  opacity:0; transition:opacity .7s var(--ease) .55s, transform .9s var(--ease) .55s; }
+.demo.open .m1 .deco{ opacity:1; transform:translateY(-50%) scale(1); }
+
+/* =========================================================
+   2 — SZÍNPANELEK (staggered)
+   ========================================================= */
+.m2 .pan{ position:absolute; top:0; bottom:0; width:20.4%; transform:translateY(-101%);
+  transition:transform .85s var(--expo); }
+.m2 .pan:nth-child(1){ left:0;    background:var(--green-wash); transition-delay:.00s; }
+.m2 .pan:nth-child(2){ left:20%;  background:var(--green);      transition-delay:.06s; }
+.m2 .pan:nth-child(3){ left:40%;  background:var(--green-deep); transition-delay:.12s; }
+.m2 .pan:nth-child(4){ left:60%;  background:var(--n-orange);   transition-delay:.18s; }
+.m2 .pan:nth-child(5){ left:80%;  background:var(--red);        transition-delay:.24s; }
+.demo.open .m2 .pan{ transform:translateY(0); }
+.m2 .mn__list{ mix-blend-mode:difference; }
+.m2 .mn__list a{ color:#fff; }
+.m2 .mn__meta{ color:var(--cream); }
+
+/* =========================================================
+   3 — KÖR-EXPANZIÓ A GOMBBÓL
+   ========================================================= */
+.m3 .mn__sheet{ position:absolute; inset:0; z-index:2; background:var(--ink);
+  clip-path:circle(0% at calc(100% - 46px) 46px); transition:clip-path .95s var(--expo); }
+.demo.open .m3 .mn__sheet{ clip-path:circle(155% at calc(100% - 46px) 46px); }
+.m3 .mn__list{ left:50%; transform:translate(-50%,-50%); text-align:center; }
+.m3 .mn__list a{ color:var(--cream); }
+.m3 .mn__list a:hover{ color:var(--n-cyan); }
+.m3 .mn__meta{ left:50%; transform:translateX(-50%); color:rgba(250,246,239,.55); }
+.m3 .ring{ position:absolute; left:50%; top:50%; translate:-50% -50%; border-radius:50%; z-index:2;
+  border:1.5px dashed rgba(250,246,239,.18); width:min(78%,460px); aspect-ratio:1; opacity:0;
+  transition:opacity .6s var(--ease) .5s; animation:spin 26s linear infinite; }
+.demo.open .m3 .ring{ opacity:1; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* =========================================================
+   4 — SZÉTNYÍLÓ FÉLLAPOK + FUTÓ SZALAG
+   ========================================================= */
+.m4 .half{ position:absolute; left:0; right:0; height:51%; background:var(--cream); z-index:3;
+  transition:transform 1s var(--expo); }
+.m4 .half--t{ top:0;    transform:translateY(-101%); border-radius:0 0 46% 46% / 0 0 16% 16%; }
+.m4 .half--b{ bottom:0; transform:translateY(101%);  border-radius:46% 46% 0 0 / 16% 16% 0 0; }
+.demo.open .m4 .half--t{ transform:translateY(0); }
+.demo.open .m4 .half--b{ transform:translateY(0); }
+.m4 .mn__sheet{ position:absolute; inset:0; z-index:2; background:var(--ink); opacity:0; transition:opacity .01s .4s; }
+.demo.open .m4 .mn__sheet{ opacity:1; transition-delay:0s; }
+.m4 .mn__list{ z-index:5; }
+.m4 .mn__list a{ color:var(--ink); }
+.m4 .mn__list a:hover{ color:var(--red); }
+.m4 .mn__meta{ z-index:5; color:var(--ink-soft); }
+.m4 .tick{ position:absolute; left:0; right:0; top:calc(50% - 22px); height:44px; z-index:4; overflow:hidden;
+  background:var(--red); transform:rotate(-2deg) scale(1.08); opacity:0; transition:opacity .4s var(--ease) .55s; }
+.demo.open .m4 .tick{ opacity:1; }
+.m4 .tick div{ display:flex; width:max-content; animation:march 18s linear infinite; }
+.m4 .tick span{ font-family:var(--font-display); font-weight:800; font-size:19px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--cream); padding:0 16px; line-height:44px; white-space:nowrap; }
+@keyframes march{ to{ transform:translateX(-50%); } }
+
+/* =========================================================
+   5 — CSEMPE-RÁCS
+   ========================================================= */
+.m5 .tiles{ position:absolute; inset:0; z-index:2; display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(3,1fr); }
+.m5 .tiles i{ background:var(--ink); transform:scale(0); border-radius:30%;
+  transition:transform .62s var(--expo), border-radius .62s var(--expo); }
+.demo.open .m5 .tiles i{ transform:scale(1.02); border-radius:0; }
+.m5 .mn__list a{ color:var(--cream); }
+.m5 .mn__list a:hover{ color:var(--n-lime); }
+.m5 .mn__meta{ color:rgba(250,246,239,.55); }
+
+/* =========================================================
+   EXTRA GOMBVÁLTOZATOK (mind jobb felül)
+   ========================================================= */
+/* — körbeforgó felirat a gomb körül — */
+.burger--ring{ width:78px; height:78px; background:transparent; }
+.burger--ring .core{ position:absolute; width:52px; height:52px; border-radius:50%; background:var(--ink);
+  display:grid; place-items:center; gap:5px; align-content:center; transition:background .35s, border-radius .5s var(--ease); }
+.burger--ring .core i{ width:20px; }
+.burger--ring svg{ position:absolute; inset:0; width:100%; height:100%; animation:spin 9s linear infinite; }
+.burger--ring text{ font-family:var(--font-ui); font-size:9.5px; font-weight:700; letter-spacing:.24em;
+  text-transform:uppercase; fill:var(--ink); }
+.demo.open .burger--ring .core{ background:var(--cream); }
+.demo.open .burger--ring text{ fill:var(--cream); }
+
+/* — goo: két blob folyik össze — */
+.burger--goo{ width:64px; height:64px; background:transparent; filter:url(#gooBtn); }
+.burger--goo .g{ position:absolute; border-radius:50%; background:var(--ink); transition:transform .5s var(--ease); }
+.burger--goo .g1{ width:52px; height:52px; }
+.burger--goo .g2{ width:26px; height:26px; transform:translate(20px,-18px); }
+.burger--goo .g3{ width:18px; height:18px; transform:translate(-20px,18px); }
+.burger--goo:hover .g2{ transform:translate(28px,-24px) scale(1.15); }
+.burger--goo:hover .g3{ transform:translate(-27px,24px) scale(1.15); }
+.burger--goo .lines{ position:absolute; display:grid; gap:5px; filter:none; z-index:2; }
+.burger--goo .lines i{ width:20px; }
+.demo.open .burger--goo .g{ background:var(--cream); }
+
+/* — mágneses gomb: követi a kurzort — */
+.burger--magnet{ background:var(--red); transition:transform .18s ease-out, background .35s, border-radius .5s var(--ease); }
+.burger--magnet:hover{ border-radius:44% 56% 50% 50% / 52% 48% 52% 48%; }
+.demo.open .burger--magnet{ background:var(--cream); }
+.demo.open .burger--magnet i{ background:var(--ink); }
+
+/* — feliratos pill, ami körré húzódik — */
+.burger--label{ width:auto; min-width:118px; height:52px; border-radius:100px; gap:12px;
+  grid-auto-flow:column; align-items:center; padding:0 20px; }
+.burger--label b{ font-family:var(--font-display); font-weight:800; font-size:12px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--cream); transition:color .3s; }
+.burger--label .st{ display:grid; gap:5px; }
+.burger--label .st i{ width:20px; }
+.demo.open .burger--label b{ color:var(--ink); }
+
+/* — színíves gomb: futó gradiens gyűrű — */
+.burger--arc{ width:64px; height:64px; background:conic-gradient(var(--green) 0deg, var(--n-lime) 90deg, var(--n-orange) 190deg, var(--red) 280deg, var(--green) 360deg);
+  animation:spin 5.5s linear infinite; }
+.burger--arc .core{ position:absolute; width:50px; height:50px; border-radius:50%; background:var(--ink);
+  display:grid; place-items:center; gap:5px; align-content:center; animation:spinR 5.5s linear infinite; }
+.burger--arc .core i{ width:20px; }
+.demo.open .burger--arc .core{ background:var(--cream); }
+@keyframes spinR{ to{ transform:rotate(-360deg); } }
+
+/* =========================================================
+   6 — FOLYÉKONY TERJEDÉS (goo)
+   ========================================================= */
+.m6 .goo{ position:absolute; inset:0; z-index:2; filter:url(#gooBig); }
+.m6 .goo i{ position:absolute; border-radius:50%; background:var(--green-deep); transform:scale(0);
+  transition:transform .9s var(--expo); }
+.demo.open .m6 .goo i{ transform:scale(1); }
+.m6 .goo i:nth-child(1){ width:150%; aspect-ratio:1; right:-25%; top:-46%; transition-delay:0s; }
+.m6 .goo i:nth-child(2){ width:120%; aspect-ratio:1; left:-30%; top:-10%; transition-delay:.1s; }
+.m6 .goo i:nth-child(3){ width:130%; aspect-ratio:1; right:-30%; bottom:-46%; transition-delay:.18s; }
+.m6 .goo i:nth-child(4){ width:120%; aspect-ratio:1; left:-25%; bottom:-40%; transition-delay:.26s; }
+.m6 .mn__list a{ color:var(--cream); } .m6 .mn__list a:hover{ color:var(--n-lime); }
+.m6 .mn__meta{ color:rgba(250,246,239,.6); }
+
+/* =========================================================
+   7 — ÁTLÓS SÖPRÉS A SAROKBÓL
+   ========================================================= */
+.m7 .sheet{ position:absolute; inset:-40%; z-index:2; background:var(--ink); transform-origin:100% 0;
+  transform:rotate(-14deg) translate(112%,-40%); transition:transform 1s var(--expo); }
+.demo.open .m7 .sheet{ transform:rotate(0deg) translate(0,0); }
+.m7 .sheet--u{ background:var(--red); transition-delay:0s; }
+.m7 .sheet--o{ background:var(--ink); transition-delay:.12s; }
+.m7 .mn__list a{ color:var(--cream); } .m7 .mn__list a:hover{ color:var(--n-orange); }
+.m7 .mn__meta{ color:rgba(250,246,239,.55); }
+
+/* =========================================================
+   8 — TIPÓ-MASZK ("MENÜ" betűin át)
+   ========================================================= */
+.m8 .sheet{ position:absolute; inset:0; z-index:2; background:var(--ink);
+  -webkit-mask:var(--mk) center / var(--ms,0%) no-repeat; mask:var(--mk) center / var(--ms,0%) no-repeat;
+  --ms:0%; transition:--ms 1.05s var(--expo); }
+.demo.open .m8 .sheet{ --ms:1800%; }
+@property --ms{ syntax:'<percentage>'; initial-value:0%; inherits:false; }
+.m8 .mn__list a{ color:var(--cream); } .m8 .mn__list a:hover{ color:var(--n-cyan); }
+.m8 .mn__meta{ color:rgba(250,246,239,.55); }
+
+/* =========================================================
+   9 — HULLÁMGYŰRŰK
+   ========================================================= */
+.m9 .rip{ position:absolute; right:46px; top:46px; translate:-50% -50%; border-radius:50%; z-index:2;
+  width:0; aspect-ratio:1; background:var(--green-deep); transform:translate(50%,-50%) scale(0);
+  transition:transform .95s var(--expo); }
+.m9 .rip{ width:300vmax; }
+.demo.open .m9 .rip{ transform:translate(50%,-50%) scale(1); }
+.m9 .rip:nth-child(1){ background:var(--n-lime);   transition-delay:0s; }
+.m9 .rip:nth-child(2){ background:var(--green);    transition-delay:.09s; }
+.m9 .rip:nth-child(3){ background:var(--green-deep);transition-delay:.18s; }
+.m9 .rip:nth-child(4){ background:var(--ink);      transition-delay:.27s; }
+.m9 .mn__list a{ color:var(--cream); } .m9 .mn__list a:hover{ color:var(--n-lime); }
+.m9 .mn__meta{ color:rgba(250,246,239,.55); }
+
+/* =========================================================
+   10 — KÁRTYAPAKLI
+   ========================================================= */
+.m10 .sheet{ position:absolute; inset:0; z-index:2; background:var(--cream-deep); opacity:0;
+  transition:opacity .5s var(--ease); }
+.demo.open .m10 .sheet{ opacity:1; }
+.m10 .mn__list{ left:50%; transform:translate(-50%,-50%); }
+.m10 .mn__list li{ overflow:visible; }
+.m10 .mn__list a{ position:relative; background:var(--cream); border:1.5px solid var(--cream-line);
+  border-radius:22px 14px 20px 16px; padding:10px 26px; font-size:clamp(1.2rem,3.4vw,2.1rem);
+  box-shadow:0 8px 0 0 rgba(22,17,13,.14); color:var(--ink);
+  transform:translate(46vw,-52vh) rotate(24deg); transition:transform .8s var(--expo), box-shadow .3s, background .3s; }
+.demo.open .m10 .mn__list a{ transform:translate(0,0) rotate(var(--tilt,0deg)); }
+.m10 .mn__list a:hover{ background:var(--n-lime); box-shadow:0 13px 0 0 rgba(22,17,13,.18); }
+.m10 .mn__list li:nth-child(1) a{ --tilt:-3deg; } .m10 .mn__list li:nth-child(2) a{ --tilt:2.4deg; }
+.m10 .mn__list li:nth-child(3) a{ --tilt:-1.8deg; } .m10 .mn__list li:nth-child(4) a{ --tilt:3deg; }
+.m10 .mn__list li:nth-child(5) a{ --tilt:-2.2deg; }
+.m10 .mn__meta{ color:var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Menü — 10 nyitási koncepció</h1>
+  <p class="sub">Mindegyikben ugyanaz a fejléc: bal oldalt a logó, jobb oldalt a nyitógomb. Kattints a gombra bármelyik ablakban — élőben nyílik és záródik. A 06–10-es daraboknál a <strong>gomb maga is külön dizájn</strong>: körbeforgó felirat, folyékony goo-blob, mágneses (kurzort követő), feliratos pill és színíves változat.</p>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="gooBtn"><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/>
+    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"/></filter>
+  <filter id="gooBig"><feGaussianBlur in="SourceGraphic" stdDeviation="26" result="b"/>
+    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -12"/></filter>
+</svg>
+
+  <!-- ============ 1 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">01</span><span class="case__name">Blob-függöny</span></div>
+    <p class="case__note">A menü nem lapként jön, hanem egy organikus, ívelt zöld felület dagad le felülről (ellipszis clip-path), és a menüpontok maszk mögül úsznak fel, egyenként késleltetve. Ez folytatja az oldal blob-nyelvét.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m1">
+        <div class="mn__sheet"></div>
+        <img class="deco" src="assets/logo.png" alt="">
+        <ul class="mn__list">
+          <li><a href="#"><span class="mn__num">01</span>Termékek</a></li>
+          <li><a href="#"><span class="mn__num">02</span>Rólunk</a></li>
+          <li><a href="#"><span class="mn__num">03</span>Tanúsítványok</a></li>
+          <li><a href="#"><span class="mn__num">04</span>Gombahíradó</a></li>
+          <li><a href="#"><span class="mn__num">05</span>Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>+36 …</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger" data-toggle aria-label="Menü"><i></i><i></i><i></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">02</span><span class="case__name">Színpanelek</span></div>
+    <p class="case__note">Öt függőleges hasáb zuhan le egymás után a márka teljes palettájával, és a menüpontok <em>difference</em> keverési módban égnek rá — így minden hasáb fölött más színűnek látszik ugyanaz a szöveg. Nagyon erős, nagyon „megnézem még egyszer”.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m2">
+        <div class="pan"></div><div class="pan"></div><div class="pan"></div><div class="pan"></div><div class="pan"></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger" data-toggle aria-label="Menü"><i></i><i></i><i></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">03</span><span class="case__name">Kör-expanzió a gombból</span></div>
+    <p class="case__note">A sötét felület magából a hamburger gombból tágul ki körként, amíg be nem tölti a képernyőt — a menü szó szerint a gombból nő ki. Középre zárt, számozott lista, mögötte lassan forgó szaggatott gyűrű, ami a preloaderre rímel.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m3">
+        <div class="mn__sheet"></div>
+        <div class="ring"></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger" data-toggle aria-label="Menü"><i></i><i></i><i></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">04</span><span class="case__name">Összecsukódó féllapok + futó szalag</span></div>
+    <p class="case__note">Két ívelt krém féllap csapódik össze fentről és lentről — ugyanaz a mozdulat, mint a preloader nyílása, csak visszafelé. A találkozásnál egy ferde piros szalag fut végig a szavakkal. Ez köti össze a menüt a betöltővel egyetlen mozdulatnyelvvé.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m4">
+        <div class="mn__sheet"></div>
+        <div class="half half--t"></div>
+        <div class="half half--b"></div>
+        <div class="tick"><div>
+          <span>Komposzt ★</span><span>Csíra ★</span><span>Friss gomba ★</span><span>Konzerv ★</span><span>Export ★</span>
+          <span>Komposzt ★</span><span>Csíra ★</span><span>Friss gomba ★</span><span>Konzerv ★</span><span>Export ★</span>
+        </div></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger" data-toggle aria-label="Menü"><i></i><i></i><i></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">05</span><span class="case__name">Csempe-rács</span></div>
+    <p class="case__note">A képernyő 12 csempére bomlik: mindegyik pöttyből nő ki és négyzetté szögletesedik, átlós sorrendben. Játékos, mértani, és pont annyira szokatlan, hogy megjegyezhető legyen.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m5">
+        <div class="tiles"></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger" data-toggle aria-label="Menü"><i></i><i></i><i></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">06</span><span class="case__name">Folyékony terjedés — goo</span><span class="case__note" style="margin:0">gomb: körbeforgó felirat</span></div>
+    <p class="case__note">Négy óriási kör dagad be a sarkokból, és egy SVG gooey szűrő <em>összeragasztja</em> őket: a menü nem lapként érkezik, hanem folyadékként terjed szét a képernyőn. A gomb körül közben körbeforog a „MENÜ · KORONA” felirat.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m6">
+        <div class="goo"><i></i><i></i><i></i><i></i></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger burger--ring" data-toggle aria-label="Menü">
+          <svg viewBox="0 0 100 100">
+            <defs><path id="cir6" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs>
+            <text><textPath href="#cir6">MENÜ · KORONA · MENÜ · KORONA · </textPath></text>
+          </svg>
+          <span class="core"><i></i><i></i><i></i></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">07</span><span class="case__name">Átlós söprés a sarokból</span><span class="case__note" style="margin:0">gomb: goo-blob</span></div>
+    <p class="case__note">Két megdöntött, teljes felületű lap söpör be a jobb felső sarokból átlósan, egymás után — és menet közben egyenesedik ki vízszintesre. A gomb maga is folyadék: három blob lebeg egymás körül, hoverre szétúsznak és összefolynak.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m7">
+        <div class="sheet sheet--u"></div>
+        <div class="sheet sheet--o"></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger burger--goo" data-toggle aria-label="Menü">
+          <span class="g g1"></span><span class="g g2"></span><span class="g g3"></span>
+          <span class="lines"><i></i><i></i><i></i></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">08</span><span class="case__name">Tipó-maszk — a „MENÜ” betűin át</span><span class="case__note" style="margin:0">gomb: mágneses</span></div>
+    <p class="case__note">A sötét felület a „MENÜ” szó betűformáin keresztül tágul ki, amíg be nem nyeli az egész képernyőt — a szó szó szerint kinyílik. A gomb mágneses: közelítve a kurzorhoz húz, elengedve visszapattan.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m8">
+        <div class="sheet" data-textmask="MENÜ"></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger burger--magnet" data-toggle data-magnet aria-label="Menü"><i></i><i></i><i></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">09</span><span class="case__name">Hullámgyűrűk</span><span class="case__note" style="margin:0">gomb: feliratos pill</span></div>
+    <p class="case__note">Négy óriási kör csap ki a gombból egymás után, mindegyik más színnel — lime, zöld, sötétzöld, tinta. Olyan, mint egy kőbedobás a vízbe, csak a márka palettájával. A gomb feliratos pill, ami nyitáskor a bezárás felé alakul.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m9">
+        <div class="rip"></div><div class="rip"></div><div class="rip"></div><div class="rip"></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger burger--label" data-toggle aria-label="Menü">
+          <b>Menü</b><span class="st"><i></i><i></i><i></i></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 ============ -->
+  <section class="case">
+    <div class="case__bar"><span class="case__no">10</span><span class="case__name">Kártyapakli</span><span class="case__note" style="margin:0">gomb: színíves</span></div>
+    <p class="case__note">A menüpontok nem szövegek, hanem kártyák: a jobb felső sarokból repülnek be megpörgetve, és megdöntve állnak meg, kemény árnyékkal. Hoverre kigyulladnak. A gomb körül folyamatosan forog egy színátmenetes gyűrű a teljes palettából.</p>
+    <div class="demo" data-demo>
+      <div class="demo__site"><h3>A magyar gomba<em>exportminőségben</em></h3><p>Korona Gombaipari Egyesülés</p></div>
+      <div class="mn m10">
+        <div class="sheet"></div>
+        <ul class="mn__list">
+          <li><a href="#">Termékek</a></li><li><a href="#">Rólunk</a></li><li><a href="#">Tanúsítványok</a></li>
+          <li><a href="#">Gombahíradó</a></li><li><a href="#">Kapcsolat</a></li>
+        </ul>
+        <div class="mn__meta"><span>HU · EN · DE</span><span>1990 óta</span></div>
+      </div>
+      <div class="bar">
+        <div class="bar__logo"><img src="assets/logo.png" alt=""><span>KORONA</span></div>
+        <button class="burger burger--arc" data-toggle aria-label="Menü">
+          <span class="core"><i></i><i></i><i></i></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* csempék legyártása + átlós késleltetés */
+document.querySelectorAll('.m5 .tiles').forEach(function(g){
+  for(var r=0;r<3;r++){
+    for(var c=0;c<4;c++){
+      var t=document.createElement('i');
+      t.style.transitionDelay = ((r+c)*0.055)+'s';
+      g.appendChild(t);
+    }
+  }
+});
+
+/* szövegmaszk a 08-hoz */
+document.querySelectorAll('[data-textmask]').forEach(function(el){
+  var t = el.dataset.textmask;
+  var svg = "data:image/svg+xml,"+encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 460 160'>"+
+    "<text x='230' y='122' text-anchor='middle' font-family='Bricolage Grotesque, Archivo, sans-serif' "+
+    "font-size='140' font-weight='800' letter-spacing='-5' fill='black'>"+t+"</text></svg>");
+  el.style.setProperty('--mk', "url(\""+svg+"\")");
+});
+
+/* mágneses gomb */
+document.querySelectorAll('[data-magnet]').forEach(function(btn){
+  var host = btn.closest('.demo');
+  host.addEventListener('mousemove', function(e){
+    var r = btn.getBoundingClientRect();
+    var cx = r.left + r.width/2, cy = r.top + r.height/2;
+    var dx = e.clientX - cx, dy = e.clientY - cy;
+    var d  = Math.hypot(dx,dy);
+    if(d < 190){ var f = (1 - d/190) * .42; btn.style.transform = 'translate('+(dx*f)+'px,'+(dy*f)+'px)'; }
+    else btn.style.transform = '';
+  });
+  host.addEventListener('mouseleave', function(){ btn.style.transform = ''; });
+});
+
+document.querySelectorAll('[data-demo]').forEach(function(demo){
+  demo.querySelector('[data-toggle]').addEventListener('click', function(){
+    demo.classList.toggle('open');
+  });
+});
+</script>
+</body>
+</html>

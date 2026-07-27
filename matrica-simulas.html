@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matrica rásimulás — 10 terv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --cream-deep:#F2EADD; --cream-line:#E3D8C6;
+  --ink:#16110D; --ink-soft:#6B6053;
+  --green:#3DA35D; --green-deep:#216B37;
+  --red:#D93A2B; --n-lime:#D9E34E;
+  --display:'Bricolage Grotesque', system-ui, sans-serif;
+  --lead:'Archivo Black','Archivo',sans-serif;
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#E4DCCE; color:var(--ink); font-family:'Archivo',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+.page{ max-width:1240px; margin:0 auto; padding:44px clamp(16px,3vw,28px) 90px; }
+h1{ font-family:var(--display); font-weight:800; font-size:clamp(2rem,4.4vw,3.2rem); line-height:.92; letter-spacing:-.04em; text-transform:uppercase; }
+.sub{ color:var(--ink-soft); margin-top:12px; font-size:15px; line-height:1.65; max-width:76ch; }
+.bar{ margin:22px 0 8px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.bar label{ font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft); }
+.bar input{ width:min(420px,60vw); }
+.bar b{ font-family:var(--display); font-size:14px; }
+
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:22px; margin-top:24px; }
+.card{ background:var(--ink); border-radius:20px; overflow:hidden; box-shadow:0 16px 34px rgba(22,17,13,.16); }
+.card__top{ display:flex; align-items:baseline; gap:10px; padding:14px 18px 4px; }
+.card__no{ font-family:var(--display); font-weight:800; font-size:12px; background:var(--n-lime); color:var(--ink); border-radius:100px; padding:4px 10px; }
+.card__name{ font-family:var(--display); font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--cream); }
+.card__why{ padding:2px 18px 14px; font-size:11.5px; line-height:1.5; color:rgba(250,246,239,.62); }
+.stagebox{ position:relative; height:280px; display:grid; place-items:center;
+  background:radial-gradient(ellipse 70% 60% at 50% 45%, #241C15, #16110D); }
+.shot{ position:relative; width:76%; }
+.shot img.photo{ display:block; width:100%; aspect-ratio:3/2; object-fit:cover;
+  border-radius:22px 12px 20px 14px; border:4px solid var(--cream); box-shadow:0 18px 34px rgba(0,0,0,.45); }
+
+/* ---- a matrica közös váza ---- */
+.stamp{ position:absolute; left:-14%; bottom:-18%; width:52%; aspect-ratio:1; z-index:5; --t:0; }
+.stamp .lg{ position:absolute; inset:0; }
+.stamp .lg img{ width:100%; height:100%; object-fit:contain; display:block;
+  filter:drop-shadow(0 0 3px var(--cream)) drop-shadow(0 0 3px var(--cream)) drop-shadow(0 0 2px var(--cream)); }
+/* a felhajtott rész alá vetett árnyék + a hajlás árnyalása */
+.shade{ position:absolute; inset:0; border-radius:50%; pointer-events:none; }
+
+/* ===== 01 · ALSÓ ÉLRŐL ===== */
+.v1 .stamp{ perspective:760px; }
+.v1 .lg{ transform-origin:50% 100%; transform:rotateX(calc((1 - var(--t)) * 74deg)); }
+.v1 .lg img{ filter:drop-shadow(0 0 3px var(--cream)) drop-shadow(0 0 3px var(--cream))
+  drop-shadow(calc(2px + (1 - var(--t)) * 10px) calc(4px + (1 - var(--t)) * 22px) calc(0px + (1 - var(--t)) * 10px) rgba(0,0,0,.5)); }
+.v1 .shade{ background:linear-gradient(0deg, rgba(0,0,0,.55), transparent 65%); opacity:calc(1 - var(--t)); }
+
+/* ===== 02 · FELSŐ ÉLRŐL ===== */
+.v2 .stamp{ perspective:760px; }
+.v2 .lg{ transform-origin:50% 0%; transform:rotateX(calc((1 - var(--t)) * -68deg)); }
+.v2 .shade{ background:linear-gradient(180deg, rgba(0,0,0,.5), transparent 62%); opacity:calc(1 - var(--t)); }
+
+/* ===== 03 · BAL OLDALRÓL ===== */
+.v3 .stamp{ perspective:820px; }
+.v3 .lg{ transform-origin:0% 50%; transform:rotateY(calc((1 - var(--t)) * 72deg)); }
+.v3 .shade{ background:linear-gradient(90deg, transparent 40%, rgba(0,0,0,.5)); opacity:calc(1 - var(--t)); }
+
+/* ===== 04 · ÁTLÓS SAROK ===== */
+.v4 .stamp{ perspective:700px; }
+.v4 .lg{ transform-origin:100% 100%; transform:rotate3d(1,-1,0, calc((1 - var(--t)) * 78deg)); }
+.v4 .shade{ background:linear-gradient(135deg, rgba(0,0,0,.55), transparent 58%); opacity:calc(1 - var(--t)); }
+
+/* ===== 05 · VISSZAPATTANÓ ===== */
+.v5 .stamp{ perspective:760px; }
+.v5 .lg{ transform-origin:50% 100%;
+  transform:rotateX(calc((1 - var(--b,0)) * 70deg)); }
+.v5 .shade{ background:linear-gradient(0deg, rgba(0,0,0,.5), transparent 62%); opacity:calc(1 - var(--t)); }
+
+/* ===== 06 · KÉTRÉTEGŰ HULLÁM ===== */
+.v6 .stamp{ perspective:900px; }
+.v6 .half{ position:absolute; inset:0; }
+.v6 .half img{ width:100%; height:100%; object-fit:contain; display:block;
+  filter:drop-shadow(0 0 3px var(--cream)) drop-shadow(0 0 3px var(--cream)); }
+.v6 .top{ clip-path:inset(0 0 50% 0); transform-origin:50% 100%; transform:rotateX(calc((1 - var(--t)) * 62deg)); }
+.v6 .bot{ clip-path:inset(50% 0 0 0); transform-origin:50% 0%; transform:rotateX(calc((1 - var(--t)) * -34deg)); }
+.v6 .shade{ background:linear-gradient(0deg, rgba(0,0,0,.5), transparent 55%); opacity:calc(1 - var(--t)); }
+
+/* ===== 07 · ÁRNYÉK-HANGSÚLYOS ===== */
+.v7 .stamp{ perspective:700px; }
+.v7 .lg{ transform-origin:50% 100%;
+  transform:rotateX(calc((1 - var(--t)) * 66deg)) translateY(calc((1 - var(--t)) * -8%)); }
+.v7 .drop{ position:absolute; left:8%; right:8%; bottom:-6%; height:16%; border-radius:50%;
+  background:rgba(0,0,0,.55); filter:blur(calc(6px + (1 - var(--t)) * 12px));
+  transform:scale(calc(.6 + var(--t) * .4)); opacity:calc(.25 + (1 - var(--t)) * .55); }
+
+/* ===== 08 · FÉNYCSÍKKAL ===== */
+.v8 .stamp{ perspective:760px; overflow:hidden; }
+.v8 .lg{ transform-origin:50% 100%; transform:rotateX(calc((1 - var(--t)) * 70deg)); }
+.v8 .gloss{ position:absolute; inset:-20%; pointer-events:none; border-radius:50%;
+  background:linear-gradient(115deg, transparent 38%, rgba(255,255,255,.55) 50%, transparent 62%);
+  transform:translateX(calc(-120% + var(--t) * 240%)); opacity:calc(1 - abs(var(--t) - .5) * 1.6); }
+.v8 .shade{ background:linear-gradient(0deg, rgba(0,0,0,.5), transparent 62%); opacity:calc(1 - var(--t)); }
+
+/* ===== 09 · HÁTOLDALLAL ===== */
+.v9 .stamp{ perspective:760px; }
+.v9 .lg{ transform-origin:50% 100%; transform:rotateX(calc((1 - var(--t)) * 88deg)); backface-visibility:hidden; }
+.v9 .back{ position:absolute; inset:0; border-radius:50%; background:var(--cream-deep);
+  transform-origin:50% 100%; transform:rotateX(calc(88deg - (1 - var(--t)) * 0deg));
+  opacity:calc((1 - var(--t)) * .9);
+  box-shadow:inset 0 -10px 20px rgba(0,0,0,.18); }
+.v9 .shade{ background:linear-gradient(0deg, rgba(0,0,0,.55), transparent 60%); opacity:calc(1 - var(--t)); }
+
+/* ===== 10 · BENYOMÓDÓ FELÜLET ===== */
+.v10 .stamp{ perspective:740px; }
+.v10 .lg{ transform-origin:50% 100%;
+  transform:rotateX(calc((1 - var(--t)) * 72deg)) scale(calc(1.06 - var(--t) * .06)); }
+.v10 .press{ position:absolute; inset:-6%; border-radius:50%; pointer-events:none;
+  box-shadow:0 0 0 calc(var(--t) * 10px) rgba(0,0,0,.16);
+  opacity:calc(var(--t) * (1 - var(--t)) * 4); }
+.v10 .shade{ background:linear-gradient(0deg, rgba(0,0,0,.5), transparent 60%); opacity:calc(1 - var(--t)); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Matrica rásimulás — 10 terv</h1>
+  <p class="sub">Mindegyikben a logó félig felhajtva áll, és rásimul a felületre. A csúszkával végigléptetheted a mozdulatot mind a tízen egyszerre — élesben ezt a görgetés fogja hajtani, tehát visszafelé is lejátszódik.</p>
+
+  <div class="bar">
+    <label for="rng">Rásimulás</label>
+    <input id="rng" type="range" min="0" max="100" value="35">
+    <b id="val">35%</b>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <div class="card v1">
+      <div class="card__top"><span class="card__no">01</span><span class="card__name">Alsó élről</span></div>
+      <p class="card__why">A matrica alja tapad, a felső fele el van emelve, és lefelé simul rá. A legtermészetesebb, ezt csinálja a kéz is.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="lg"><img src="assets/logo.png" alt=""></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v2">
+      <div class="card__top"><span class="card__no">02</span><span class="card__name">Felső élről</span></div>
+      <p class="card__why">Fordítva: a teteje tapad, az alja lóg el, és felfelé simul vissza. Kicsit szokatlanabb, jobban észreveszed.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="lg"><img src="assets/logo.png" alt=""></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v3">
+      <div class="card__top"><span class="card__no">03</span><span class="card__name">Bal oldalról</span></div>
+      <p class="card__why">Függőleges tengely körül nyílik ki, mint egy lap. Oldalirányú mozgás, jól illik a bal alsó sarki pozícióhoz.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="lg"><img src="assets/logo.png" alt=""></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v4">
+      <div class="card__top"><span class="card__no">04</span><span class="card__name">Átlós sarok</span></div>
+      <p class="card__why">A jobb alsó sarok tapad, az átellenes sarok van felhajtva — átlós tengely mentén simul le. Ez néz ki a leginkább „lehúzott matricának”.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="lg"><img src="assets/logo.png" alt=""></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v5">
+      <div class="card__top"><span class="card__no">05</span><span class="card__name">Visszapattanó</span></div>
+      <p class="card__why">Ugyanaz, mint az 01, de a végén túlfut és picit visszaleng — mintha a matrica rugózna, mielőtt megtapad. Élőbb.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="lg"><img src="assets/logo.png" alt=""></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v6">
+      <div class="card__top"><span class="card__no">06</span><span class="card__name">Kétrétegű hullám</span></div>
+      <p class="card__why">A matrica két fele külön hajlik, eltérő szögben — a hajlás hullámként fut végig rajta, nem merev lapként mozog.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp">
+          <span class="half top"><img src="assets/logo.png" alt=""></span>
+          <span class="half bot"><img src="assets/logo.png" alt=""></span>
+          <span class="shade"></span>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="card v7">
+      <div class="card__top"><span class="card__no">07</span><span class="card__name">Árnyék-hangsúlyos</span></div>
+      <p class="card__why">A felhajtott állapotban erős, elmosott árnyék van alatta, ami lesimuláskor összemegy és élesedik. Ettől érződik, hogy tényleg elemelkedik a felülettől.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="drop"></span><span class="lg"><img src="assets/logo.png" alt=""></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v8">
+      <div class="card__top"><span class="card__no">08</span><span class="card__name">Fénycsíkkal</span></div>
+      <p class="card__why">Lesimulás közben fényreflex fut végig a matrica felületén, a mozgás felénél a legerősebb. Fóliás, prémium hatás.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="lg"><img src="assets/logo.png" alt=""></span><span class="gloss"></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v9">
+      <div class="card__top"><span class="card__no">09</span><span class="card__name">Hátoldallal</span></div>
+      <p class="card__why">Felhajtva a matrica krém <em>hátoldala</em> látszik, és ahogy lesimul, fordul át a logós oldalára. A leginkább fizikai megoldás.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="back"></span><span class="lg"><img src="assets/logo.png" alt=""></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+    <div class="card v10">
+      <div class="card__top"><span class="card__no">10</span><span class="card__name">Benyomódó felület</span></div>
+      <p class="card__why">Ahogy rásimul, egy finom nyomáshullám fut ki alóla a felületen, és a matrica egy hajszálnyit összemegy. Tapintható, „rányomtam” érzet.</p>
+      <div class="stagebox"><div class="shot"><img class="photo" src="assets/rolunk-1400.webp" alt="">
+        <div class="stamp"><span class="lg"><img src="assets/logo.png" alt=""></span><span class="press"></span><span class="shade"></span></div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var rng = document.getElementById('rng');
+var val = document.getElementById('val');
+var stamps = Array.prototype.slice.call(document.querySelectorAll('.stamp'));
+
+function apply(){
+  var t = rng.value / 100;
+  val.textContent = rng.value + '%';
+  stamps.forEach(function(s){
+    s.style.setProperty('--t', t.toFixed(3));
+    /* az 05-ös visszapattanó saját, túlfutó görbét kap */
+    var b = t < 1 ? 1 - Math.pow(2, -9 * t) * Math.cos(t * 14) : 1;
+    s.style.setProperty('--b', b.toFixed(3));
+  });
+}
+rng.addEventListener('input', apply);
+apply();
+</script>
+</body>
+</html>

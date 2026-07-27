@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tanúsítványok szekció — 5 vizuális koncepció</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,500&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --cream-deep:#F2EADD; --cream-line:#E3D8C6;
+  --ink:#16110D; --ink-soft:#6B6053;
+  --green:#3DA35D; --green-deep:#216B37; --green-wash:#E8F3EA;
+  --red:#D93A2B;
+  --n-cyan:#35D6F5; --n-lime:#D9E34E; --n-coral:#FF5F6D;
+  --n-purple:#B08DE0; --n-orange:#F79457; --n-green:#4FD97A;
+  --font-display:'Bricolage Grotesque', system-ui, sans-serif;
+  --font-serif:'Fraunces', Georgia, serif;
+  --font-ui:'Archivo', system-ui, sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#E9E2D6; color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; }
+
+/* ---- keret / fejléc ---- */
+.page{ max-width:1320px; margin:0 auto; padding:48px clamp(16px,3vw,40px) 100px; }
+.page__title{ font-family:var(--font-display); font-weight:800; font-size:clamp(2rem,4vw,3.2rem); line-height:.95; letter-spacing:-.035em; text-transform:uppercase; }
+.page__sub{ color:var(--ink-soft); margin-top:12px; max-width:60ch; line-height:1.6; font-size:15px; }
+
+.concept{ margin-top:56px; }
+.concept__bar{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+.concept__no{ font-family:var(--font-display); font-weight:800; font-size:14px; background:var(--ink); color:var(--cream); border-radius:100px; padding:5px 13px; letter-spacing:.06em; }
+.concept__name{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.2rem,2.2vw,1.7rem); letter-spacing:-.02em; }
+.concept__note{ color:var(--ink-soft); font-size:13.5px; line-height:1.55; max-width:78ch; margin-bottom:16px; }
+.frame{ border-radius:26px; overflow:hidden; border:1.5px solid #D7CCBA; box-shadow:0 18px 40px rgba(22,17,13,.10); }
+
+/* ---- közös mini-szekció alap ---- */
+.mini{ position:relative; background:var(--cream); padding:52px clamp(18px,3vw,44px) 60px; overflow:hidden; }
+.mini__head{ position:relative; z-index:3; text-align:center; max-width:760px; margin:0 auto 38px; }
+.eyebrow{ display:flex; align-items:center; justify-content:center; gap:12px; font-size:10px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:16px; }
+.eyebrow i{ display:block; width:28px; height:1.5px; background:var(--red); }
+.mini__title{ font-family:var(--font-display); font-weight:800; font-size:clamp(1.9rem,4.4vw,3.2rem); line-height:.88; letter-spacing:-.038em; text-transform:uppercase; }
+.mini__title em{ display:block; font-family:var(--font-serif); font-style:italic; font-weight:300; text-transform:none; font-size:clamp(1.1rem,2.4vw,1.9rem); line-height:1; color:var(--green-deep); margin-top:.08em; }
+
+.grid{ position:relative; z-index:3; max-width:1080px; margin:0 auto;
+  display:grid; grid-template-columns:1fr minmax(210px,.86fr) 1fr; gap:34px 40px; align-items:start; }
+.c{ position:relative; }
+.c--a{ grid-column:1; grid-row:1; } .c--b{ grid-column:3; grid-row:1; }
+.c--c{ grid-column:1; grid-row:2; } .c--d{ grid-column:3; grid-row:2; }
+.c--b, .c--d{ text-align:right; }
+.c--b .badge, .c--d .badge{ margin-left:auto; }
+.c--b .desc, .c--d .desc{ margin-left:auto; }
+
+.badge{ position:relative; width:86px; aspect-ratio:1; display:grid; place-items:center; margin-bottom:14px; }
+.badge::before{ content:""; position:absolute; inset:0; background:var(--c);
+  border-radius:58% 42% 47% 53% / 45% 50% 50% 55%; transform:rotate(var(--r,0deg)); }
+.disc{ position:relative; width:70%; height:70%; border-radius:50%; background:#fff; display:grid; place-items:center;
+  box-shadow:0 6px 14px rgba(22,17,13,.16); font-family:var(--font-display); font-weight:800; font-size:11px; letter-spacing:-.01em; color:var(--ink); }
+.name{ font-family:var(--font-display); font-weight:800; font-size:1.5rem; line-height:1; letter-spacing:-.03em; text-transform:uppercase; }
+.full{ font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ct); margin-top:7px; }
+.desc{ font-size:12.5px; line-height:1.55; color:var(--ink-soft); margin-top:9px; max-width:30ch; }
+.tag{ display:inline-flex; align-items:center; gap:7px; margin-top:12px; font-size:9px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; border:1.4px solid var(--ink); border-radius:100px; padding:5px 12px; }
+.tag::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--c); }
+
+/* középső HACCP alap */
+.mid{ grid-column:2; grid-row:1 / span 2; align-self:center; z-index:4;
+  display:grid; justify-items:center; text-align:center; gap:12px;
+  background:var(--cream-deep); border:1.5px solid var(--cream-line); border-radius:38px; padding:26px 22px; }
+.mid .desc{ max-width:26ch; margin:8px auto 0; }
+
+/* =========================================================
+   1 — PECSÉT-FAL: sötét közép + forgó körfelirat
+   ========================================================= */
+.k1 .mid{ background:var(--ink); border-color:var(--ink); color:var(--cream); }
+.k1 .mid .name{ color:var(--cream); }
+.k1 .mid .full{ color:var(--n-orange); }
+.k1 .mid .desc{ color:#BDB3A5; }
+.k1 .mid .tag{ border-color:rgba(250,246,239,.4); color:var(--cream); }
+.k1 .mid .badge::before{ background:var(--n-orange); }
+.k1 .seal{ position:absolute; width:340px; height:340px; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2; pointer-events:none;
+  animation:spin 26s linear infinite; opacity:.85; }
+.k1 .seal text{ font-family:var(--font-ui); font-size:12.5px; font-weight:700; letter-spacing:.30em; text-transform:uppercase; fill:var(--ink-soft); }
+.k1 .seal circle{ fill:none; stroke:var(--cream-line); stroke-width:1.4; stroke-dasharray:3 8; }
+.k1 .midwrap{ grid-column:2; grid-row:1 / span 2; align-self:center; position:relative; display:grid; place-items:center; }
+.k1 .midwrap .mid{ grid-column:auto; grid-row:auto; position:relative; }
+@keyframes spin{ to{ transform:translate(-50%,-50%) rotate(360deg); } }
+
+/* =========================================================
+   2 — IDEGPÁLYA: befutó szaggatott ívek
+   ========================================================= */
+.k2 .wires{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+.k2 .wires path{ fill:none; stroke:var(--green); stroke-width:1.6; stroke-dasharray:5 7; opacity:.55;
+  stroke-dashoffset:600; animation:draw 3.2s var(--ease) forwards; }
+.k2 .wires path:nth-child(2){ animation-delay:.15s; stroke:var(--red); }
+.k2 .wires path:nth-child(3){ animation-delay:.3s; }
+.k2 .wires path:nth-child(4){ animation-delay:.45s; stroke:var(--n-cyan); }
+@keyframes draw{ to{ stroke-dashoffset:0; } }
+.k2 .mid{ box-shadow:0 0 0 10px rgba(232,243,234,.75); }
+.k2 .node{ position:absolute; width:9px; height:9px; border-radius:50%; background:var(--ink); z-index:2; }
+
+/* =========================================================
+   3 — MATRICA-DOBOZ
+   ========================================================= */
+.k3 .c{ background:#fff; padding:20px 20px 22px; border-radius:34px 20px 30px 22px;
+  filter:drop-shadow(0 10px 16px rgba(22,17,13,.14)); transform:rotate(var(--tilt,0deg));
+  transition:transform .4s var(--ease); border:6px solid #fff; outline:1.5px solid #F0E8DA; }
+.k3 .c:hover{ transform:rotate(0deg) translateY(-6px); }
+.k3 .c--a{ --tilt:-2.4deg; } .k3 .c--b{ --tilt:2.8deg; }
+.k3 .c--c{ --tilt:2deg; }    .k3 .c--d{ --tilt:-3deg; }
+.k3 .mid{ background:#fff; border:6px solid #fff; outline:1.5px solid #F0E8DA; border-radius:30px 40px 26px 36px;
+  filter:drop-shadow(0 14px 22px rgba(22,17,13,.16)); }
+.k3 .tape{ position:absolute; width:78px; height:22px; background:rgba(217,58,43,.16); border-left:1px dashed rgba(217,58,43,.4); border-right:1px dashed rgba(217,58,43,.4);
+  top:-11px; left:50%; transform:translateX(-50%) rotate(-4deg); z-index:5; }
+
+/* =========================================================
+   4 — ZAJ + PÖTTYRÁCS + LEBEGŐ WASH
+   ========================================================= */
+.k4 .mini{ background:var(--cream-deep); }
+.k4 .tex{ position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
+  background-image:radial-gradient(circle at 1px 1px, rgba(22,17,13,.16) 1px, transparent 0);
+  background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 45%, #000 10%, transparent 78%);
+          mask-image:radial-gradient(ellipse 70% 60% at 50% 45%, #000 10%, transparent 78%); }
+.k4 .noise{ position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.16;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.k4 .wash{ position:absolute; z-index:0; border-radius:52% 48% 44% 56% / 48% 52% 48% 52%; filter:blur(14px); }
+.k4 .wash--1{ width:300px; height:260px; background:rgba(61,163,93,.20); left:-70px; top:60px; animation:float1 16s ease-in-out infinite; }
+.k4 .wash--2{ width:260px; height:240px; background:rgba(217,58,43,.13); right:-60px; bottom:20px; animation:float2 20s ease-in-out infinite; }
+.k4 .wash--3{ width:180px; height:170px; background:rgba(247,148,87,.20); right:22%; top:-40px; animation:float1 24s ease-in-out infinite reverse; }
+@keyframes float1{ 0%,100%{ transform:translate(0,0) rotate(0); } 50%{ transform:translate(26px,-22px) rotate(12deg); } }
+@keyframes float2{ 0%,100%{ transform:translate(0,0) rotate(0); } 50%{ transform:translate(-30px,18px) rotate(-10deg); } }
+.k4 .c, .k4 .mid{ backdrop-filter:blur(2px); }
+
+/* =========================================================
+   5 — FUTÓSZALAG (ferde marquee)
+   ========================================================= */
+.k5 .mini{ padding-top:0; }
+.k5 .ticker{ position:relative; z-index:5; background:var(--red); color:var(--cream); overflow:hidden;
+  transform:rotate(-2.2deg) scale(1.06); margin:22px 0 34px; padding:11px 0; box-shadow:0 6px 0 0 rgba(22,17,13,.16); }
+.k5 .ticker__in{ display:flex; gap:0; width:max-content; animation:march 22s linear infinite; }
+.k5 .ticker span{ font-family:var(--font-display); font-weight:800; font-size:15px; letter-spacing:.10em; text-transform:uppercase; padding:0 20px; white-space:nowrap; }
+.k5 .ticker span::after{ content:"★"; margin-left:20px; color:var(--n-lime); }
+@keyframes march{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+.k5 .ticker--2{ transform:rotate(1.6deg) scale(1.06); background:var(--ink); margin-top:44px; margin-bottom:0; }
+.k5 .ticker--2 .ticker__in{ animation-duration:28s; animation-direction:reverse; }
+.k5 .ticker--2 span::after{ color:var(--n-orange); }
+
+/* ---- ajánlás doboz ---- */
+.rec{ margin-top:64px; background:var(--ink); color:var(--cream); border-radius:26px; padding:30px 32px; }
+.rec h3{ font-family:var(--font-display); font-weight:800; font-size:1.4rem; letter-spacing:-.02em; margin-bottom:10px; }
+.rec p{ font-size:14.5px; line-height:1.65; color:#C9BFB1; max-width:75ch; }
+.rec strong{ color:var(--n-lime); }
+
+@media (max-width:900px){
+  .grid{ grid-template-columns:1fr; max-width:460px; }
+  .c--a,.c--b,.c--c,.c--d,.mid,.k1 .midwrap{ grid-column:1; grid-row:auto; text-align:left; }
+  .c--b .badge,.c--d .badge,.c--b .desc,.c--d .desc{ margin-left:0; }
+  .k2 .wires, .k1 .seal{ display:none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1 class="page__title">Tanúsítványok szekció<br>— 5 vizuális irány</h1>
+  <p class="page__sub">Mind az 5 az éles struktúrára épül (4 sarok-kártya + középen a HACCP). A jelvényképek helyett itt szövegkorongok vannak, minden más az igazi. Görgess végig, a mozgások élnek.</p>
+
+  <!-- ============ 1 ============ -->
+  <section class="concept k1">
+    <div class="concept__bar"><span class="concept__no">01</span><span class="concept__name">Pecsét-fal — a HACCP mint napkorong</span></div>
+    <p class="concept__note">A középső kártya sötét lesz (<code>--ink</code>), mögötte lassan forgó szaggatott gyűrű körbefutó felirattal. A 4 sarok világos marad → azonnali hierarchia, a közép „lyukat üt” a krém felületbe. Legerősebb kontraszt, legkevesebb munka.</p>
+    <div class="frame"><div class="mini">
+      <div class="mini__head">
+        <p class="eyebrow"><i></i> Független auditok · Évente megújítva <i></i></p>
+        <h2 class="mini__title">Tanúsítványok<em>amik mögöttünk állnak</em></h2>
+      </div>
+      <div class="grid">
+        <article class="c c--a" style="--c:var(--green); --ct:var(--green-deep); --r:-8deg">
+          <div class="badge"><span class="disc">GAP</span></div>
+          <h3 class="name">GAP</h3><p class="full">Global G.A.P.</p>
+          <p class="desc">Nemzetközi mezőgazdasági jó gyakorlat – felelős termesztés és teljes nyomon követhetőség.</p>
+          <span class="tag">Mezőgazdaság</span>
+        </article>
+        <article class="c c--b" style="--c:var(--red); --ct:var(--red); --r:9deg">
+          <div class="badge"><span class="disc">IFS</span></div>
+          <h3 class="name">IFS</h3><p class="full">International Featured Standards</p>
+          <p class="desc">A vezető európai láncok által elfogadott élelmiszer-biztonsági szabvány.</p>
+          <span class="tag">Feldolgozás</span>
+        </article>
+        <div class="midwrap">
+          <svg class="seal" viewBox="0 0 340 340" aria-hidden="true">
+            <circle cx="170" cy="170" r="158"/>
+            <defs><path id="cp" d="M170,170 m-136,0 a136,136 0 1,1 272,0 a136,136 0 1,1 -272,0"/></defs>
+            <text><textPath href="#cp" startOffset="0">HACCP · CODEX ALIMENTARIUS · FÜGGETLENÜL AUDITÁLT · ÉVENTE MEGÚJÍTVA · </textPath></text>
+          </svg>
+          <article class="mid" style="--c:var(--n-orange); --ct:#C2601F; --r:7deg">
+            <div class="badge"><span class="disc">HACCP</span></div>
+            <h3 class="name">HACCP</h3><p class="full">Veszélyelemzés &amp; Kritikus Pontok</p>
+            <p class="desc">Kockázatok módszeres kezelése a teljes termelési láncban.</p>
+            <span class="tag">Élelmiszer-biztonság</span>
+          </article>
+        </div>
+        <article class="c c--c" style="--c:var(--n-lime); --ct:#7E8A1F; --r:6deg">
+          <div class="badge"><span class="disc">BIO</span></div>
+          <h3 class="name">BIO</h3><p class="full">Biokontroll</p>
+          <p class="desc">Akkreditált bio tanúsítás – vegyszermentes termesztés az EU 2018/848 szerint.</p>
+          <span class="tag">Bio termesztés</span>
+        </article>
+        <article class="c c--d" style="--c:var(--n-cyan); --ct:#0E7E96; --r:-11deg">
+          <div class="badge"><span class="disc">GRASP</span></div>
+          <h3 class="name">GRASP</h3><p class="full">Risk Assessment on Social Practice</p>
+          <p class="desc">A munkavállalók jogainak és biztonságának független értékelése.</p>
+          <span class="tag">Szociális felelősség</span>
+        </article>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="concept k2">
+    <div class="concept__bar"><span class="concept__no">02</span><span class="concept__name">Idegpálya — befutó ívek</span></div>
+    <p class="concept__note">Egy SVG a rács alatt: szaggatott ívek futnak a HACCP-től mind a 4 tanúsítványhoz, scrollra „berajzolódnak” (<code>stroke-dashoffset</code>). Vizuálisan elmondja, hogy a HACCP a közös alap. Kombinálható a 01-gyel.</p>
+    <div class="frame"><div class="mini">
+      <svg class="wires" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M500,280 C400,220 340,150 250,140"/>
+        <path d="M500,280 C600,220 660,150 750,140"/>
+        <path d="M500,280 C400,340 340,410 250,420"/>
+        <path d="M500,280 C600,340 660,410 750,420"/>
+      </svg>
+      <div class="mini__head">
+        <p class="eyebrow"><i></i> Független auditok · Évente megújítva <i></i></p>
+        <h2 class="mini__title">Tanúsítványok<em>amik mögöttünk állnak</em></h2>
+      </div>
+      <div class="grid">
+        <article class="c c--a" style="--c:var(--green); --ct:var(--green-deep); --r:-8deg">
+          <div class="badge"><span class="disc">GAP</span></div>
+          <h3 class="name">GAP</h3><p class="full">Global G.A.P.</p>
+          <p class="desc">Nemzetközi mezőgazdasági jó gyakorlat – felelős termesztés.</p>
+          <span class="tag">Mezőgazdaság</span>
+        </article>
+        <article class="c c--b" style="--c:var(--red); --ct:var(--red); --r:9deg">
+          <div class="badge"><span class="disc">IFS</span></div>
+          <h3 class="name">IFS</h3><p class="full">International Featured Standards</p>
+          <p class="desc">Európai láncok által elfogadott élelmiszer-biztonsági szabvány.</p>
+          <span class="tag">Feldolgozás</span>
+        </article>
+        <article class="mid" style="--c:var(--n-orange); --ct:#C2601F; --r:7deg">
+          <div class="badge"><span class="disc">HACCP</span></div>
+          <h3 class="name">HACCP</h3><p class="full">Veszélyelemzés &amp; Kritikus Pontok</p>
+          <p class="desc">Kockázatok módszeres kezelése a teljes láncban.</p>
+          <span class="tag">Élelmiszer-biztonság</span>
+        </article>
+        <article class="c c--c" style="--c:var(--n-lime); --ct:#7E8A1F; --r:6deg">
+          <div class="badge"><span class="disc">BIO</span></div>
+          <h3 class="name">BIO</h3><p class="full">Biokontroll</p>
+          <p class="desc">Akkreditált bio tanúsítás, vegyszermentes termesztés.</p>
+          <span class="tag">Bio termesztés</span>
+        </article>
+        <article class="c c--d" style="--c:var(--n-cyan); --ct:#0E7E96; --r:-11deg">
+          <div class="badge"><span class="disc">GRASP</span></div>
+          <h3 class="name">GRASP</h3><p class="full">Risk Assessment on Social Practice</p>
+          <p class="desc">Munkavállalói jogok független értékelése.</p>
+          <span class="tag">Szociális felelősség</span>
+        </article>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="concept k3">
+    <div class="concept__bar"><span class="concept__no">03</span><span class="concept__name">Matrica-doboz</span></div>
+    <p class="concept__note">A kártyák igazi matricákká válnak: fehér perem, egyenetlen sarkok, random döntés, ragasztószalag-csík. Hoverre kiegyenesednek és felugranak. A fenti blob-csíkos, kézműves hangulatot viszi tovább. <em>Húzd rájuk az egeret.</em></p>
+    <div class="frame"><div class="mini">
+      <div class="mini__head">
+        <p class="eyebrow"><i></i> Független auditok · Évente megújítva <i></i></p>
+        <h2 class="mini__title">Tanúsítványok<em>amik mögöttünk állnak</em></h2>
+      </div>
+      <div class="grid">
+        <article class="c c--a" style="--c:var(--green); --ct:var(--green-deep); --r:-8deg">
+          <span class="tape"></span>
+          <div class="badge"><span class="disc">GAP</span></div>
+          <h3 class="name">GAP</h3><p class="full">Global G.A.P.</p>
+          <p class="desc">Nemzetközi mezőgazdasági jó gyakorlat – felelős termesztés.</p>
+          <span class="tag">Mezőgazdaság</span>
+        </article>
+        <article class="c c--b" style="--c:var(--red); --ct:var(--red); --r:9deg">
+          <div class="badge"><span class="disc">IFS</span></div>
+          <h3 class="name">IFS</h3><p class="full">International Featured Standards</p>
+          <p class="desc">Európai láncok által elfogadott biztonsági szabvány.</p>
+          <span class="tag">Feldolgozás</span>
+        </article>
+        <article class="mid" style="--c:var(--n-orange); --ct:#C2601F; --r:7deg">
+          <span class="tape"></span>
+          <div class="badge"><span class="disc">HACCP</span></div>
+          <h3 class="name">HACCP</h3><p class="full">Veszélyelemzés &amp; Kritikus Pontok</p>
+          <p class="desc">Kockázatok módszeres kezelése a teljes láncban.</p>
+          <span class="tag">Élelmiszer-biztonság</span>
+        </article>
+        <article class="c c--c" style="--c:var(--n-lime); --ct:#7E8A1F; --r:6deg">
+          <div class="badge"><span class="disc">BIO</span></div>
+          <h3 class="name">BIO</h3><p class="full">Biokontroll</p>
+          <p class="desc">Akkreditált bio tanúsítás, vegyszermentes termesztés.</p>
+          <span class="tag">Bio termesztés</span>
+        </article>
+        <article class="c c--d" style="--c:var(--n-cyan); --ct:#0E7E96; --r:-11deg">
+          <span class="tape"></span>
+          <div class="badge"><span class="disc">GRASP</span></div>
+          <h3 class="name">GRASP</h3><p class="full">Risk Assessment on Social Practice</p>
+          <p class="desc">Munkavállalói jogok független értékelése.</p>
+          <span class="tag">Szociális felelősség</span>
+        </article>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="concept k4">
+    <div class="concept__bar"><span class="concept__no">04</span><span class="concept__name">Textúra — szemcse, pöttyrács, lebegő washok</span></div>
+    <p class="concept__note">Nem a kártyákat változtatja, hanem a „papírt” alattuk: szemcsés zaj, halvány pöttyrács maszkolva középre, és lassan úszó színes blob-foltok a széleken. Olcsó beavatkozás, de az egész szekció drágábbnak néz ki.</p>
+    <div class="frame"><div class="mini">
+      <span class="wash wash--1"></span><span class="wash wash--2"></span><span class="wash wash--3"></span>
+      <span class="tex"></span><span class="noise"></span>
+      <div class="mini__head">
+        <p class="eyebrow"><i></i> Független auditok · Évente megújítva <i></i></p>
+        <h2 class="mini__title">Tanúsítványok<em>amik mögöttünk állnak</em></h2>
+      </div>
+      <div class="grid">
+        <article class="c c--a" style="--c:var(--green); --ct:var(--green-deep); --r:-8deg">
+          <div class="badge"><span class="disc">GAP</span></div>
+          <h3 class="name">GAP</h3><p class="full">Global G.A.P.</p>
+          <p class="desc">Nemzetközi mezőgazdasági jó gyakorlat – felelős termesztés.</p>
+          <span class="tag">Mezőgazdaság</span>
+        </article>
+        <article class="c c--b" style="--c:var(--red); --ct:var(--red); --r:9deg">
+          <div class="badge"><span class="disc">IFS</span></div>
+          <h3 class="name">IFS</h3><p class="full">International Featured Standards</p>
+          <p class="desc">Európai láncok által elfogadott biztonsági szabvány.</p>
+          <span class="tag">Feldolgozás</span>
+        </article>
+        <article class="mid" style="--c:var(--n-orange); --ct:#C2601F; --r:7deg">
+          <div class="badge"><span class="disc">HACCP</span></div>
+          <h3 class="name">HACCP</h3><p class="full">Veszélyelemzés &amp; Kritikus Pontok</p>
+          <p class="desc">Kockázatok módszeres kezelése a teljes láncban.</p>
+          <span class="tag">Élelmiszer-biztonság</span>
+        </article>
+        <article class="c c--c" style="--c:var(--n-lime); --ct:#7E8A1F; --r:6deg">
+          <div class="badge"><span class="disc">BIO</span></div>
+          <h3 class="name">BIO</h3><p class="full">Biokontroll</p>
+          <p class="desc">Akkreditált bio tanúsítás, vegyszermentes termesztés.</p>
+          <span class="tag">Bio termesztés</span>
+        </article>
+        <article class="c c--d" style="--c:var(--n-cyan); --ct:#0E7E96; --r:-11deg">
+          <div class="badge"><span class="disc">GRASP</span></div>
+          <h3 class="name">GRASP</h3><p class="full">Risk Assessment on Social Practice</p>
+          <p class="desc">Munkavállalói jogok független értékelése.</p>
+          <span class="tag">Szociális felelősség</span>
+        </article>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="concept k5">
+    <div class="concept__bar"><span class="concept__no">05</span><span class="concept__name">Futószalag — ferde marquee keret</span></div>
+    <p class="concept__note">Ferde, végtelenített szalag a szekció tetején és alján, ellentétes irányban futva. A CRAV-os bátor stílushoz passzol, és a szekciót önálló „blokká” keretezi. A kártyák változatlanok.</p>
+    <div class="frame"><div class="mini">
+      <div class="ticker"><div class="ticker__in">
+        <span>Global G.A.P.</span><span>IFS</span><span>Biokontroll</span><span>GRASP</span><span>HACCP</span>
+        <span>Global G.A.P.</span><span>IFS</span><span>Biokontroll</span><span>GRASP</span><span>HACCP</span>
+      </div></div>
+      <div class="mini__head">
+        <p class="eyebrow"><i></i> Független auditok · Évente megújítva <i></i></p>
+        <h2 class="mini__title">Tanúsítványok<em>amik mögöttünk állnak</em></h2>
+      </div>
+      <div class="grid">
+        <article class="c c--a" style="--c:var(--green); --ct:var(--green-deep); --r:-8deg">
+          <div class="badge"><span class="disc">GAP</span></div>
+          <h3 class="name">GAP</h3><p class="full">Global G.A.P.</p>
+          <p class="desc">Nemzetközi mezőgazdasági jó gyakorlat – felelős termesztés.</p>
+          <span class="tag">Mezőgazdaság</span>
+        </article>
+        <article class="c c--b" style="--c:var(--red); --ct:var(--red); --r:9deg">
+          <div class="badge"><span class="disc">IFS</span></div>
+          <h3 class="name">IFS</h3><p class="full">International Featured Standards</p>
+          <p class="desc">Európai láncok által elfogadott biztonsági szabvány.</p>
+          <span class="tag">Feldolgozás</span>
+        </article>
+        <article class="mid" style="--c:var(--n-orange); --ct:#C2601F; --r:7deg">
+          <div class="badge"><span class="disc">HACCP</span></div>
+          <h3 class="name">HACCP</h3><p class="full">Veszélyelemzés &amp; Kritikus Pontok</p>
+          <p class="desc">Kockázatok módszeres kezelése a teljes láncban.</p>
+          <span class="tag">Élelmiszer-biztonság</span>
+        </article>
+        <article class="c c--c" style="--c:var(--n-lime); --ct:#7E8A1F; --r:6deg">
+          <div class="badge"><span class="disc">BIO</span></div>
+          <h3 class="name">BIO</h3><p class="full">Biokontroll</p>
+          <p class="desc">Akkreditált bio tanúsítás, vegyszermentes termesztés.</p>
+          <span class="tag">Bio termesztés</span>
+        </article>
+        <article class="c c--d" style="--c:var(--n-cyan); --ct:#0E7E96; --r:-11deg">
+          <div class="badge"><span class="disc">GRASP</span></div>
+          <h3 class="name">GRASP</h3><p class="full">Risk Assessment on Social Practice</p>
+          <p class="desc">Munkavállalói jogok független értékelése.</p>
+          <span class="tag">Szociális felelősség</span>
+        </article>
+      </div>
+      <div class="ticker ticker--2"><div class="ticker__in">
+        <span>Auditált</span><span>Évente megújítva</span><span>Nyomon követhető</span><span>Független</span><span>Korona Gombaipari</span>
+        <span>Auditált</span><span>Évente megújítva</span><span>Nyomon követhető</span><span>Független</span><span>Korona Gombaipari</span>
+      </div></div>
+    </div></div>
+  </section>
+
+  <div class="rec">
+    <h3>Ajánlás</h3>
+    <p><strong>01 + 02 együtt</strong> — a sötét, forgó pecsétes közép adja a hierarchiát, a befutó ívek a mozgást és a jelentést („minden ide fut vissza”). Ha ez sok, a <strong>04</strong> önmagában is látványos ugrás, és nulla kockázat: csak a háttér változik. Az <strong>05</strong> bármelyikre ráteszhető külön rétegként.</p>
+  </div>
+
+</div>
+</body>
+</html>

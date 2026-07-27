@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logó megjelenés — 6 scroll-alapú terv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Archivo:wght@400;500;600;700&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --cream-deep:#F2EADD; --cream-line:#E3D8C6;
+  --ink:#16110D; --ink-soft:#6B6053;
+  --green:#3DA35D; --green-deep:#216B37;
+  --red:#D93A2B; --n-lime:#D9E34E; --n-orange:#F79457;
+  --display:'Bricolage Grotesque', system-ui, sans-serif;
+  --lead:'Archivo Black','Archivo',sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#E4DCCE; color:var(--ink); font-family:'Archivo',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+.page{ max-width:1180px; margin:0 auto; padding:46px clamp(16px,3vw,30px) 90px; }
+h1{ font-family:var(--display); font-weight:800; font-size:clamp(2rem,4.4vw,3.2rem); line-height:.92; letter-spacing:-.04em; text-transform:uppercase; }
+.sub{ color:var(--ink-soft); margin-top:12px; font-size:15px; line-height:1.65; max-width:74ch; }
+.lbl{ margin:50px 0 14px; }
+.lbl__bar{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+.lbl__no{ font-family:var(--display); font-weight:800; font-size:13px; background:var(--ink); color:var(--cream); border-radius:100px; padding:5px 12px; }
+.lbl__name{ font-family:var(--display); font-weight:800; font-size:clamp(1.1rem,2vw,1.5rem); letter-spacing:-.025em; }
+.lbl p{ color:var(--ink-soft); font-size:13.5px; line-height:1.6; max-width:88ch; }
+.hint{ display:inline-block; margin-top:8px; font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--ink-soft); border:1.4px solid var(--cream-line); background:#fff; border-radius:100px; padding:6px 13px; }
+
+/* ---- a Rólunk szekció kicsinyített mása ---- */
+.sc{ position:relative; height:230vh; }
+.pin{ position:sticky; top:0; height:100vh; background:var(--ink); color:var(--cream); overflow:hidden;
+  display:grid; place-items:center; }
+.wrap{ position:relative; width:min(90%,880px); display:grid; grid-template-columns:1fr 1fr;
+  gap:clamp(20px,3vw,44px); align-items:center; }
+.body h3{ font-family:var(--display); font-weight:800; font-size:clamp(1.5rem,3.4vw,2.6rem); line-height:.9;
+  letter-spacing:-.04em; text-transform:uppercase; }
+.body h3 em{ display:block; font-style:normal; color:var(--cream);
+  -webkit-text-stroke:1.2px var(--green-deep); paint-order:stroke fill; text-shadow:3px 4px 0 var(--green-deep); }
+.body p{ margin-top:14px; font-family:var(--lead); font-size:12.5px; line-height:1.6; color:rgba(250,246,239,.8); max-width:34ch; }
+.shot{ position:relative; }
+.shot picture, .shot .ph{ display:block; border-radius:30px 16px 26px 18px; overflow:hidden;
+  border:5px solid var(--cream); box-shadow:0 26px 50px rgba(0,0,0,.42); }
+.shot img.photo{ display:block; width:100%; height:auto; aspect-ratio:3/2; object-fit:cover; }
+
+/* ---- a matrica közös váza ---- */
+.stamp{ position:absolute; left:-9%; bottom:-13%; width:clamp(120px,15vw,190px); aspect-ratio:1; z-index:5;
+  display:grid; place-items:center; --t:0; }
+.stamp img{ width:100%; height:100%; object-fit:contain; display:block;
+  filter:drop-shadow(0 0 3px var(--cream)) drop-shadow(0 0 3px var(--cream))
+         drop-shadow(0 0 2px var(--cream)) drop-shadow(4px 7px 0 rgba(0,0,0,.36)); }
+.prog{ position:absolute; left:0; bottom:0; height:3px; background:var(--n-lime); width:calc(var(--p,0) * 100%); z-index:9; }
+
+/* ===== 1 — PECSÉTNYOMÁS ===== */
+.s1 .stamp img{ transform:scale(calc(2.4 - var(--t) * 1.4)) rotate(calc(-24deg + var(--t) * 18deg));
+  filter:blur(calc((1 - var(--t)) * 7px))
+         drop-shadow(0 0 3px var(--cream)) drop-shadow(0 0 3px var(--cream)) drop-shadow(4px 7px 0 rgba(0,0,0,.36));
+  opacity:calc(.1 + var(--t) * .9); }
+.s1 .ring{ position:absolute; inset:0; border-radius:50%; border:2px solid var(--n-lime);
+  transform:scale(calc(1 + var(--t) * 1.6)); opacity:calc((1 - var(--t)) * var(--t) * 3.4); }
+
+/* ===== 2 — KÖRKÖRÖS FELTÁRÁS ===== */
+@property --ang{ syntax:'<angle>'; initial-value:0deg; inherits:true; }
+.s2 .stamp{ --ang:calc(var(--t) * 360deg);
+  -webkit-mask:conic-gradient(#000 var(--ang), transparent 0); mask:conic-gradient(#000 var(--ang), transparent 0); }
+.s2 .stamp img{ transform:rotate(calc(-30deg + var(--t) * 24deg)); }
+
+/* ===== 3 — FELHAJTOTT SAROK (peel) ===== */
+.s3 .stamp{ perspective:700px; }
+.s3 .stamp img{ transform-origin:100% 100%;
+  transform:rotate(-6deg) rotate3d(1,-1,0, calc((1 - var(--t)) * 82deg)); }
+.s3 .stamp::after{ content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
+  background:linear-gradient(135deg, rgba(0,0,0,.45), transparent 60%);
+  opacity:calc((1 - var(--t)) * .9); }
+
+/* ===== 4 — SZÉTDOBÁLT DARABOK ===== */
+.s4 .stamp{ display:block; }
+.s4 .piece{ position:absolute; inset:0; }
+.s4 .piece img{ width:100%; height:100%; object-fit:contain; }
+.s4 .p1{ clip-path:polygon(0 0,50% 0,50% 50%,0 50%);
+  transform:translate(calc((1 - var(--t)) * -120px), calc((1 - var(--t)) * -90px)) rotate(calc((1 - var(--t)) * -40deg)); }
+.s4 .p2{ clip-path:polygon(50% 0,100% 0,100% 50%,50% 50%);
+  transform:translate(calc((1 - var(--t)) * 130px), calc((1 - var(--t)) * -70px)) rotate(calc((1 - var(--t)) * 46deg)); }
+.s4 .p3{ clip-path:polygon(0 50%,50% 50%,50% 100%,0 100%);
+  transform:translate(calc((1 - var(--t)) * -110px), calc((1 - var(--t)) * 96px)) rotate(calc((1 - var(--t)) * 38deg)); }
+.s4 .p4{ clip-path:polygon(50% 50%,100% 50%,100% 100%,50% 100%);
+  transform:translate(calc((1 - var(--t)) * 116px), calc((1 - var(--t)) * 84px)) rotate(calc((1 - var(--t)) * -44deg)); }
+
+/* ===== 5 — MEGRAJZOLT PECSÉTGYŰRŰ ===== */
+.s5 .ringsvg{ position:absolute; inset:-12%; z-index:6; }
+.s5 .ringsvg circle{ fill:none; stroke:var(--n-lime); stroke-width:2.4;
+  stroke-dasharray:640; stroke-dashoffset:calc(640 - var(--t) * 640); transform:rotate(-90deg); transform-origin:50% 50%; }
+.s5 .stamp img{ transform:scale(calc(.55 + var(--t) * .45)) rotate(calc(-14deg + var(--t) * 8deg));
+  opacity:calc(max(0, (var(--t) - .45)) / .55); }
+
+/* ===== 6 — PÖRGŐ ÉRKEZÉS ÍVEN ===== */
+.s6 .stamp img{
+  transform:
+    translate(calc((1 - var(--t)) * 280px), calc((1 - var(--t)) * -190px))
+    rotate(calc(-420deg + var(--t) * 414deg))
+    scale(calc(.5 + var(--t) * .5)); }
+.s6 .trail{ position:absolute; inset:0; border-radius:50%; border:1.6px dashed rgba(250,246,239,.35);
+  transform:scale(calc(1 + (1 - var(--t)) * .5)); opacity:calc((1 - var(--t)) * .8); }
+
+@media (max-width:760px){ .wrap{ grid-template-columns:1fr; } .body{ display:none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Logó megjelenés — 6 scroll-alapú terv</h1>
+  <p class="sub">Mind görgetésre vezérelt, tehát <strong>felfelé görgetve visszafelé is lejátszódik</strong>. A jobb alsó sarokban ott a Rólunk szekció kicsinyített mása a valódi képpel és logóval. Görgess lassan.</p>
+
+  <!-- 1 -->
+  <div class="lbl"><div class="lbl__bar"><span class="lbl__no">01</span><span class="lbl__name">Pecsétnyomás</span></div>
+    <p>A logó nagyban, elmosódva lebeg, majd ahogy görgetsz, lecsapódik a helyére: élesedik, összemegy, kiegyenesedik — és a becsapódás pillanatában egy lime gyűrű lökéshullámként kifut belőle. Ez a legerőteljesebb.</p>
+    <span class="hint">↓ görgess</span></div>
+  <section class="sc s1" data-sc><div class="pin">
+    <div class="wrap">
+      <div class="body"><h3>Húsz hektár<em>fehér tető alatt</em></h3><p>1990 óta egyetlen dologra hegyeztük ki magunkat: a gombára.</p></div>
+      <div class="shot"><picture><img class="photo" src="assets/rolunk-1400.webp" alt=""></picture>
+        <div class="stamp"><span class="ring"></span><img src="assets/logo.png" alt=""></div>
+      </div>
+    </div><div class="prog"></div>
+  </div></section>
+
+  <!-- 2 -->
+  <div class="lbl"><div class="lbl__bar"><span class="lbl__no">02</span><span class="lbl__name">Körkörös feltárás</span></div>
+    <p>A logó úgy jelenik meg, mintha egy mutató körbejárná: óramutató szerint tárul fel, közben lassan kiegyenesedik. Pecsét-hangulat, illik a tanúsítványos, auditált világhoz.</p>
+    <span class="hint">↓ görgess</span></div>
+  <section class="sc s2" data-sc><div class="pin">
+    <div class="wrap">
+      <div class="body"><h3>Húsz hektár<em>fehér tető alatt</em></h3><p>Saját komposzt, saját csíra, saját termesztőházak.</p></div>
+      <div class="shot"><picture><img class="photo" src="assets/rolunk-1400.webp" alt=""></picture>
+        <div class="stamp"><img src="assets/logo.png" alt=""></div>
+      </div>
+    </div><div class="prog"></div>
+  </div></section>
+
+  <!-- 3 -->
+  <div class="lbl"><div class="lbl__bar"><span class="lbl__no">03</span><span class="lbl__name">Felhajtott sarok</span></div>
+    <p>A matrica térben, a saroknál felhajtva áll, és görgetésre lesimul a felületre — közben az árnyék is elfogy róla. Ez a leginkább „valódi matrica” érzet.</p>
+    <span class="hint">↓ görgess</span></div>
+  <section class="sc s3" data-sc><div class="pin">
+    <div class="wrap">
+      <div class="body"><h3>Húsz hektár<em>fehér tető alatt</em></h3><p>A teljes vertikum egy kézben, hogy minden láda ugyanolyan legyen.</p></div>
+      <div class="shot"><picture><img class="photo" src="assets/rolunk-1400.webp" alt=""></picture>
+        <div class="stamp"><img src="assets/logo.png" alt=""></div>
+      </div>
+    </div><div class="prog"></div>
+  </div></section>
+
+  <!-- 4 -->
+  <div class="lbl"><div class="lbl__bar"><span class="lbl__no">04</span><span class="lbl__name">Összeálló darabok</span></div>
+    <p>A logó négy negyede külön irányból repül be és áll össze eggyé. Játékos, mozgalmas, és jól működik akkor is, ha valaki gyorsan görget.</p>
+    <span class="hint">↓ görgess</span></div>
+  <section class="sc s4" data-sc><div class="pin">
+    <div class="wrap">
+      <div class="body"><h3>Húsz hektár<em>fehér tető alatt</em></h3><p>Nem kiegészítő üzletág — ez a főprofil, minden nap.</p></div>
+      <div class="shot"><picture><img class="photo" src="assets/rolunk-1400.webp" alt=""></picture>
+        <div class="stamp">
+          <span class="piece p1"><img src="assets/logo.png" alt=""></span>
+          <span class="piece p2"><img src="assets/logo.png" alt=""></span>
+          <span class="piece p3"><img src="assets/logo.png" alt=""></span>
+          <span class="piece p4"><img src="assets/logo.png" alt=""></span>
+        </div>
+      </div>
+    </div><div class="prog"></div>
+  </div></section>
+
+  <!-- 5 -->
+  <div class="lbl"><div class="lbl__bar"><span class="lbl__no">05</span><span class="lbl__name">Megrajzolt pecsétgyűrű</span></div>
+    <p>Először egy lime gyűrű rajzolódik körbe, és csak amikor bezárult, akkor nő bele a logó. Nyugodt, elegáns, és pontosan rímel a preloader gyűrűire.</p>
+    <span class="hint">↓ görgess</span></div>
+  <section class="sc s5" data-sc><div class="pin">
+    <div class="wrap">
+      <div class="body"><h3>Húsz hektár<em>fehér tető alatt</em></h3><p>Öt független rendszer ellenőrzi, amit csinálunk.</p></div>
+      <div class="shot"><picture><img class="photo" src="assets/rolunk-1400.webp" alt=""></picture>
+        <div class="stamp">
+          <svg class="ringsvg" viewBox="0 0 220 220"><circle cx="110" cy="110" r="102"/></svg>
+          <img src="assets/logo.png" alt="">
+        </div>
+      </div>
+    </div><div class="prog"></div>
+  </div></section>
+
+  <!-- 6 -->
+  <div class="lbl"><div class="lbl__bar"><span class="lbl__no">06</span><span class="lbl__name">Pörgő érkezés</span></div>
+    <p>A logó a jobb felső sarokból érkezik pörögve, mint egy eldobott korong, és a helyén áll meg — közben egy szaggatott gyűrű fut vele, ami elfogy, mire megérkezik.</p>
+    <span class="hint">↓ görgess</span></div>
+  <section class="sc s6" data-sc><div class="pin">
+    <div class="wrap">
+      <div class="body"><h3>Húsz hektár<em>fehér tető alatt</em></h3><p>Harminc év egyetlen alapanyagra kihegyezve.</p></div>
+      <div class="shot"><picture><img class="photo" src="assets/rolunk-1400.webp" alt=""></picture>
+        <div class="stamp"><span class="trail"></span><img src="assets/logo.png" alt=""></div>
+      </div>
+    </div><div class="prog"></div>
+  </div></section>
+
+</div>
+
+<script>
+var secs = Array.prototype.slice.call(document.querySelectorAll('[data-sc]'));
+function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
+function smooth(x){ return x*x*(3-2*x); }
+function frame(){
+  var vh = window.innerHeight;
+  secs.forEach(function(s){
+    var r = s.getBoundingClientRect();
+    var total = s.offsetHeight - vh;
+    var p = clamp(-r.top / total, 0, 1);
+    var pin = s.querySelector('.pin');
+    pin.style.setProperty('--p', p.toFixed(4));
+    var t = smooth(clamp((p - 0.18) / 0.46, 0, 1));
+    var st = s.querySelector('.stamp');
+    if(st) st.style.setProperty('--t', t.toFixed(4));
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
