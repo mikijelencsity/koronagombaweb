@@ -562,20 +562,29 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   color:var(--acc); margin-bottom:12px; }
 /* sima, tömör kitöltés, csak egy vékony körvonallal a kontraszthoz —
    nem a régi vastag fehér keret, csak épp annyi, hogy elváljon a háttértől */
-.slide__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(1.7rem,3.4vw,2.9rem);
+.slide__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(1.1rem,2.3vw,1.9rem);
   line-height:1.02; letter-spacing:-.015em; text-transform:uppercase; margin-bottom:26px;
   white-space:nowrap;
   color:var(--stroke,var(--ink)); -webkit-text-stroke:1.5px var(--cream); paint-order:stroke fill; }
 /* a "Gombakomposzt" a leghosszabb név — kisebb betűmérettel fér csak el
-   ütközés nélkül a kép mellett */
-.slide__name--long{ font-size:clamp(1.35rem,2.6vw,2.25rem); }
+   ütközés nélkül a kép mellett.
+   (2026-08: a dia szélessége 1000px->800px lett a szomszédos diák
+   belógásához, ami az egész oszlopot keskenyítette — ezért kellett a fenti
+   alapméretet is jelentősen csökkenteni, különben minden terméknév
+   belelógott volna a képbe, nem csak a leghosszabb "Gombakomposzt".) */
+.slide__name--long{ font-size:clamp(1rem,2vw,1.7rem); }
+/* a méret (font-size/padding) MINDIG ugyanaz, aktív és inaktív dián is —
+   korábban csak az aktívra volt megadva, az inaktív a .btn--lg alap
+   (nagyobb) méretét kapta, ezért diaváltáskor a gomb láthatóan
+   ugrott/megnőtt, ahogy aktívvá vált */
+.slide__btn{ font-size:clamp(13px,1.1vw,15px); padding:clamp(15px,1.65vw,21px) clamp(26px,2.6vw,36px); }
 /* a .slide__body > * szabály (a belépő animációhoz) felülírja a .btn saját
    transition-jét — itt explicit visszaadjuk neki, magasabb specificitással,
    ÉS saját, per-tulajdonság késleltetéssel: az opacity/transform megtartja a
    belépéshez szükséges .32s-os késleltetést (a "3. gyerek" stagger-jét), de a
    box-shadow-nak SOSE legyen késleltetése — se be-, se kihoverelésnél —
    különben az előző javítás után is lomhának/laggosnak tűnt a visszaállás */
-.slide.is-active .slide__body > .slide__btn{ box-shadow:0 4px 0 0 var(--stroke); font-size:clamp(13px,1.1vw,15px); padding:clamp(15px,1.65vw,21px) clamp(26px,2.6vw,36px);
+.slide.is-active .slide__body > .slide__btn{ box-shadow:0 4px 0 0 var(--stroke);
   transition:opacity .6s ease .32s, transform .3s var(--ease) .32s, box-shadow .3s var(--ease) 0s; }
 .slide.is-active .slide__body > .slide__btn:hover{ box-shadow:0 7px 0 0 var(--stroke); }
 /* a lapozó most egy középre zárt csoport a kép alatt, nem a szélekre szórva */
@@ -1008,7 +1017,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      "KORONA GOMBA" feliratba (a kép mérete/szélessége nagy desktopon,
      ezért egy kicsit kisebbre is vesszük, hogy elférjen a szöveg fölött
      anélkül, hogy a teteje a viewport fölé lógna és levágódna) ===== */
-  .zoo__hand{ top:-4vh; width:clamp(300px,26vw,460px); }
+  .zoo__hand{ top:-4vh; width:clamp(300px,26vw,460px); left:clamp(-125px,-6vw,-15px); }
 
   /* ===== TERMÉKEK — a szomszédos diák visszakapják a 80%-on látott
      "belógást" =====
@@ -1033,7 +1042,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .zoo__break{ display:block; flex-basis:100%; height:0; }
   /* a kéz+fazék nagyobb (a hely jó marad) — a szöveg margin-top-ja
      (feljebb) ad hozzá elég teret, hogy ne érjenek egymásba */
-  .zoo__hand{ top:11%; width:clamp(300px,38vw,480px); }
+  .zoo__hand{ top:11%; width:clamp(300px,38vw,480px); left:clamp(-165px,-11vw,-60px); }
   /* a mondat egy sorban maradt volna és keskeny kijelzőn pár px-el túlért —
      ez adta az egész oldal vízszintes „kicsúszását". Csak vízszintesen
      vágjuk (a függőleges zoom-média/kéz marad); a sticky-t ez nem töri. */
