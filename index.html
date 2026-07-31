@@ -675,6 +675,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   text-shadow:0 10px 0 rgba(22,17,13,.14);
   opacity:calc(1 - var(--zp,0) * 1.6); }
 .zoo__slot{ position:relative; display:inline-block; width:.78em; height:.78em; vertical-align:middle; }
+/* mobilon a "KORONA" / "GOMBA" 2 sorba törik, hogy ne csússzon ki —
+   ez a kényszerített törőpont közöttük (deskopon rejtve, egysoros marad) */
+.zoo__break{ display:none; }
 
 /* a média a pinhez képest abszolút — így a mondat nem tördelődik újra */
 .zoo__media{ position:absolute; z-index:4; overflow:hidden; background:var(--ink);
@@ -817,10 +820,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:900px){
   .tl__track{ height:auto; }
   .tl__path, .tl__marker{ display:none; }
-  .tl__list{ position:static; display:grid; gap:34px; }
+  .tl__list{ position:relative; display:grid; gap:34px; }
   .tl__item, .tl__item--r{ position:static; width:100%; flex-direction:row; text-align:left;
     transform:translateY(28px) rotate(var(--rot,0deg)); }
   .tl__item.is-in{ transform:rotate(var(--rot,0deg)); }
+  /* a gépes kanyargós dashed útvonal helyett egy egyenes, szaggatott
+     csík fut az évszám-matricák mögött — enélkül az állomások csak
+     "úsztak" egymás alatt, kicsit steril volt.
+     FONTOS: az .tl__item-eken NEM szabad position:relative-re váltani —
+     azok inline "left:X%" attribútuma (a desktop absolute-pozícióhoz kell)
+     position:static alatt figyelmen kívül marad, de relative/absolute
+     alatt újra érvénybe lépne és jobbra tolná/kicsúsztatná a kártyákat.
+     A csík z-index nélkül, DOM-sorrend alapján marad az itemek MÖGÖTT. */
+  .tl__list::before{ content:""; position:absolute; left:38px; top:20px; bottom:20px;
+    width:0; border-left:3px dashed rgba(22,17,13,.20); }
 }
 
 /* ============================================================
@@ -868,8 +881,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .prt__cell:hover img{ opacity:1; transform:translateY(-6px) scale(1.06); }
 
 @media (max-width:760px){
-  .prt__rows{ grid-template-columns:repeat(2,1fr); gap:clamp(28px,7vw,50px) 24px; }
-  .prt__cell img{ height:clamp(64px,13vw,104px); }
+  .prt__rows{ grid-template-columns:repeat(2,1fr); gap:clamp(34px,8vw,54px) 20px; }
+  /* jóval nagyobb logók, mint korábban (64-104px helyett) */
+  .prt__cell img{ height:clamp(110px,30vw,170px); }
 }
 
 /* ============================================================
@@ -911,7 +925,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* a felirat és a dobált gombák nem lóghatnak ki a sávból */
   overflow:hidden; }
 .ft__word{ position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-  font-family:var(--font-lead); font-weight:400; font-size:clamp(3.4rem,22vw,20rem);
+  font-family:var(--font-lead); font-weight:400;
+  /* korábban 22vw/20rem volt: a "KORONA"/"GOMBA" szó ekkor szélesebb lett,
+     mint az .ft__stage (aminek van oldalpaddingje) — mivel overflow:hidden
+     vágja, mindkét szél levágódott. Kisebb, biztonságos méret. */
+  font-size:clamp(2.7rem,17vw,15.5rem);
   line-height:.82; letter-spacing:-.03em; text-transform:uppercase; text-align:center; white-space:nowrap;
   color:var(--green);
   -webkit-text-stroke:clamp(5px,.85vw,12px) #FFFFFF; paint-order:stroke fill;
@@ -988,10 +1006,19 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 }
 @media (max-width:900px){
   .zoo{ height:280vh; }
-  .zoo__sent{ font-size:clamp(1.8rem,11vw,4rem); }
-  /* a mondat egy sorban marad és keskeny kijelzőn pár px-el túlér — ez adta
-     az egész oldal vízszintes „kicsúszását". Csak vízszintesen vágjuk (a
-     függőleges zoom-média/kéz marad); a sticky-t ez nem töri. */
+  /* "KORONA" / "GOMBA" 2 sorba törve (lásd .zoo__break) — mivel soronként
+     kevesebb szélesség kell, jóval nagyobbra vehető, mint 1 sorban lenne.
+     A margin-top kicsit lejjebb told a szöveget, hogy a kéz+fazék kép
+     alatta férjen el ütközés nélkül. */
+  .zoo__sent{ flex-wrap:wrap; font-size:clamp(2.6rem,16vw,6rem); row-gap:.02em;
+    margin-top:8vh; }
+  .zoo__break{ display:block; flex-basis:100%; height:0; }
+  /* a kéz+fazék kicsit lejjebb kerül, és kisebb is, hogy ne érjen bele
+     a (2 sorossá nagyobbodott) feliratba */
+  .zoo__hand{ top:11%; width:clamp(240px,30vw,420px); }
+  /* a mondat egy sorban maradt volna és keskeny kijelzőn pár px-el túlért —
+     ez adta az egész oldal vízszintes „kicsúszását". Csak vízszintesen
+     vágjuk (a függőleges zoom-média/kéz marad); a sticky-t ez nem töri. */
   .zoo__pin{ overflow-x:clip; }
   .stage{ height:210vh; }
 
@@ -1050,8 +1077,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .s3,.s4,.r3,.r4{ display:block; }
   .mextra{ display:block; }
 
-  /* az EST. 1990 tábla lejjebb, közvetlenül a KORONA felirat fölé */
-  .est{ z-index:12; top:16vh !important; }
+  /* az EST. 1990 tábla feljebb, a hero tetejéhez közel — a gombák (z:40)
+     elé kell kerülnie (z:46), különben a bal-felső óriás gomba eltakarja */
+  .est{ z-index:46; top:4vh !important; }
 
   /* --- CÍM: nagyobb, de a vastag kontúr is beleférjen a szélek elé --- */
   .big{ padding:0 4vw; }
@@ -1081,11 +1109,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .r2{ --x:-12vw !important; --y:74vh !important; --w:48vw !important; }  /* jobb-alsó sarok, óriás */
   .r4{ --x:22vw  !important; --y:88vh !important; --w:25vw !important; }  /* alsó rés */
 
-  /* --- MATRICÁK: a „Saját komposzt" feljebb, jól látható helyre a bal
-     oldalra (a cím alatti sávba); az export marad jobb-alul --- */
+  /* --- MATRICÁK: a „Saját komposzt" a CTA gombok ALÁ kerül, de feljebb
+     marad, mint a „12 ország export" (ami a legalsó sarokban marad) --- */
   .hsticker{ z-index:44; }
   .hsticker:not(.hsticker--green){ left:3% !important; right:auto !important;
-    top:auto !important; bottom:40% !important; }
+    top:auto !important; bottom:16% !important; }
   /* a „12 ország export" beljebb, a közép felé (a jobb széltől elhúzva) */
   .hsticker--green{ right:22% !important; }
 }
@@ -1415,7 +1443,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     <div class="zoo__sent" aria-label="Korona Gomba">
       <span aria-hidden="true">KOR</span>
       <span class="zoo__slot" aria-hidden="true"></span>
-      <span aria-hidden="true">NA&nbsp;GOMBA</span>
+      <span aria-hidden="true">NA</span>
+      <span class="zoo__break" aria-hidden="true"></span>
+      <span aria-hidden="true">GOMBA</span>
     </div>
 
     <div class="zoo__media" data-zoo-media>
