@@ -1003,6 +1003,18 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .hero .btn--lg{ padding:clamp(16px,2vw,21px) clamp(27px,3.4vw,40px);
                   font-size:clamp(11px,1.15vw,13px); }
   .hsticker{ font-size:clamp(11px,1.45vw,17px); padding:11px 16px; }
+
+  /* ===== TERMÉKEK — a szomszédos diák visszakapják a 80%-on látott
+     "belógást" =====
+     A JS mindig az aktív dia KÉPÉT középre igazítja (lásd centerOn()).
+     Mivel a dia szélessége eddig 1000px-ig fix volt, 100% zoomon (keskenyebb
+     effektív nézet) alig maradt hely az aktív dia körül — épp csak a
+     szomszéd kép átlátszó szél-margója (a beégetett árnyék helye) fért be,
+     a tényleges termékfotó nem. 80% zoomon (szélesebb effektív nézet)
+     ugyanennyi FIX pixelű dia körül arányosan több hely maradt, így a
+     szomszéd fotó valódi része is belátszott. Kisebb dia-plafonnal
+     ugyanez a belógás visszaáll 100%-on is. */
+  .slide{ flex:0 0 min(800px,66vw); }
 }
 @media (max-width:900px){
   .zoo{ height:280vh; }
