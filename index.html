@@ -681,12 +681,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   will-change:left,top,width,height; box-shadow:0 30px 60px rgba(22,17,13,.28); }
 .zoo__media video{ width:100%; height:100%; object-fit:cover; display:block; }
 
-/* a kéz+fazék png — az oldal bal széléről nyúlik be, a felirat FÖLÖTT */
-.zoo__hand{ position:absolute; z-index:5; left:clamp(-160px,-12vw,-50px); top:-14%;
-  width:clamp(380px,42vw,760px); pointer-events:none;
+/* a kéz+fazék png — úgy nyúlik be az oldal bal széléről, mintha valaki
+   odanyújtaná a nézőnek: a kar a bal képszélen kívülről indul, a fazék
+   pedig teljes egészében látszik (korábban a top:-14% miatt a teteje
+   a viewport fölé lógott ki, ott levágódott). */
+.zoo__hand{ position:absolute; z-index:5; left:clamp(-150px,-9vw,-40px); top:8%;
+  width:clamp(340px,34vw,620px); pointer-events:none;
   filter:drop-shadow(0 20px 40px rgba(22,17,13,.35));
   opacity:calc(1 - var(--zp,0) * 1.6); }
-.zoo__hand img{ width:100%; height:auto; display:block; transform:rotate(6deg); }
+.zoo__hand img{ width:100%; height:auto; display:block; transform:rotate(-4deg); }
 
 /* ============================================================
    5b. RÓLUNK → ÉLETKÉPEK GALÉRIA
@@ -963,6 +966,26 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      A gyűrűt a kép mögé húzzuk, hogy a termék a gyűrűben üljön, mint gépen. */
   .carousel__ring{ top:34%; }
 }
+/* ===== HERO — 100% zoomon a 80%-os arány visszaállítása (CSAK desktop) =====
+   Az oldalt 80% böngésző-zoomon terveztük; 100%-on a hero PX-alapú elemei
+   (cím, kontúr, EST tábla, CTA gombok, térközök, matricák) ~20%-kal nagyobbak.
+   A vw-alapú GOMBÁK fizikailag ugyanakkorák maradtak, ezért azokat NEM bántjuk.
+   Itt csak a px-alapú értékeket vesszük 0.8×-ra, így desktopon a cím + a gombák
+   aránya visszaáll a megszokott 80%-os képre. Tablet/mobil külön breakpointon
+   van (max-width:900/640), ezt a min-width:901 nem érinti. */
+@media (min-width:901px){
+  .l{ font-size:min(19vw,214px); -webkit-text-stroke-width:7px; }
+  .after{ gap:clamp(16px,2.4vw,26px); margin-top:clamp(30px,4.6vw,54px); }
+  .divider{ width:min(40vw,432px); }
+  .cta{ gap:clamp(8px,1.2vw,13px); }
+  .est{ top:clamp(16px,2.6vw,30px); gap:clamp(10px,1.4vw,16px);
+        padding:clamp(7px,1vw,11px) clamp(14px,2vw,24px); }
+  .est b{ font-size:clamp(11px,1.5vw,18px); }
+  .est span{ font-size:clamp(8px,.92vw,10px); }
+  .hero .btn--lg{ padding:clamp(16px,2vw,21px) clamp(27px,3.4vw,40px);
+                  font-size:clamp(11px,1.15vw,13px); }
+  .hsticker{ font-size:clamp(11px,1.45vw,17px); padding:11px 16px; }
+}
 @media (max-width:900px){
   .zoo{ height:280vh; }
   .zoo__sent{ font-size:clamp(1.8rem,11vw,4rem); }
@@ -1094,7 +1117,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   <div class="pre__ring pre__ring--2"></div>
 
   <div class="pre__core">
-    <img class="pre__logo" src="assets/logo.png" alt="">
+    <img class="pre__logo" src="images/assets/logo.webp" alt="">
     <div class="pre__num"><span id="preNum">0</span><i>%</i></div>
     <div class="pre__word" id="preWord" data-letters="Gombaipari Egyesülés"></div>
   </div>
@@ -1111,7 +1134,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 <!-- ===================== NAV ===================== -->
 <nav class="nav">
   <a class="brand" href="#">
-    <img class="brand__logo" src="assets/logo.png" alt="Korona Gombaipari Egyesülés logó">
+    <img class="brand__logo" src="images/assets/logo.webp" alt="Korona Gombaipari Egyesülés logó">
     <span><span class="brand__name">KORONA</span><span class="brand__sub">Gombaipari Egyesülés</span></span>
   </a>
 
@@ -1228,9 +1251,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   <div class="neon__spot" aria-hidden="true"></div>
   <div class="neon__trio">
-    <div class="neon__photo neon__p1" style="background-image:url(assets/elet/harapas.png)"></div>
-    <div class="neon__photo neon__p2" style="background-image:url(assets/elet/par-eszik.png)"></div>
-    <div class="neon__photo neon__p3" style="background-image:url(assets/elet/tal-gomba.png)"></div>
+    <div class="neon__photo neon__p1" style="background-image:url(images/assets/elet/harapas.webp)"></div>
+    <div class="neon__photo neon__p2" style="background-image:url(images/assets/elet/par-eszik.webp)"></div>
+    <div class="neon__photo neon__p3" style="background-image:url(images/assets/elet/tal-gomba.webp)"></div>
   </div>
 
   <a class="neon__cta" href="#products">Nézd meg a termékeket <span aria-hidden="true">→</span></a>
@@ -1256,7 +1279,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <article class="slide"
         data-bg="#3DA35D" data-deep="#216B37" data-deeper="#123B20" data-acc="#F0B93C" data-ui="#F9F4FF"
         style="--bg:#3DA35D; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20">
-        <div class="slide__media"><img src="assets/products/friss-fx.webp" alt="Friss gombák" decoding="async"></div>
+        <div class="slide__media"><img src="images/assets/products/friss-fx.webp" alt="Friss gombák" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Termesztés</p>
           <h3 class="slide__name">Friss gombák</h3>
@@ -1268,7 +1291,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <article class="slide"
         data-bg="#F62213" data-deep="#A71106" data-deeper="#620A04" data-acc="#F0B93C" data-ui="#FFF2EE"
         style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04">
-        <div class="slide__media"><img src="assets/products/konzerv-fx.webp" alt="Korona termesztett csiperke szeletek konzerv" decoding="async"></div>
+        <div class="slide__media"><img src="images/assets/products/konzerv-fx.webp" alt="Korona termesztett csiperke szeletek konzerv" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Feldolgozás</p>
           <h3 class="slide__name">Gombakonzerv</h3>
@@ -1280,7 +1303,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <article class="slide"
         data-bg="#2E9B57" data-deep="#1C6B3A" data-deeper="#0F4526" data-acc="#D9E34E" data-ui="#F9F4FF"
         style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526">
-        <div class="slide__media"><img src="assets/products/csira-fx.webp" alt="Gombacsíra" decoding="async"></div>
+        <div class="slide__media"><img src="images/assets/products/csira-fx.webp" alt="Gombacsíra" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Szaporítóanyag</p>
           <h3 class="slide__name">Gombacsíra</h3>
@@ -1292,7 +1315,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <article class="slide"
         data-bg="#E1432B" data-deep="#A32E1D" data-deeper="#611B11" data-acc="#F0B93C" data-ui="#FFF2EE"
         style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11">
-        <div class="slide__media"><img src="assets/products/komposzt-fx.webp" alt="Gombakomposzt" decoding="async"></div>
+        <div class="slide__media"><img src="images/assets/products/komposzt-fx.webp" alt="Gombakomposzt" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Alapanyag</p>
           <h3 class="slide__name slide__name--long">Gombakomposzt</h3>
@@ -1343,7 +1366,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- 01 — GLOBALG.A.P. -->
     <article class="cert cert--a" style="--c:var(--green); --ct:var(--green-deep); --r:-8deg">
-      <div class="cert__badge"><span class="cert__disc"><img src="assets/certs/globalgap.png" alt="GLOBALG.A.P. tanúsítvány"></span></div>
+      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/globalgap.webp" alt="GLOBALG.A.P. tanúsítvány"></span></div>
       <h3 class="cert__name">GAP</h3>
       <p class="cert__full">Global G.A.P.</p>
       <span class="cert__tag">Mezőgazdaság</span>
@@ -1351,7 +1374,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- 02 — IFS -->
     <article class="cert cert--b" style="--c:var(--red); --ct:var(--red); --r:9deg">
-      <div class="cert__badge"><span class="cert__disc"><img src="assets/certs/ifs.png" alt="IFS International Featured Standards tanúsítvány"></span></div>
+      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/ifs.webp" alt="IFS International Featured Standards tanúsítvány"></span></div>
       <h3 class="cert__name">IFS</h3>
       <p class="cert__full">International Featured Standards</p>
       <span class="cert__tag">Feldolgozás</span>
@@ -1359,7 +1382,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- 05 — HACCP -->
     <article class="cert cert--wide" style="--c:var(--sand); --ct:var(--ink-soft); --r:7deg">
-      <div class="cert__badge"><span class="cert__disc"><img src="assets/certs/haccp.png" alt="HACCP élelmiszer-biztonsági tanúsítvány"></span></div>
+      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/haccp.webp" alt="HACCP élelmiszer-biztonsági tanúsítvány"></span></div>
       <h3 class="cert__name">HACCP</h3>
       <p class="cert__full">Veszélyelemzés &amp; Kritikus Pontok</p>
       <span class="cert__tag">Élelmiszer-biztonság</span>
@@ -1367,7 +1390,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- 03 — BIO -->
     <article class="cert cert--c" style="--c:var(--n-lime); --ct:#7E8A1F; --r:6deg">
-      <div class="cert__badge"><span class="cert__disc"><img src="assets/certs/biokontroll.png" alt="Biokontroll Hungária bio tanúsítvány"></span></div>
+      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/biokontroll.webp" alt="Biokontroll Hungária bio tanúsítvány"></span></div>
       <h3 class="cert__name">BIO</h3>
       <p class="cert__full">Biokontroll</p>
       <span class="cert__tag">Bio termesztés</span>
@@ -1375,7 +1398,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- 04 — GRASP -->
     <article class="cert cert--d" style="--c:var(--green-deep); --ct:var(--green-deep); --r:-11deg">
-      <div class="cert__badge"><span class="cert__disc"><img src="assets/certs/grasp.png" alt="GLOBALG.A.P. GRASP tanúsítvány"></span></div>
+      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/grasp.webp" alt="GLOBALG.A.P. GRASP tanúsítvány"></span></div>
       <h3 class="cert__name">GRASP</h3>
       <p class="cert__full">Risk Assessment on Social Practice</p>
       <span class="cert__tag">Szociális felelősség</span>
@@ -1402,12 +1425,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     </div>
 
     <div class="zoo__hand" aria-hidden="true">
-      <img src="assets/elet/fazek-gomba.png" alt="" loading="lazy">
+      <img src="images/assets/elet/fazek-gomba.webp" alt="" loading="lazy">
     </div>
 
     <!-- ============ 4b. DEKOR MATRICA — tanúsítványok és a videós rész közötti üres jobb oldalon ============ -->
     <div class="deco-sticker" aria-hidden="true">
-      <img src="assets/elet/bbq-barattok.png" alt="">
+      <img src="images/assets/elet/bbq-barattok.webp" alt="">
     </div>
 
   </div>
@@ -1430,19 +1453,19 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <div class="gal__track">
       <div class="gal__track-inner" id="galTrack">
-        <div class="gal__card"><img src="koronakepek/ai-2.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/fb-1.jpg" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-4.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/fb-2.jpg" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-5.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/fb-3.jpg" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-6.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/fb-4.jpg" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-7.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-8.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-9.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-3.png" loading="lazy" alt=""></div>
-        <div class="gal__card"><img src="koronakepek/ai-10.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-2.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/fb-1.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-4.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/fb-2.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-5.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/fb-3.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-6.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/fb-4.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-7.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-8.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-9.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-3.webp" loading="lazy" alt=""></div>
+        <div class="gal__card"><img src="images/koronakepek/ai-10.webp" loading="lazy" alt=""></div>
       </div>
     </div>
   </div>
@@ -1468,18 +1491,18 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   </div>
 
   <div class="prt__rows">
-    <div class="prt__cell"><img src="partners-mono/lidl.png" alt="Lidl" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/spar.png" alt="SPAR" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/metro.png" alt="METRO" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/hofer.png" alt="Hofer" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/bio-eu.png" alt="EU Bio" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/ifs.png" alt="IFS" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/kivalo-magyar.png" alt="Kiváló Magyar Élelmiszer" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/gtl.png" alt="GTL" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/fancom.png" alt="Fancom" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/hoving-holland.png" alt="Hoving Holland" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/masterlab.png" alt="Masterlab" loading="lazy"></div>
-    <div class="prt__cell"><img src="partners-mono/mcsubstradd.png" alt="MC Substradd" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/lidl.webp" alt="Lidl" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/spar.webp" alt="SPAR" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/metro.webp" alt="METRO" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/hofer.webp" alt="Hofer" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/bio-eu.webp" alt="EU Bio" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/ifs.webp" alt="IFS" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/kivalo-magyar.webp" alt="Kiváló Magyar Élelmiszer" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/gtl.webp" alt="GTL" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/fancom.webp" alt="Fancom" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/hoving-holland.webp" alt="Hoving Holland" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/masterlab.webp" alt="Masterlab" loading="lazy"></div>
+    <div class="prt__cell"><img src="images/partners-mono/mcsubstradd.webp" alt="MC Substradd" loading="lazy"></div>
   </div>
 
 </section>
@@ -1511,7 +1534,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- az úton haladó jelölő -->
     <div class="tl__marker" id="tlMarker" aria-hidden="true">
-      <img src="assets/logo.png" alt="">
+      <img src="images/assets/logo.webp" alt="">
     </div>
 
     <ol class="tl__list">
@@ -1581,7 +1604,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   <div class="ft__top">
     <div class="ft__col">
       <a class="ft__brand" href="#">
-        <img src="assets/logo.png" alt="Korona Gombaipari Egyesülés logó">
+        <img src="images/assets/logo.webp" alt="Korona Gombaipari Egyesülés logó">
         <span><b>KORONA</b><i>Gombaipari Egyesülés</i></span>
       </a>
       <p class="ft__note">Családi vállalkozások szövetsége 1990 óta — komposzttól a konzervig, egy kézben.</p>
@@ -1810,7 +1833,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     }
     l1.insertAdjacentHTML('beforeend',
       letters('KOR')
-      + '<span class="olog"><img src="assets/logo.png" alt="Korona Gombaipari Egyesülés"></span>'
+      + '<span class="olog"><img src="images/assets/logo.webp" alt="Korona Gombaipari Egyesülés"></span>'
       + letters('NA'));
     l2.innerHTML =
       letters('G')
