@@ -957,6 +957,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .carousel__ring{ left:50%; }
   .carousel__ring .disc, .carousel__ring .rings{ width:min(68vw,340px); }
 }
+@media (max-width:640px){
+  /* Telefonon a termékkép feljebb ül, mint a dekor körgyűrű (a gyűrű a
+     carousel 52%-ánál van, a kép viszont az egy-oszlopos elrendezés tetején).
+     A gyűrűt a kép mögé húzzuk, hogy a termék a gyűrűben üljön, mint gépen. */
+  .carousel__ring{ top:34%; }
+}
 @media (max-width:900px){
   .zoo{ height:280vh; }
   .zoo__sent{ font-size:clamp(1.8rem,11vw,4rem); }
@@ -1021,13 +1027,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .s3,.s4,.r3,.r4{ display:block; }
   .mextra{ display:block; }
 
-  /* az EST. 1990 tábla a gombák MÖGÉ kerül (a gombák takarják) */
-  .est{ z-index:12; }
+  /* az EST. 1990 tábla lejjebb, közvetlenül a KORONA felirat fölé */
+  .est{ z-index:12; top:16vh !important; }
 
-  /* --- CÍM: kisebb + több oldalpadding, hogy SEHOGY ne csússzon ki
-     (a vastag kontúr is beleférjen a szélek elé) --- */
-  .big{ padding:0 6vw; }
-  .l{ font-size:16vw !important; -webkit-text-stroke-width:5px; }
+  /* --- CÍM: nagyobb, de a vastag kontúr is beleférjen a szélek elé --- */
+  .big{ padding:0 4vw; }
+  .l{ font-size:19vw !important; -webkit-text-stroke-width:6px; }
+
+  /* --- CTA GOMBOK: nagyobbak, hogy kitöltsék az üres teret --- */
+  .btn--lg{ font-size:16px !important; padding:24px 32px !important; }
+  .after{ gap:clamp(24px,5vw,34px); margin-top:clamp(48px,7vw,72px); }
 
   /* A gomba-pozíciók (--x/--y/--w) inline style-ban ülnek az elemeken (gépes
      alapértékek), ezért itt !important kell, hogy telefonon felülírja őket.
@@ -1054,6 +1063,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .hsticker{ z-index:44; }
   .hsticker:not(.hsticker--green){ left:3% !important; right:auto !important;
     top:auto !important; bottom:40% !important; }
+  /* a „12 ország export" beljebb, a közép felé (a jobb széltől elhúzva) */
+  .hsticker--green{ right:22% !important; }
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -1722,8 +1733,18 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     }
     requestAnimationFrame(tick);
 
-    /* ha a load esemény elakadna (lassú videó/külső kép), 6 mp után így is indulunk */
-    setTimeout(function(){ loaded = true; }, 6000);
+    /* KEMÉNY vészfék: a fenti koreográfia a requestAnimationFrame-re épül, ami
+       háttérben lévő fülön leáll (és lassú eszközön/ tabváltáskor is akadhat) —
+       ilyenkor a preloader sosem lépne ki. Ez a setTimeout a rAF-tól FÜGGETLENÜL
+       mindenképp kilépteti a preloadert, legkésőbb 3.2 mp-nél. */
+    setTimeout(exit, 3200);
+
+    /* NEM várunk a teljes window.load-ra: a hero sok külső/nagy képet tölt,
+       ami éles hostingon (pl. GitHub Pages) több másodperc — addig a látogató
+       csak a preloadert látná. Ezért a koreográfia (MIN) lejárta után rövid
+       vészfékkel mindenképp kilépünk; a hero képei a saját popIn animációjukkal
+       úsznak be. (Localhoston a cache miatt ez eddig nem látszott.) */
+    setTimeout(function(){ loaded = true; }, 1800);
   })();
 
   document.addEventListener('dragstart', function(e){
