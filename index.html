@@ -165,10 +165,6 @@ html.no-js.is-intro .est{ animation-play-state:running; }
 .brand__logo{ width:52px; height:52px; object-fit:contain; display:block; }
 .brand__name{ font-family:var(--font-display); font-weight:400; font-size:23px; letter-spacing:-.02em; line-height:1; display:block; }
 .brand__sub{ font-size:9.5px; letter-spacing:.20em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; margin-top:3px; display:block; }
-.lang{ display:flex; gap:9px; }
-.lang button{ background:none; border:none; cursor:pointer; font-family:var(--font-ui); font-size:11px; font-weight:700; letter-spacing:.10em; color:var(--ink-soft); padding:2px 0; transition:color .25s; }
-.lang button.is-on{ color:var(--ink); border-bottom:2px solid var(--red); }
-.lang button:hover{ color:var(--ink); }
 
 /* ---------- MATRICA GOMB ----------
    Fix színek: lime lap + krém perem + tinta felirat és árnyék.
@@ -461,6 +457,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .neon__trio{ gap:0; }
   .neon__photo{ width:34vw !important; }
   .neon__p2{ width:40vw !important; }
+  /* a -38px margó desktopon (~480px-es fotóknál) ~8% átfedés, de a mobil
+     34vw-os (~127px) fotóknál ugyanez a fix px-érték ~30%-ra nőtt —
+     itt a mobil mérethez arányosított, kisebb átfedés kell */
+  .neon__p1{ margin-right:-12px !important; }
+  .neon__p3{ margin-left:-12px !important; }
 }
 @keyframes twinkle{ 0%,100%{ opacity:.25; transform:scale(.85) rotate(0deg);} 50%{ opacity:1; transform:scale(1.1) rotate(20deg);} }
 
@@ -1266,7 +1267,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <li><a href="#rolunk"><span class="menu__num">02</span>Életképek</a></li>
       <li><a href="#tanusitvanyok"><span class="menu__num">03</span>Tanúsítványok</a></li>
       <li><a href="#video"><span class="menu__num">04</span>Gombahíradó</a></li>
-      <li><a href="#partnerek"><span class="menu__num">05</span>Kapcsolat</a></li>
+      <li><a href="#kapcsolat"><span class="menu__num">05</span>Kapcsolat</a></li>
     </ul>
   </div>
 
@@ -2624,11 +2625,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     img.addEventListener('error', function(){ img.classList.add('broken'); });
   });
 
-  /* ============ nyelvváltó (demó) ============ */
-  document.querySelectorAll('.lang button').forEach(function(b){
+  /* ============ nyelvváltó (demó) ============
+     A menüben és a láblécben is van egy HU/EN/DE gombsor — ugyanazt a
+     (egyelőre csak vizuális) nyelvállapotot mutatják, ezért együtt
+     frissülnek, bármelyiken kattintva. */
+  document.querySelectorAll('.menu__lang button, .ft__lang button').forEach(function(b){
     b.addEventListener('click', function(){
-      document.querySelectorAll('.lang button').forEach(function(x){ x.classList.remove('is-on'); });
-      b.classList.add('is-on');
+      var lang = b.textContent;
+      document.querySelectorAll('.menu__lang button, .ft__lang button').forEach(function(x){
+        x.classList.toggle('is-on', x.textContent === lang);
+      });
     });
   });
 })();
