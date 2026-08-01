@@ -1059,6 +1059,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
 
+  /* a grillpartis dekor-matrica visszakapcsolva mobilra is — a "KORONA
+     GOMBA" felirat és a kéz+fazék kép a bal/közép sávot foglalja el,
+     a jobb-alsó sarok üresen marad, amíg a videó ki nem nő oda (a --zp
+     alapú elhalványulás ezt már amúgy is kezeli) */
+  .deco-sticker{ display:block; top:auto; right:4%; bottom:5%; left:auto; }
+  .deco-sticker img{ width:clamp(120px,30vw,190px); }
 }
 @media (max-width:480px){
   /* 23vw ezen a szélességen a betűk+logó/gomba-ikon együttes szélessége miatt
