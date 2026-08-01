@@ -2526,7 +2526,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       var card = cards[0];
       var style = window.getComputedStyle(track);
       var gap = parseFloat(style.columnGap || style.gap || 0);
-      return card.getBoundingClientRect().width + gap;
+      /* offsetWidth kell, NEM getBoundingClientRect().width — a kártyák el
+         vannak forgatva (transform:rotate), ami a bounding rect szélességét
+         a valódinál nagyobbra torzítja, és ez lépésenként túlcsúsztatta a
+         sávot, míg a végén az összes kép kicsúszott a látható területről. */
+      return card.offsetWidth + gap;
     }
     function visibleCount(){
       return Math.max(1, Math.floor(track.parentElement.clientWidth / cardStep()));
