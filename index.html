@@ -1150,7 +1150,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   /* az EST. 1990 tábla feljebb, a hero tetejéhez közel — a gombák (z:40)
      MÖGÖTT maradjon, hogy betöltéskor eltakarják */
-  .est{ z-index:35; top:4vh !important; }
+  .est{ z-index:35; top:9vh !important; }
 
   /* --- CÍM: nagyobb, de a vastag kontúr is beleférjen a szélek elé --- */
   .big{ padding:0 4vw; }
@@ -2450,12 +2450,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       if(!W || !H) return;
       mSvg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
 
-      var X = 34; /* a jelölő/útvonal vízszintes horgonypontja, az évszám-matrica közepe táján */
+      /* markáns cikk-cakk: jobbról indul, majd a kártyák közti hézagokban
+         nagy ívben átlendül balra, aztán megint jobbra — nem csak lefelé fut */
+      var X_R = W * 0.80, X_L = W * 0.16;
       var pts = [];
       items.forEach(function(el, i){
         var r = el.getBoundingClientRect();
         var y = (r.top - trackRect.top) + r.height / 2;
-        var x = X + (i % 2 === 0 ? -7 : 7); /* enyhe kanyargás, mint a gépes útvonalon */
+        var x = (i % 2 === 0) ? X_R : X_L;
         pts.push([x, y]);
       });
 
