@@ -682,12 +682,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    külön hangolt pozícióval/mérettel a két elrendezéshez. */
 .zoo-logo{ position:absolute; z-index:6; right:clamp(50px,11vw,180px); bottom:8%; pointer-events:none;
   opacity:calc(1 - var(--zp,0) * 1.6); }
-.zoo-logo img{ display:block; width:clamp(56px,5.6vw,92px); height:auto;
+.zoo-logo img{ display:block; width:clamp(76px,7.4vw,124px); height:auto;
   filter:drop-shadow(0 12px 20px rgba(22,17,13,.30));
   animation: deco-bob 8s ease-in-out .4s infinite; }
-.zoo-shroom{ position:absolute; z-index:6; right:clamp(10px,4.4vw,70px); bottom:1%; pointer-events:none;
+.zoo-shroom{ position:absolute; z-index:6; left:clamp(10px,4.4vw,70px); bottom:1%; pointer-events:none;
   opacity:calc(1 - var(--zp,0) * 1.6); }
-.zoo-shroom img{ display:block; width:clamp(84px,8.4vw,140px); height:auto;
+.zoo-shroom img{ display:block; width:clamp(110px,11vw,180px); height:auto;
   filter:drop-shadow(0 14px 22px rgba(22,17,13,.32));
   animation: deco-bob 6.6s ease-in-out .1s infinite reverse; }
 
@@ -1079,13 +1079,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      FÖLÉ kerül (a pin doboz teteje üres, mielőtt a "KORONA GOMBA"
      margin-top:8vh-nél kezdődik), nem alá */
   .deco-sticker{ display:block; bottom:auto; right:5%; top:1%; left:auto; }
-  .deco-sticker img{ width:clamp(120px,30vw,190px); }
+  .deco-sticker img{ width:clamp(180px,46vw,280px); }
 
-  /* logó + gomba dekor a jobb-alsó, ezzel megüresedett sarokban */
-  .zoo-logo{ right:5%; bottom:20%; }
-  .zoo-logo img{ width:clamp(46px,11vw,64px); }
-  .zoo-shroom{ right:2%; bottom:3%; }
-  .zoo-shroom img{ width:clamp(80px,20vw,120px); }
+  /* logó jobbra, gomba balra, a jobb-alsó/bal-alsó sarokban, nagyobban */
+  .zoo-logo{ right:5%; bottom:20%; left:auto; }
+  .zoo-logo img{ width:clamp(64px,16vw,96px); }
+  .zoo-shroom{ left:2%; bottom:3%; right:auto; }
+  .zoo-shroom img{ width:clamp(120px,30vw,180px); }
 }
 @media (max-width:480px){
   /* 23vw ezen a szélességen a betűk+logó/gomba-ikon együttes szélessége miatt
