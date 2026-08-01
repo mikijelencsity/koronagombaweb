@@ -53,6 +53,7 @@
 }
 
 *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ -webkit-user-select:none; user-select:none; }
 body{ background:var(--cream); color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; }
 /* NINCS overflow-x a body-n: iOS Safari-n ha BÁRMELYIK ősnek (a body is az!)
    nem "visible" az overflow-ja, a position:sticky teljesen leáll — ez okozta,
@@ -92,9 +93,13 @@ body::after{
 .lead-thick{ font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em; }
 
 /* ===================== PRELOADER ===================== */
-/* A görgetősáv helye VÉGIG foglalt marad, így a feloldáskor nem csúszik el a layout. */
-html{ scrollbar-gutter:stable; }
+/* A görgetősáv teljesen el van rejtve (lásd lejjebb), így a feloldáskor
+   sincs mitől elcsúsznia a layoutnak — a scrollbar-gutter emiatt már nem kell. */
 html.is-locked{ overflow:hidden; }
+/* görgetősáv elrejtve minden böngészőben — a görgetés (kerék/érintés/
+   billentyű) továbbra is működik, csak a vizuális sáv nem látszik */
+html{ scrollbar-width:none; -ms-overflow-style:none; }
+html::-webkit-scrollbar{ display:none; width:0; height:0; }
 /* a hero bevezető animációi csak a függöny nyílásakor induljanak */
 html.is-intro .ch,
 html.is-intro .shroom img,
@@ -1773,6 +1778,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ============ KÖZÉPSŐ EGÉRGOMB (görgő-kattintás) AUTO-GÖRGETÉS TILTÁSA ============
+     Ez a natív böngésző-funkció a "wheel" eseményt megkerülve, saját
+     tempójában görgeti az oldalt — ez nem venné figyelembe a fenti egyedi
+     simagörgetést/pin-animációkat, ezért inkább teljesen kikapcsoljuk. A
+     normál görgetés (kerék, érintés, billentyű, sáv) továbbra is működik. */
+  window.addEventListener('mousedown', function(e){ if(e.button === 1) e.preventDefault(); });
+  window.addEventListener('auxclick',  function(e){ if(e.button === 1) e.preventDefault(); });
+
   /* ============ STABIL VIEWPORT-MAGASSÁG ============
      Mobilon a címsáv görgetéskor el- és megjelenik, emiatt a
      window.innerHeight scroll közben folyamatosan ugrál — ez a lenti
@@ -1938,7 +1951,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       body.classList.toggle('menu-open', v);
       btn.setAttribute('aria-expanded', v ? 'true' : 'false');
       btn.setAttribute('aria-label', v ? 'Menü bezárása' : 'Menü megnyitása');
-      /* görgetészár — a scrollbar-gutter miatt nincs elcsúszás */
+      /* görgetészár — a görgetősáv úgyis rejtve van, nincs mitől elcsúsznia */
       html.classList.toggle('is-locked', v);
       if(v){
         /* a menü elemei csak nyitva legyenek fókuszálhatók */
