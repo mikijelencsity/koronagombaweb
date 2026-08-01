@@ -605,7 +605,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .carousel.is-busy .arrow{ opacity:.4; pointer-events:none; }
 .carousel.is-busy .dot{ pointer-events:none; }
 .carousel__dots{ display:flex; gap:8px; pointer-events:auto; }
-.dot{ width:9px; height:9px; border-radius:100px; border:none; cursor:pointer; padding:0; background:currentColor; opacity:.34; transition:opacity .3s, width .35s var(--ease); }
+.dot{ width:9px; height:9px; border-radius:100px; border:none; cursor:pointer; padding:0; -webkit-appearance:none; appearance:none; color:var(--ink); background:currentColor; opacity:.34; transition:opacity .3s, width .35s var(--ease); }
 .dot.is-on{ opacity:1; width:30px; }
 .carousel__right{ display:flex; align-items:center; gap:18px; pointer-events:auto; }
 .carousel__count{ font-family:var(--font-display); font-weight:400; font-size:13px; letter-spacing:.06em; opacity:.75; }
