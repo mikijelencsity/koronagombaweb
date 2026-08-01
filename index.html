@@ -1112,8 +1112,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .mextra{ display:block; }
 
   /* az EST. 1990 tábla feljebb, a hero tetejéhez közel — a gombák (z:40)
-     elé kell kerülnie (z:46), különben a bal-felső óriás gomba eltakarja */
-  .est{ z-index:46; top:4vh !important; }
+     MÖGÖTT maradjon, hogy betöltéskor eltakarják */
+  .est{ z-index:35; top:4vh !important; }
 
   /* --- CÍM: nagyobb, de a vastag kontúr is beleférjen a szélek elé --- */
   .big{ padding:0 4vw; }
@@ -1122,7 +1122,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* --- CTA GOMBOK: nagyobbak, hogy kitöltsék az üres teret ---
      FONTOS: csak a .hero gombjaira, mert a .slide__btn (termékkarusszel
      gombja) is .btn--lg osztályú -- enélkül az is óriásira nőtt volna. */
-  .hero .btn--lg{ font-size:16px !important; padding:24px 32px !important; }
+  .hero .btn--lg{ font-size:13px !important; padding:20px 24px !important; }
   .after{ gap:clamp(24px,5vw,34px); margin-top:clamp(48px,7vw,72px); }
 
   /* A gomba-pozíciók (--x/--y/--w) inline style-ban ülnek az elemeken (gépes
@@ -1149,7 +1149,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      marad, mint a „12 ország export" (ami a legalsó sarokban marad) --- */
   .hsticker{ z-index:44; }
   .hsticker:not(.hsticker--green){ left:3% !important; right:auto !important;
-    top:auto !important; bottom:16% !important; }
+    top:auto !important; bottom:9% !important; }
   /* a „12 ország export" beljebb, a közép felé (a jobb széltől elhúzva) */
   .hsticker--green{ right:22% !important; }
 }
