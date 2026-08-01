@@ -676,6 +676,22 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:900px){ .deco-sticker{ display:none; } }
 
 /* ============================================================
+   4c. LOGÓ + GOMBA DEKOR — a jobb-alsó sarok, ami a grillpartis
+   matrica alatt/mellett üresen marad; a videó kinövésekor ez is
+   elhalványul, mint a többi zoo-dekor. Deskopon és mobilon is él,
+   külön hangolt pozícióval/mérettel a két elrendezéshez. */
+.zoo-logo{ position:absolute; z-index:6; right:clamp(50px,11vw,180px); bottom:8%; pointer-events:none;
+  opacity:calc(1 - var(--zp,0) * 1.6); }
+.zoo-logo img{ display:block; width:clamp(56px,5.6vw,92px); height:auto;
+  filter:drop-shadow(0 12px 20px rgba(22,17,13,.30));
+  animation: deco-bob 8s ease-in-out .4s infinite; }
+.zoo-shroom{ position:absolute; z-index:6; right:clamp(10px,4.4vw,70px); bottom:1%; pointer-events:none;
+  opacity:calc(1 - var(--zp,0) * 1.6); }
+.zoo-shroom img{ display:block; width:clamp(84px,8.4vw,140px); height:auto;
+  filter:drop-shadow(0 14px 22px rgba(22,17,13,.32));
+  animation: deco-bob 6.6s ease-in-out .1s infinite reverse; }
+
+/* ============================================================
    5. KOR(O)NA GOMBA — görgetésre kinövő videó a betű helyén
    ============================================================ */
 .zoo{ position:relative; height:330vh; background:var(--ink); }
@@ -1059,12 +1075,17 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
 
-  /* a grillpartis dekor-matrica visszakapcsolva mobilra is — a "KORONA
-     GOMBA" felirat és a kéz+fazék kép a bal/közép sávot foglalja el,
-     a jobb-alsó sarok üresen marad, amíg a videó ki nem nő oda (a --zp
-     alapú elhalványulás ezt már amúgy is kezeli) */
-  .deco-sticker{ display:block; top:auto; right:4%; bottom:5%; left:auto; }
+  /* a grillpartis dekor-matrica visszakapcsolva mobilra is — a szöveg
+     FÖLÉ kerül (a pin doboz teteje üres, mielőtt a "KORONA GOMBA"
+     margin-top:8vh-nél kezdődik), nem alá */
+  .deco-sticker{ display:block; bottom:auto; right:5%; top:1%; left:auto; }
   .deco-sticker img{ width:clamp(120px,30vw,190px); }
+
+  /* logó + gomba dekor a jobb-alsó, ezzel megüresedett sarokban */
+  .zoo-logo{ right:5%; bottom:20%; }
+  .zoo-logo img{ width:clamp(46px,11vw,64px); }
+  .zoo-shroom{ right:2%; bottom:3%; }
+  .zoo-shroom img{ width:clamp(80px,20vw,120px); }
 }
 @media (max-width:480px){
   /* 23vw ezen a szélességen a betűk+logó/gomba-ikon együttes szélessége miatt
@@ -1503,6 +1524,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     <!-- ============ 4b. DEKOR MATRICA — tanúsítványok és a videós rész közötti üres jobb oldalon ============ -->
     <div class="deco-sticker" aria-hidden="true">
       <img src="images/assets/elet/bbq-barattok.webp" alt="">
+    </div>
+
+    <!-- ============ 4c. LOGÓ + GOMBA DEKOR — a jobb-alsó üres sarokban ============ -->
+    <div class="zoo-logo" aria-hidden="true">
+      <img src="images/assets/logo.webp" alt="">
+    </div>
+    <div class="zoo-shroom" aria-hidden="true">
+      <img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-6.png" alt="">
     </div>
 
   </div>
