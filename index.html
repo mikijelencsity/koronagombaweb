@@ -53,7 +53,14 @@
 }
 
 *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
-body{ background:var(--cream); color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+body{ background:var(--cream); color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; }
+/* NINCS overflow-x a body-n: iOS Safari-n ha BÁRMELYIK ősnek (a body is az!)
+   nem "visible" az overflow-ja, a position:sticky teljesen leáll — ez okozta,
+   hogy a hero/zoo pin-szekciók iPhone-on nem ragadtak be, és üresen görgött
+   át a mögöttük lévő túlméretezett (260vh / 330vh) konténerük. Az egyes
+   szekciók (.hero, .zoo__pin mobilon, .certs, .abt, .tl, .ft, stb.) saját
+   maguk levágják a kilógó tartalmat, úgyhogy erre a globális védőhálóra
+   nincs is szükség. */
 ::selection{ background:var(--n-lime); color:var(--ink); text-shadow:none; }
 ::-moz-selection{ background:var(--n-lime); color:var(--ink); text-shadow:none; }
 img, svg{ -webkit-user-drag:none; user-select:none; }
