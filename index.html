@@ -459,14 +459,18 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .neon__cta:hover{ box-shadow:2px 3px 0 var(--ink); translate:2px 2px; }
 
 @media (max-width:640px){
-  .neon__trio{ gap:0; }
-  .neon__photo{ width:34vw !important; }
-  .neon__p2{ width:40vw !important; }
-  /* a -38px margó desktopon (~480px-es fotóknál) ~8% átfedés, de a mobil
-     34vw-os (~127px) fotóknál ugyanez a fix px-érték ~30%-ra nőtt —
-     itt a mobil mérethez arányosított, kisebb átfedés kell */
-  .neon__p1{ margin-right:-12px !important; }
-  .neon__p3{ margin-left:-12px !important; }
+  /* egy nagy alapkép (p2), a másik kettő matricaként rárakva a sarkokba —
+     így a fotók jóval nagyobbak, mint a korábbi három egyforma, apró kép.
+     Több levegő fent/lent a szöveg és a CTA felé, a matricák pedig csak
+     a sarokba lógnak be, nem nyúlnak ki a szöveg/gomb magasságáig. */
+  .neon__trio{ display:block; position:relative; width:min(72vw,330px);
+    margin:clamp(115px,20vw,145px) auto clamp(95px,16vw,125px); }
+  .neon__photo{ width:100% !important; margin:0 !important; }
+  .neon__p2{ position:relative; z-index:1; }
+  .neon__p1{ position:absolute !important; width:44vw !important; max-width:200px !important;
+    top:-42%; left:-18%; z-index:2; }
+  .neon__p3{ position:absolute !important; width:44vw !important; max-width:200px !important;
+    bottom:-42%; right:-18%; z-index:2; }
 }
 @keyframes twinkle{ 0%,100%{ opacity:.25; transform:scale(.85) rotate(0deg);} 50%{ opacity:1; transform:scale(1.1) rotate(20deg);} }
 
@@ -1086,7 +1090,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .zoo__break{ display:block; flex-basis:100%; height:0; }
   /* a kéz+fazék nagyobb (a hely jó marad) — a szöveg margin-top-ja
      (feljebb) ad hozzá elég teret, hogy ne érjenek egymásba */
-  .zoo__hand{ top:11%; width:clamp(300px,38vw,480px); left:clamp(-165px,-11vw,-60px); }
+  .zoo__hand{ top:-11%; width:clamp(300px,38vw,480px); left:clamp(-165px,-11vw,-60px); }
+  .zoo__hand img{ transform:rotate(24deg); }
   /* a mondat egy sorban maradt volna és keskeny kijelzőn pár px-el túlért —
      ez adta az egész oldal vízszintes „kicsúszását". Csak vízszintesen
      vágjuk (a függőleges zoom-média/kéz marad); a sticky-t ez nem töri. */
@@ -1099,8 +1104,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* a grillpartis dekor-matrica visszakapcsolva mobilra is — a szöveg
      FÖLÉ kerül (a pin doboz teteje üres, mielőtt a "KORONA GOMBA"
      margin-top:8vh-nél kezdődik), nem alá */
-  .deco-sticker{ display:block; bottom:auto; right:5%; top:1%; left:auto; }
-  .deco-sticker img{ width:clamp(180px,46vw,280px); }
+  .deco-sticker{ display:block; bottom:auto; right:auto; top:19%; left:50%; transform:translateX(-50%); }
+  .deco-sticker img{ width:clamp(240px,62vw,380px); }
 
   /* logó jobbra, gomba balra, a jobb-alsó/bal-alsó sarokban, nagyobban */
   .zoo-logo{ right:5%; bottom:20%; left:auto; }
@@ -1131,6 +1136,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .certs__spark{ display:none; }
   .certs__grid{ grid-template-columns:repeat(2,1fr); }
   .cert__badge{ width:70px; }
+  /* 5 tanúsítvány 2 oszlopban: az 5. (GRASP) egyedül marad az utolsó sorban,
+     balra tapadva — itt teljes szélességben, középre igazítva jelenítjük meg */
+  .cert--d{ grid-column:1/-1; }
   .ft__brand{ align-items:flex-start; }
   .ft__brand img{ width:72px; height:72px; }
   .ft__brand b{ font-size:34px; }
@@ -1359,7 +1367,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     <span class="r"><span class="neon__word"><span>Minden</span></span> <span class="neon__word"><span>Nap</span></span></span>
   </h2>
 
-  <p class="neon__sub">Nem sztori, hanem mindennap: a termesztőháztól a te asztalodig ugyanazzal a gondossággal, amit 1990 óta ismerünk. Ez a Korona gomba élete — nyersen, grillen, üvegben, bárhogy szereted.</p>
+  <p class="neon__sub">Grillen, nyersen, üvegben: a Korona gomba ott van, ahol jó a hangulat.</p>
 
   <div class="neon__spot" aria-hidden="true"></div>
   <div class="neon__trio">
