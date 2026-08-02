@@ -674,32 +674,32 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 /* ============================================================
    4b. DEKOR MATRICA — tanúsítványok és a videós rész közötti
-   üres jobb oldalon, fotó-matrica fehér kerettel
+   üres jobb oldalon, kivágott, átlátszó hátterű nyárs-gomba kép
    ============================================================ */
-.deco-sticker{ position:absolute; z-index:6; right:clamp(60px,13vw,220px); top:-4%; pointer-events:none;
-  opacity:calc(1 - var(--zp,0) * 1.6); }
-.deco-sticker img{ display:block; width:clamp(320px,33vw,560px); height:auto; transform-origin:50% 50%;
-  border-radius:14px; border:7px solid #fff;
-  box-shadow:0 20px 26px rgba(22,17,13,.30);
-  animation: deco-bob 7.5s ease-in-out .2s infinite; }
-@keyframes deco-bob{ 0%,100%{ transform:rotate(-8deg) translateY(0); } 50%{ transform:rotate(-3deg) translateY(-14px); } }
-@media (max-width:900px){ .deco-sticker{ display:none; } }
+.deco-sticker{ position:absolute; z-index:6; right:0; top:-14%; pointer-events:none;
+  opacity:calc(1 - var(--zp,0) * 2.6); }
+.deco-sticker img{ display:block; width:clamp(180px,16vw,300px); height:auto; transform-origin:50% 50%;
+  filter:drop-shadow(0 20px 26px rgba(22,17,13,.30));
+  animation: bob-deco 7.5s ease-in-out .2s infinite; }
+@keyframes bob-deco{ 0%,100%{ transform:rotate(-23deg) translateY(0); } 50%{ transform:rotate(-17deg) translateY(-14px); } }
 
 /* ============================================================
    4c. LOGÓ + GOMBA DEKOR — a jobb-alsó sarok, ami a grillpartis
    matrica alatt/mellett üresen marad; a videó kinövésekor ez is
    elhalványul, mint a többi zoo-dekor. Deskopon és mobilon is él,
    külön hangolt pozícióval/mérettel a két elrendezéshez. */
-.zoo-logo{ position:absolute; z-index:6; right:clamp(50px,11vw,180px); bottom:8%; pointer-events:none;
-  opacity:calc(1 - var(--zp,0) * 1.6); }
-.zoo-logo img{ display:block; width:clamp(96px,9.5vw,160px); height:auto;
+.zoo-logo{ position:absolute; z-index:6; right:-6%; bottom:2%; pointer-events:none;
+  opacity:calc(1 - var(--zp,0) * 2.6); }
+.zoo-logo img{ display:block; width:clamp(220px,24vw,400px); height:auto;
   filter:drop-shadow(0 12px 20px rgba(22,17,13,.30));
-  animation: deco-bob 8s ease-in-out .4s infinite; }
-.zoo-shroom{ position:absolute; z-index:6; left:clamp(10px,4.4vw,70px); bottom:1%; pointer-events:none;
-  opacity:calc(1 - var(--zp,0) * 1.6); }
-.zoo-shroom img{ display:block; width:clamp(140px,14vw,230px); height:auto;
+  animation: bob-logo 8s ease-in-out .4s infinite; }
+@keyframes bob-logo{ 0%,100%{ transform:rotate(-9deg) translateY(0); } 50%{ transform:rotate(-3deg) translateY(-14px); } }
+.zoo-shroom{ position:absolute; z-index:6; left:-6%; bottom:1%; pointer-events:none;
+  opacity:calc(1 - var(--zp,0) * 2.6); }
+.zoo-shroom img{ display:block; width:clamp(220px,24vw,400px); height:auto;
   filter:drop-shadow(0 14px 22px rgba(22,17,13,.32));
-  animation: deco-bob 6.6s ease-in-out .1s infinite reverse; }
+  animation: bob-shroom 6.6s ease-in-out .1s infinite; }
+@keyframes bob-shroom{ 0%,100%{ transform:rotate(3deg) translateY(0); } 50%{ transform:rotate(9deg) translateY(-14px); } }
 
 /* ============================================================
    5. KOR(O)NA GOMBA — görgetésre kinövő videó a betű helyén
@@ -731,10 +731,25 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    pedig teljes egészében látszik (korábban a top:-14% miatt a teteje
    a viewport fölé lógott ki, ott levágódott). */
 .zoo__hand{ position:absolute; z-index:5; left:clamp(-150px,-9vw,-40px); top:8%;
-  width:clamp(340px,34vw,620px); pointer-events:none;
+  width:clamp(400px,40vw,720px); pointer-events:none;
   filter:drop-shadow(0 20px 40px rgba(22,17,13,.35));
-  opacity:calc(1 - var(--zp,0) * 1.6); }
-.zoo__hand img{ width:100%; height:auto; display:block; transform:rotate(-4deg); }
+  opacity:calc(1 - var(--zp,0) * 2.6); }
+.zoo__hand img{ width:100%; height:auto; display:block;
+  animation: bob-hand 7s ease-in-out .3s infinite; }
+@keyframes bob-hand{ 0%,100%{ transform:rotate(11deg) translateY(0); } 50%{ transform:rotate(17deg) translateY(-14px); } }
+
+/* a 4 dekor-kép (fazék, nyárs, üveges kéz, villás) oldalról "benyújtva"
+   csúszik be, amikor a videós rész görgetve elérhető lesz — a bal oldali
+   párosnak balról, a jobb oldalinak jobbról. A .zoo__pin.is-in-t az
+   IntersectionObserver kapcsolja be (lásd JS, zoom-motor blokk). */
+.zoo__hand, .deco-sticker{
+  transition: transform 1s var(--expo), opacity .9s ease; }
+.zoo-logo, .zoo-shroom{
+  transition: transform 1s var(--expo) .25s, opacity .9s ease .25s; }
+.zoo__pin:not(.is-in) .zoo__hand{ transform:translateX(-420px); opacity:0 !important; }
+.zoo__pin:not(.is-in) .zoo-shroom{ transform:translateX(-160px); opacity:0 !important; }
+.zoo__pin:not(.is-in) .deco-sticker,
+.zoo__pin:not(.is-in) .zoo-logo{ transform:translateX(160px); opacity:0 !important; }
 
 /* ============================================================
    5b. RÓLUNK → ÉLETKÉPEK GALÉRIA
@@ -1090,8 +1105,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .zoo__break{ display:block; flex-basis:100%; height:0; }
   /* a kéz+fazék nagyobb (a hely jó marad) — a szöveg margin-top-ja
      (feljebb) ad hozzá elég teret, hogy ne érjenek egymásba */
-  .zoo__hand{ top:-11%; width:clamp(300px,38vw,480px); left:clamp(-165px,-11vw,-60px); }
-  .zoo__hand img{ transform:rotate(24deg); }
+  .zoo__hand{ top:-4%; width:clamp(300px,38vw,480px); left:clamp(-165px,-11vw,-60px); }
   /* a mondat egy sorban maradt volna és keskeny kijelzőn pár px-el túlért —
      ez adta az egész oldal vízszintes „kicsúszását". Csak vízszintesen
      vágjuk (a függőleges zoom-média/kéz marad); a sticky-t ez nem töri. */
@@ -1101,17 +1115,18 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
 
-  /* a grillpartis dekor-matrica visszakapcsolva mobilra is — a szöveg
-     FÖLÉ kerül (a pin doboz teteje üres, mielőtt a "KORONA GOMBA"
-     margin-top:8vh-nél kezdődik), nem alá */
-  .deco-sticker{ display:block; bottom:auto; right:auto; top:19%; left:50%; transform:translateX(-50%); }
-  .deco-sticker img{ width:clamp(240px,62vw,380px); }
+  /* a nyárs-gomba dekor mobilon a szöveg FÖLÉ kerül (a pin doboz teteje
+     üres, mielőtt a "KORONA GOMBA" margin-top:8vh-nél kezdődik), nem alá —
+     és jobbról lóg be teljesen */
+  .deco-sticker{ bottom:auto; right:-4%; top:8%; left:auto; transform:none; }
+  .deco-sticker img{ width:clamp(200px,52vw,320px); animation-name:bob-deco-mobile; }
+  @keyframes bob-deco-mobile{ 0%,100%{ transform:rotate(-34deg) translateY(0); } 50%{ transform:rotate(-28deg) translateY(-14px); } }
 
   /* logó jobbra, gomba balra, a jobb-alsó/bal-alsó sarokban, nagyobban */
-  .zoo-logo{ right:5%; bottom:20%; left:auto; }
-  .zoo-logo img{ width:clamp(74px,18vw,110px); }
-  .zoo-shroom{ left:2%; bottom:3%; right:auto; }
-  .zoo-shroom img{ width:clamp(140px,34vw,210px); }
+  .zoo-logo{ right:-12%; bottom:8%; left:auto; }
+  .zoo-logo img{ width:clamp(180px,44vw,260px); }
+  .zoo-shroom{ left:0; bottom:3%; right:auto; }
+  .zoo-shroom img{ width:clamp(180px,44vw,260px); }
 }
 @media (max-width:480px){
   /* 23vw ezen a szélességen a betűk+logó/gomba-ikon együttes szélessége miatt
@@ -1222,6 +1237,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .slide__body > *, .slide__media img, .slide__media::before, .slide__media::after{ opacity:1 !important; transform:none !important; animation:none !important; }
   .cert{ opacity:1 !important; transform:none !important; }
   .certs__spark{ opacity:.42 !important; }
+  .zoo__pin:not(.is-in) .zoo__hand, .zoo__pin:not(.is-in) .zoo-shroom,
+  .zoo__pin:not(.is-in) .deco-sticker, .zoo__pin:not(.is-in) .zoo-logo{
+    transform:none !important; opacity:calc(1 - var(--zp,0) * 2.6) !important; }
 }
 </style>
 </head>
@@ -1552,15 +1570,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- ============ 4b. DEKOR MATRICA — tanúsítványok és a videós rész közötti üres jobb oldalon ============ -->
     <div class="deco-sticker" aria-hidden="true">
-      <img src="images/assets/elet/bbq-barattok.webp" alt="">
+      <img src="images/assets/elet/nyars-gomba.webp" alt="">
     </div>
 
     <!-- ============ 4c. LOGÓ + GOMBA DEKOR — a jobb-alsó üres sarokban ============ -->
     <div class="zoo-logo" aria-hidden="true">
-      <img src="images/assets/logo.webp" alt="">
+      <img src="images/assets/elet/kez-uveg.webp" alt="">
     </div>
     <div class="zoo-shroom" aria-hidden="true">
-      <img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-6.png" alt="">
+      <img src="images/assets/elet/villa-gomba-mirror.webp" alt="">
     </div>
 
   </div>
@@ -2342,6 +2360,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     var media = sec.querySelector('[data-zoo-media]');
     var RATIO = 16/9;                       /* a videó képaránya — végig megmarad, nincs levágás */
     var raf = false;
+
+    /* a 4 dekor-kép oldalról becsúszó belépő animációja: amint a videós
+       rész görgetve megjelenik, a .zoo__pin megkapja az is-in osztályt */
+    if('IntersectionObserver' in window){
+      var ioZoo = new IntersectionObserver(function(en){
+        en.forEach(function(e){ if(e.isIntersecting){ pin.classList.add('is-in'); ioZoo.disconnect(); } });
+      }, { threshold:0.15 });
+      ioZoo.observe(sec);
+    } else { pin.classList.add('is-in'); }
 
     function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
     function smooth(t){ return t*t*(3-2*t); }
