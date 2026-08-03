@@ -503,7 +503,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* --- karusszel --- */
 .carousel{ position:relative; overflow:hidden; background:var(--c-bg);
   transition:background-color var(--swap) var(--swap-ease);
-  padding-top:clamp(50px,7vw,90px); }
+  padding-top:clamp(20px,3vw,45px); }
 .products__head{ position:relative; z-index:3; text-align:center; margin-bottom:clamp(10px,2vw,20px);
   font-family:var(--font-display); font-weight:400; text-transform:uppercase;
   font-size:clamp(2.4rem,7vw,6.4rem); line-height:.9; letter-spacing:-.03em;
@@ -798,13 +798,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .tl__wave{ position:absolute; left:0; right:0; top:-1px; z-index:2; pointer-events:none; line-height:0; }
 .tl__wave svg{ display:block; width:100%; height:clamp(86px,8vw,128px); }
 .tl__wave path{ fill:var(--red); }
+/* átvezető blob az idővonal ALJÁN a sötét "Európai jelenlét" szekcióba —
+   a kitöltés a következő szekció tetejének színe, ezért folytonos a határ */
+.tl__wave--eu{ top:auto; bottom:-1px; z-index:4; }
+.tl__wave--eu svg{ height:clamp(130px,15vw,250px); }
+.tl__wave--eu path{ fill:#1A2018; }
 /* a partnerek pirosa az idővonalba lóg bele */
 
 /* ============================================================
    5c. IDŐVONAL — görgetésre rajzolódó útvonal, haladó jelölővel
    ============================================================ */
+/* az alsó padding a blob magasságánál nagyobb, hogy a hullám alatta kapjon
+   helyet és ne vágjon bele az idővonal tartalmába */
 .tl{ position:relative; background:var(--certs-bg); overflow:hidden;
-  padding:clamp(120px,12vw,190px) clamp(14px,2vw,30px) clamp(90px,11vw,170px); }
+  padding:clamp(120px,12vw,190px) clamp(14px,2vw,30px) clamp(210px,25vw,400px); }
 .tl__head{ position:relative; z-index:3; max-width:820px; margin:0 auto clamp(40px,6vw,90px); text-align:center; }
 .tl__eyebrow{ display:flex; align-items:center; justify-content:center; gap:12px; font-size:11px; font-weight:700;
   letter-spacing:.26em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:18px; }
@@ -959,6 +966,161 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 }
 
 /* ============================================================
+   5d. EURÓPAI JELENLÉT — "Digital Europe Network" hologram.
+   A Történetünk idővonal végén, önálló, sötét szekcióban fut.
+   A GeoJSON (custom.geo.json) csak adatforrás: részecske-felhő,
+   neon kontúr animált fényfolyással és adatáramlás-ívek épülnek
+   belőle (lásd assets/eumap-scene.js). Nincs klasszikus 3D térkép.
+   A vászon átlátszó — az oldal krém háttere látszik át alatta, a grafika
+   pedig a márka zöld/lime/piros palettájában mozog. */
+.eumap{ position:relative; text-align:center; overflow:hidden;
+  padding:0 clamp(20px,4vw,60px);
+  /* 1px átfedés a fenti szekcióra: tört képpont-arányoknál (pl. 125% nagyítás)
+     enélkül egy hajszálvékony világos csík villan a blob alatt */
+  margin-top:-1px;
+  /* SÖTÉT, drámai háttér: a világos országlapok úgy úsznak rajta, mint egy
+     megvilágított makett. A krémből ide vezető átmenet már az előző szekció
+     alján lefut (.tl::after), ezért ez itt végig egyenletesen sötét, és alul
+     pontosan a lábléc színébe (--ink) ér — így egyik szélen sincs vágás. */
+  /* FONTOS: a szekció FELSŐ ÉLE végig pontosan #1A2018 legyen — ez a blob
+     kitöltési színe. A reflektor-fény ezért lejjebb ül és nem ér fel a
+     tetejéig, különben a hullám alatt látszana a színkülönbség (vágás). */
+  background:
+    radial-gradient(96% 62% at 50% 62%, rgba(70,92,72,.42), rgba(0,0,0,0) 70%),
+    linear-gradient(to bottom, #1A2018 0%, #1A2018 16%, #171D18 48%, var(--ink) 100%); }
+
+/* 2. réteg: lassan úszó zöld fény-felhők (aurora) — ettől "él" a háttér */
+.eumap::before{ content:''; position:absolute; inset:-20%; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(38% 42% at 22% 30%, rgba(61,163,93,.30), transparent 65%),
+    radial-gradient(34% 38% at 78% 62%, rgba(217,227,78,.16), transparent 65%),
+    radial-gradient(30% 34% at 58% 18%, rgba(33,107,55,.26), transparent 68%);
+  filter:blur(34px);
+  /* a felső sávban ne legyen semmi, hogy a blob alatti él egyszínű maradjon */
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, transparent 22%, #000 34%);
+          mask-image:linear-gradient(to bottom, transparent 0, transparent 22%, #000 34%);
+  animation:eumapAurora 26s ease-in-out infinite alternate; }
+@keyframes eumapAurora{
+  0%{   transform:translate3d(0,0,0) scale(1); }
+  50%{  transform:translate3d(2.5%,-2%,0) scale(1.07); }
+  100%{ transform:translate3d(-2%,2.5%,0) scale(1.03); }
+}
+
+/* a topográfiai szintvonalak vászna — a JS rajzolja meg egyszer */
+.eumap__bg{ position:absolute; inset:0; z-index:1; width:100%; height:100%;
+  display:block; pointer-events:none; opacity:.85;
+  /* a radiális maszk mellé egy felső levágás is, hogy a blob alatti sáv
+     tiszta egyszínű maradjon (különben ott is látszana a határ) */
+  -webkit-mask-image:radial-gradient(82% 72% at 50% 52%, #000 25%, transparent 100%),
+                     linear-gradient(to bottom, transparent 0, transparent 20%, #000 32%);
+          mask-image:radial-gradient(82% 72% at 50% 52%, #000 25%, transparent 100%),
+                     linear-gradient(to bottom, transparent 0, transparent 20%, #000 32%);
+  -webkit-mask-composite:source-in;
+          mask-composite:intersect; }
+
+/* 3. réteg: finom papírszemcse (beágyazott SVG-zaj, nincs külső kép) */
+.eumap::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+  /* sötét alapon a multiply csak feketítene — a soft-light adja a szemcsét */
+  opacity:.5; mix-blend-mode:soft-light;
+  /* a felső sávban nincs szemcse: a blob kitöltése sem szemcsés, így ott
+     bármilyen apró tónuskülönbség vonalként látszana a határon */
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, transparent 20%, #000 32%);
+          mask-image:linear-gradient(to bottom, transparent 0, transparent 20%, #000 32%);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E"); }
+
+/* teljes szélességű, képernyő-magas színpad — a ScrollTrigger ezt pinneli,
+   a canvas abszolút tölti ki */
+.eumap__stage{ position:relative; z-index:2; width:100vw; margin:0 calc(50% - 50vw);
+  height:100vh; }
+.eumap__canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:pan-y; }
+
+/* az egér/ujj alatti ország neve — buborék, közvetlenül a kurzor fölött */
+.eumap__tooltip{ position:absolute; left:0; top:0; z-index:3; transform:translate(-50%,calc(-100% - 16px));
+  background:var(--ink); color:var(--cream); font-family:var(--font-display); font-weight:400;
+  font-size:clamp(15px,1.15vw,19px); letter-spacing:.01em; white-space:nowrap; padding:8px 18px; border-radius:100px;
+  pointer-events:none; opacity:0; transition:opacity .16s ease;
+  box-shadow:0 12px 28px -10px rgba(0,0,0,.45); }
+.eumap__tooltip.is-on{ opacity:1; }
+
+/* egyetlen "kattints" felirat, középen alul */
+.eumap__hint{ position:absolute; z-index:5; left:50%; bottom:clamp(28px,5vh,54px); transform:translate(-50%,10px);
+  display:flex; align-items:center; gap:10px; margin:0; padding:10px 20px 10px 16px;
+  background:rgba(18,24,19,.62); border:1.3px solid rgba(250,246,239,.20); border-radius:100px;
+  backdrop-filter:blur(8px); pointer-events:none; white-space:nowrap;
+  font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:rgba(250,246,239,.82);
+  opacity:0; transition:opacity .5s var(--ease), transform .5s var(--ease); }
+.eumap__hint.is-on{ opacity:1; transform:translate(-50%,0); }
+.eumap__hint span{ width:9px; height:9px; border-radius:50%; background:var(--green); flex:none;
+  animation:eumapPing 1.9s var(--ease) infinite; }
+@keyframes eumapPing{
+  0%,100%{ transform:scale(1); opacity:1; }
+  50%{ transform:scale(1.45); opacity:.55; }
+}
+
+/* a kattintással kiemelt ország adatlapja — bal alul, a térkép fölött */
+.eumap__card{ position:absolute; z-index:6; left:clamp(24px,7vw,120px); bottom:clamp(60px,12vh,140px);
+  width:min(38ch,84vw); text-align:left; background:var(--cream);
+  border:1.5px solid var(--cream-line); border-radius:22px; padding:26px 28px 28px;
+  box-shadow:0 26px 60px -26px rgba(0,0,0,.35);
+  opacity:0; transform:translateY(16px) scale(.98); pointer-events:none;
+  transition:opacity .45s var(--ease), transform .45s var(--ease); }
+.eumap__card.is-on{ opacity:1; transform:none; pointer-events:auto; }
+.eumap__card-x{ position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%;
+  border:1.4px solid var(--cream-line); background:transparent; cursor:pointer; line-height:1;
+  font-size:19px; color:var(--ink-soft); transition:background .25s, color .25s, border-color .25s; }
+.eumap__card-x:hover{ background:var(--green); border-color:var(--green); color:var(--cream); }
+.eumap__card-kicker{ display:block; font-size:11px; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--green); margin-bottom:10px; }
+.eumap__card-title{ font-family:var(--font-display); font-weight:400; letter-spacing:-.02em; line-height:1;
+  font-size:clamp(26px,2.6vw,40px); color:var(--ink); margin:0 0 12px; }
+.eumap__card-text{ font-family:var(--font-lead); font-size:clamp(14px,1.15vw,17px); line-height:1.55;
+  color:var(--ink-soft); margin:0; }
+
+/* márkaüzenet — mindjárt az elején, a szekció tetején; görgetésre elúszik */
+/* --- szerkesztői keret: hajszálvékony vonal + sarokjelek --- */
+.eumap__frame{ position:absolute; z-index:3; pointer-events:none;
+  inset:clamp(18px,3.2vw,54px);
+  border:1px solid rgba(250,246,239,.16); }
+.eumap__corner{ position:absolute; width:14px; height:14px; }
+.eumap__corner::before,
+.eumap__corner::after{ content:''; position:absolute; background:var(--n-lime); }
+.eumap__corner::before{ width:14px; height:1.6px; }
+.eumap__corner::after{ width:1.6px; height:14px; }
+.eumap__corner--tl{ left:-1px; top:-1px; }
+.eumap__corner--tr{ right:-1px; top:-1px; }
+.eumap__corner--tr::before{ right:0; }
+.eumap__corner--tr::after{ right:0; }
+.eumap__corner--bl{ left:-1px; bottom:-1px; }
+.eumap__corner--bl::before{ bottom:0; }
+.eumap__corner--bl::after{ bottom:0; }
+.eumap__corner--br{ right:-1px; bottom:-1px; }
+.eumap__corner--br::before{ right:0; bottom:0; }
+.eumap__corner--br::after{ right:0; bottom:0; }
+
+/* --- fejléc: bal felül, a kereten belül; görgetésre elúszik --- */
+.eumap__msg{ position:absolute; z-index:4;
+  left:clamp(34px,5.4vw,86px); top:clamp(38px,6vw,92px);
+  width:min(34ch,72vw); text-align:left; pointer-events:none;
+  opacity:0; transform:translateY(-12px);
+  transition:opacity .8s var(--ease), transform .8s var(--ease); }
+.eumap__msg.is-on{ opacity:1; transform:none; }
+.eumap__msg-kicker{ display:block; font-size:11px; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--n-lime); margin-bottom:12px; }
+.eumap__msg-title{ font-family:var(--font-display); font-weight:400; letter-spacing:-.02em; line-height:.94;
+  font-size:clamp(30px,3.6vw,58px); color:var(--cream); margin:0 0 12px; }
+.eumap__msg-lead{ font-family:var(--font-lead); font-size:clamp(14px,1.15vw,18px); line-height:1.5;
+  color:rgba(250,246,239,.68); margin:0; max-width:28ch; }
+
+
+@media (max-width:760px){
+  .eumap__frame{ inset:12px; }
+  .eumap__msg{ left:24px; right:24px; top:30px; width:auto; }
+  .eumap__msg-lead{ max-width:none; }
+  .eumap__card{ left:16px; right:16px; width:auto; bottom:clamp(28px,5vh,60px); padding:22px 22px 24px; }
+}
+
+
+/* ============================================================
    7. LÁBLÉC — óriás felirat, felugráló gombákkal
    ============================================================ */
 .ft{ position:relative; background:var(--ink); color:var(--cream); overflow:hidden;
@@ -992,7 +1154,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .ft__lang button:hover{ color:var(--cream); border-color:var(--cream); transform:translateY(-2px); }
 
 /* --- az óriás felirat és a gombák --- */
-.ft__stage{ position:relative; z-index:2; width:100%; max-width:none; margin:0;
+.ft__stage{ position:relative; z-index:2;
+  /* kitör a .ft oldalpaddingjéből, hogy tényleg a teljes szélességben fusson —
+     enélkül a szélén felugró gombák a padding miatt levágódtak */
+  margin:0 calc(clamp(20px,4vw,60px) * -1);
   height:clamp(260px,36vw,620px);
   /* a felirat és a dobált gombák nem lóghatnak ki a sávból */
   overflow:hidden; }
@@ -1753,8 +1918,60 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <img src="images/assets/logo.webp" alt="">
     </div>
   </div>
+
+  <!-- mozgó blob a szekcióhatáron: ugyanaz a hullám-motor rajzolja, mint a
+       termékek és a "rólunk" csíkját (lásd 4b. HULLÁM). A kitöltés a KÖVETKEZŐ
+       (sötét) szekció színe, így az szervesen csorog bele a krémbe. -->
+  <div class="tl__wave tl__wave--eu" aria-hidden="true">
+    <svg viewBox="0 0 1200 300" preserveAspectRatio="none">
+      <path id="wave-eumap" d=""/>
+    </svg>
+  </div>
 </section>
 
+<!-- ================== 5d. EURÓPAI JELENLÉT ================== -->
+<section class="eumap" id="eu-jelenlet">
+  <!-- procedurális topográfiai háttér (izovonalak) — a JS rajzolja egyszer -->
+  <canvas class="eumap__bg" id="eumapBg" aria-hidden="true"></canvas>
+
+  <div class="eumap__stage" id="eumapStage">
+    <!-- A 3D-ben CSAK a lebegő térkép van (assets/eumap-scene.js) — nincs
+         asztal/tányér, mert az mindig elszívta a figyelmet a térképről.
+         A "prémium tárgy" érzetet ez a szerkesztői keretezés adja. -->
+    <canvas class="eumap__canvas" id="eumapCanvas" aria-hidden="true"></canvas>
+    <span class="eumap__tooltip" id="eumapTooltip" aria-hidden="true"></span>
+
+    <!-- vékony keret + sarokjelek, mint egy bekeretezett metszeten -->
+    <div class="eumap__frame" aria-hidden="true">
+      <i class="eumap__corner eumap__corner--tl"></i>
+      <i class="eumap__corner eumap__corner--tr"></i>
+      <i class="eumap__corner eumap__corner--bl"></i>
+      <i class="eumap__corner eumap__corner--br"></i>
+    </div>
+
+    <!-- fejléc: bal felül, görgetésre elúszik -->
+    <header class="eumap__msg" id="eumapMessage">
+      <span class="eumap__msg-kicker">Európai jelenlét</span>
+      <h2 class="eumap__msg-title">Innen indul<br>Európa gombája</h2>
+      <p class="eumap__msg-lead">Demjén, Magyarország — saját komposztból, 1990 óta.</p>
+    </header>
+
+    <!-- egyetlen, központi felhívás — az országnevek lekerültek a térképről -->
+    <p class="eumap__hint" id="eumapHint">
+      <span></span> Kattints egy zászlós országra
+    </p>
+
+    <!-- kattintásra kiemelt ország adatlapja.
+         FIGYELEM: a leírás egyelőre KITÖLTENDŐ helykitöltő szöveg, nem valós
+         adat — a végleges szöveget a JS-ben (COPY) kell megírni. -->
+    <aside class="eumap__card" id="eumapCard" aria-live="polite">
+      <button class="eumap__card-x" id="eumapCardClose" type="button" aria-label="Bezárás">&times;</button>
+      <span class="eumap__card-kicker">Exportpiac</span>
+      <h3 class="eumap__card-title" id="eumapCardTitle">—</h3>
+      <p class="eumap__card-text" id="eumapCardText"></p>
+    </aside>
+  </div>
+</section>
 
 <!-- ================== 7. LÁBLÉC ================== -->
 <footer class="ft" id="kapcsolat">
@@ -2071,6 +2288,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     ioC.observe(certs);
   } else { certs.classList.add('is-in'); }
 
+  /* 5d. EURÓPAI JELENLÉT — a 3D mycelium-jelenetet és a hover-feliratot
+     az assets/eumap-scene.js modul kezeli (Three.js + GSAP ScrollTrigger). */
+
   /* ============ 3. egér-parallax ============ */
   if (!reduce && window.innerWidth >= 900){
     var els = Array.prototype.slice.call(document.querySelectorAll('.shroom'));
@@ -2265,7 +2485,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     var top = document.getElementById('wave-top');
     var bot = document.getElementById('wave-bot');
     var abt = document.getElementById('wave-abt');
-    if(!top && !bot && !abt) return;
+    var eum = document.getElementById('wave-eumap');   /* átvezetés a sötét szekcióba */
+    if(!top && !bot && !abt && !eum) return;
 
     var W = 1200, H = 300, N = 5;
 
@@ -2315,13 +2536,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       if(top) top.setAttribute('d', toPath(sample(0, 1)));
       if(bot) bot.setAttribute('d', toPath(sample(0,-1)));
       if(abt) abt.setAttribute('d', toPath(sample(3, 1)));
+      if(eum) eum.setAttribute('d', toPath(sample(1.6,-1)));
       return;
     }
 
     var t0 = performance.now();
-    var vis = { products:true, rolunk:true };
+    var vis = { products:true, rolunk:true, eumap:true };
     if('IntersectionObserver' in window){
-      [['products','products'],['rolunk','rolunk']].forEach(function(pair){
+      [['products','products'],['rolunk','rolunk'],['eumap','idovonal']].forEach(function(pair){
         var sec = document.getElementById(pair[1]);
         if(!sec) return;
         vis[pair[0]] = false;
@@ -2336,6 +2558,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       if(top) top.setAttribute('d', toPath(sample(t, 1)));
       if(bot) bot.setAttribute('d', toPath(sample(t*0.86 + 2.4, -1)));
       if(abt) abt.setAttribute('d', toPath(sample(t*0.74 + 5.7, 1)));
+      if(eum) eum.setAttribute('d', toPath(sample(t*0.62 + 1.6, -1)));
     }
     paint(0);
 
@@ -2347,6 +2570,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         if(bot) bot.setAttribute('d', toPath(sample(t*0.86 + 2.4, -1)));
       }
       if(vis.rolunk && abt) abt.setAttribute('d', toPath(sample(t*0.74 + 5.7, 1)));
+      if(vis.eumap && eum) eum.setAttribute('d', toPath(sample(t*0.62 + 1.6, -1)));
     }
     requestAnimationFrame(frame);
   })();
@@ -2687,5 +2911,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   });
 })();
 </script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script src="assets/eumap-bg.js"></script>
+<script type="module" src="assets/eumap-scene.js"></script>
 </body>
 </html>

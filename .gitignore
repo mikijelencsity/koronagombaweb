@@ -10,3 +10,14 @@ timeline/
 javitasok.md
 todo.txt
 partners/gtl.png.png
+.superpowers/
+hiba1.png
+ChatGPT Image *.png
+
+# nyers 3D modellek és a belőlük optimalizált változatok — jelenleg nincsenek
+# használatban a jelenetben, és fejenként 15 MB-osak
+*.glb
+assets/models/
+
+# helyi biztonsági mentések
+backup/
