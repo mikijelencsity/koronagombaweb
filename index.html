@@ -934,8 +934,27 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 /* a média a pinhez képest abszolút — így a mondat nem tördelődik újra */
 .zoo__media{ position:absolute; z-index:4; overflow:hidden; background:var(--ink);
-  will-change:left,top,width,height; box-shadow:var(--sh-float-lg); }
-.zoo__media video{ width:100%; height:100%; object-fit:cover; display:block; }
+  will-change:left,top,width,height;
+  /* A keret súlya a nyílással együtt nő: záráskor még alig vet árnyékot,
+     teljesen kinyílva komoly, mozis tömbként ül a sötét háttéren.
+     A --zp-t (0 = zárt betű-kör, 1 = teljes 16:9) a JS írja a .zoo__pin-re;
+     az alábbi rétegek MIND ezt olvassák, ezért nem kellett új JS. */
+  box-shadow:0 calc(18px + 46px * var(--zp,0)) calc(40px + 90px * var(--zp,0))
+             calc(-20px - 20px * var(--zp,0)) rgba(0,0,0,calc(.35 + .3 * var(--zp,0))); }
+
+/* DOLLY: a videó induláskor ~22%-kal rá van nagyítva, és ahogy a keret
+   kinyílik, visszahúzódik 1.0-ra. Ettől nem "nő egy doboz", hanem a kamera
+   hátrálni látszik — ez adja a mozis érzetet.
+   A színek is a nyitással érkeznek meg: eleinte fakóbb és kontrasztosabb. */
+.zoo__media video{ width:100%; height:100%; object-fit:cover; display:block;
+  transform:scale(calc(1.22 - .22 * var(--zp,0))); transform-origin:50% 50%;
+  filter:saturate(calc(.72 + .28 * var(--zp,0))) contrast(calc(1.14 - .14 * var(--zp,0))); }
+
+/* VIGNETTA — nyitás elején erős, a végére alig: a szélek felé sötétít,
+   így a kép közepe emelkedik ki. */
+.zoo__media::after{ content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:radial-gradient(125% 105% at 50% 50%, rgba(0,0,0,0) 42%, rgba(0,0,0,.62) 100%);
+  opacity:calc(.85 - .45 * var(--zp,0)); }
 
 /* a kéz+fazék png — úgy nyúlik be az oldal bal széléről, mintha valaki
    odanyújtaná a nézőnek: a kar a bal képszélen kívülről indul, a fazék
