@@ -603,7 +603,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 /* FIX kör-hátter — a karusszel közepén áll, NEM mozog a diákkal; csak a termékkép csúszik át rajta.
    Balra tolva, mert a kép most a dia jobb oldalán ül (a szöveg a bal oldalon van mellette). */
-.carousel__ring{ position:absolute; z-index:1; left:50%; top:52%; translate:-50% -50%; pointer-events:none; }
+/* top 52% -> 58%: a kör közepe 48px-szel a termékkép közepe FÖLÖTT volt,
+   ezért a kép alul kilógott a körből. A kép függőleges helyzetét a dia rácsa
+   adja (és a lapozósáv miatti alsó padding tolja), ezért nem a képet
+   mozgatjuk, hanem a kört igazítjuk hozzá.
+   Mobilon (≤640px) külön érték él, azt nem érintjük. */
+.carousel__ring{ position:absolute; z-index:1; left:50%; top:58%; translate:-50% -50%; pointer-events:none; }
 .carousel__ring i{ position:absolute; left:50%; top:50%; translate:-50% -50%; border-radius:50%; display:block; }
 /* sokkal halványabb, csak sejlik — és magassághoz is korlátozva, hogy ne vágódjon le fent/lent */
 .carousel__ring .disc{ width:min(40vw,58vh,480px); aspect-ratio:1; background:rgba(255,255,255,.28); }
@@ -635,7 +640,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      ezért futásidőben NINCS drop-shadow filter — az volt a lassulás/akadás oka.
      A kép körül van egy kis üres margó (a beégetett árnyék helye), ezért
      ~16%-kal nagyobbra kell venni, hogy a termék mérete ugyanaz maradjon */
-  width:min(142%,1090px); height:auto;
+  /* 142% -> 118%: a kép beleért a terméknévbe. A -fx fájlok átlátszó
+     margója NEM egyforma (konzerv 24%, friss 14%, csíra és komposzt csak
+     8%), ezért a legkisebb margójú kettőnél a termék tényleges pereme
+     26px-en átfedte a nevet. A karusszel JS a kép KÖZEPÉT igazítja a
+     képernyő közepére, tehát oldalra tolni nem lehet — csak kisebbre venni. */
+  width:min(118%,900px); height:auto;
   /* nincs már drága filter, úgyhogy ez most olcsó: mindig legyen kész,
      előre kirajzolt rétege a képnek — enélkül a klón-diák (amiket a
      böngésző még sosem rajzolt ki) a hurok-váltás csúsztatása KÖZBEN
@@ -710,7 +720,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    FONTOS: a csírához és a komposzthoz NEM étel-, hanem üzemi fotó megy —
    azok alapanyag/szaporítóanyag, nincs hozzájuk elkészített étel. */
 .slide__pola{ position:absolute; inset:0; z-index:4; pointer-events:none; }
-.slide__pola figure{ position:absolute; width:clamp(128px,16.5%,210px);
+.slide__pola figure{ position:absolute; width:clamp(152px,21%,250px);
   background:var(--cream); padding:8px 8px clamp(18px,2.6vw,26px);
   border-radius:var(--r-sm); box-shadow:var(--sh-float-md);
   transform:rotate(var(--rot,0deg)) scale(.86); opacity:0;
@@ -732,8 +742,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    ezért a vízszintes helyzetét a név nem korlátozza.
    A jobb oldali kilóghat a dia jobb széle mögül: a .slide overflow-ja
    visible, és a .carousel (overflow:hidden) széléig még bőven van hely. */
-.slide__pola figure:nth-child(1){ left:29%;  top:3%; }
-.slide__pola figure:nth-child(2){ right:-14%; bottom:14%; }
+.slide__pola figure:nth-child(1){ left:6%;   bottom:0; }
+.slide__pola figure:nth-child(2){ right:-14%; bottom:22%; }
 /* a "Gombakomposzt" a leghosszabb név — kisebb betűmérettel fér csak el
    ütközés nélkül a kép mellett.
    (2026-08: a dia szélessége 1000px->800px lett a szomszédos diák
