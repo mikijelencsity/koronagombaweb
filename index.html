@@ -601,23 +601,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   font-size:clamp(2.4rem,7vw,6.4rem); line-height:.9; letter-spacing:-.03em;
   color:var(--c-ui,#fff); transition:color var(--swap) var(--swap-ease); }
 
-/* FIX kör-hátter — a karusszel közepén áll, NEM mozog a diákkal; csak a termékkép csúszik át rajta.
-   Balra tolva, mert a kép most a dia jobb oldalán ül (a szöveg a bal oldalon van mellette). */
-/* top 52% -> 58%: a kör közepe 48px-szel a termékkép közepe FÖLÖTT volt,
-   ezért a kép alul kilógott a körből. A kép függőleges helyzetét a dia rácsa
-   adja (és a lapozósáv miatti alsó padding tolja), ezért nem a képet
-   mozgatjuk, hanem a kört igazítjuk hozzá.
-   Mobilon (≤640px) külön érték él, azt nem érintjük. */
-.carousel__ring{ position:absolute; z-index:1; left:50%; top:58%; translate:-50% -50%; pointer-events:none; }
-.carousel__ring i{ position:absolute; left:50%; top:50%; translate:-50% -50%; border-radius:50%; display:block; }
-/* sokkal halványabb, csak sejlik — és magassághoz is korlátozva, hogy ne vágódjon le fent/lent */
-.carousel__ring .disc{ width:min(40vw,58vh,480px); aspect-ratio:1; background:rgba(255,255,255,.28); }
-.carousel__ring .rings{ width:min(40vw,58vh,480px); aspect-ratio:1; border:1.5px solid rgba(255,255,255,.14);
-  box-shadow:
-    0 0 0 44px rgba(255,255,255,.05),
-    0 0 0 88px rgba(255,255,255,.035),
-    0 0 0 132px rgba(255,255,255,.02); }
-
 .carousel__track{ position:relative; z-index:2; display:flex; align-items:center; gap:clamp(10px,2vw,30px);
   will-change:transform; transition:transform var(--swap) cubic-bezier(.65,.02,.18,1); }
 
@@ -633,7 +616,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 }
 .slide__body{ order:1; text-align:left; }
 /* a termékkép a dia jobb oldalán, dominánsan nagyra véve — a fix kör mögötte áll */
-.slide__media{ order:2; position:relative; z-index:3; display:grid; place-items:center; width:100%; }
+.slide__media{ order:2; position:relative; z-index:3;
+  /* Diánként eltérő függőleges korrekció. A -fx képeken a termék
+     látható tartalma más-más magasságban ül a fájlon belül, ezért a
+     kör kivétele után diánként mást kellett igazítani ahhoz, hogy a
+     termék fölött és alatt nagyjából egyforma üres hely maradjon.
+     Az értékeket mérésből kaptuk, lásd az <article> inline stílusát. */
+  transform:translateY(var(--media-shift,0)); display:grid; place-items:center; width:100%; }
 .slide__media img{
   position:relative; z-index:2;
   /* az -fx.webp fájlokba bele van sütve az árnyék (Pillow-val előre legenerálva),
@@ -1491,14 +1480,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .slide__body{ text-align:center; order:2; }
   .slide__media{ order:1; }
   .slide__media img{ width:min(85%,422px); }
-  .carousel__ring{ left:50%; }
-  .carousel__ring .disc, .carousel__ring .rings{ width:min(68vw,340px); }
 }
 @media (max-width:640px){
   /* Telefonon a termékkép feljebb ül, mint a dekor körgyűrű (a gyűrű a
      carousel 52%-ánál van, a kép viszont az egy-oszlopos elrendezés tetején).
      A gyűrűt a kép mögé húzzuk, hogy a termék a gyűrűben üljön, mint gépen. */
-  .carousel__ring{ top:34%; }
 }
 /* ===== HERO — 100% zoomon a 80%-os arány visszaállítása (CSAK desktop) =====
    Az oldalt 80% böngésző-zoomon terveztük; 100%-on a hero PX-alapú elemei
@@ -1854,13 +1840,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   <!-- KARUSSZEL -->
   <div class="carousel" id="carousel">
     <h2 class="products__head">Termékeink</h2>
-    <div class="carousel__ring" aria-hidden="true"><i class="rings"></i><i class="disc"></i></div>
     <div class="carousel__track" id="track">
 
       <!-- 01 — FRISS GOMBÁK -->
       <article class="slide"
         data-bg="#399957" data-deep="#216B37" data-deeper="#123B20" data-acc="#F0B93C" data-ui="#F9F4FF"
-        style="--bg:#399957; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20">
+        style="--bg:#399957; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20; --media-shift:-10px">
         <div class="slide__media"><img src="images/assets/products/friss-fx.webp" alt="Friss gombák" decoding="async"></div>
           <div class="slide__shrooms" aria-hidden="true">
             <img src="images/mushrooms/mushroom-0.webp" alt="" style="--x:7%; --y:10%; --w:clamp(62px,9vw,108px); --rot:-12deg" loading="lazy" decoding="async">
@@ -1876,7 +1861,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 02 — GOMBAKONZERV -->
       <article class="slide"
         data-bg="#F62213" data-deep="#A71106" data-deeper="#620A04" data-acc="#F0B93C" data-ui="#FFF2EE"
-        style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04">
+        style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04; --media-shift:15px">
         <div class="slide__media"><img src="images/assets/products/konzerv-fx.webp" alt="Korona termesztett csiperke szeletek konzerv" decoding="async"></div>
           <div class="slide__shrooms" aria-hidden="true">
             <img src="images/mushrooms/mushroom-2.webp" alt="" style="--x:8%; --y:12%; --w:clamp(58px,8.4vw,100px); --rot:11deg" loading="lazy" decoding="async">
@@ -1892,7 +1877,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 03 — GOMBACSÍRA -->
       <article class="slide"
         data-bg="#2E9B57" data-deep="#1C6B3A" data-deeper="#0F4526" data-acc="#D9E34E" data-ui="#F9F4FF"
-        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526">
+        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526; --media-shift:32px">
         <div class="slide__media"><img src="images/assets/products/csira-fx.webp" alt="Gombacsíra" decoding="async"></div>
           <div class="slide__shrooms" aria-hidden="true">
             <img src="images/mushrooms/mushroom-4.webp" alt="" style="--x:6%; --y:11%; --w:clamp(56px,8vw,96px); --rot:8deg" loading="lazy" decoding="async">
@@ -1908,7 +1893,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 04 — GOMBAKOMPOSZT -->
       <article class="slide"
         data-bg="#E1432B" data-deep="#A32E1D" data-deeper="#611B11" data-acc="#F0B93C" data-ui="#FFF2EE"
-        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11">
+        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11; --media-shift:31px">
         <div class="slide__media"><img src="images/assets/products/komposzt-fx.webp" alt="Gombakomposzt" decoding="async"></div>
           <div class="slide__shrooms" aria-hidden="true">
             <img src="images/mushrooms/mushroom-6.webp" alt="" style="--x:7%; --y:12%; --w:clamp(58px,8.2vw,98px); --rot:-9deg" loading="lazy" decoding="async">
