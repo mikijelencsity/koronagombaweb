@@ -582,8 +582,45 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .carousel{ position:relative; overflow:hidden; background:var(--c-bg);
   /* mennyivel ül feljebb a cím; lásd .products__head */
   --head-lift:clamp(46px,5.2vw,86px); margin-top:calc(-1 * var(--head-lift));
+  /* A termékfotó vízszintes eltolása. KÖZÖS változó, mert a háttér-körök és
+     a napsugár is ehhez igazodik — így ha ez változik, együtt mozognak. */
+  --media-x:55px;
+  --ring-x:calc(50% + var(--media-x));
+  --ring-y:58%;
   transition:background-color var(--swap) var(--swap-ease);
   padding-top:clamp(20px,3vw,45px); }
+
+/* ===== HÁTTÉR: NAPSUGÁR + KONCENTRIKUS KÖRÖK ==========================
+   A régi verzióban egyetlen nagy, tömör világos korong volt — az elnyomta a
+   terméket. Most: EGY tömör korong középen, körülötte csak KÖRVONALAS
+   gyűrűk, mögötte pedig teljes szélességű napsugár.
+   Mindhárom a --ring-x / --ring-y köré épül, ami a termékfotó eltolásából
+   származik, tehát a termék pontosan a közepükön ül. */
+
+/* napsugár — teljes szélességben, a kör közepéből indulva.
+   repeating-conic-gradient adja a sugarakat; a radiális maszk kifelé
+   elhalványítja őket, hogy ne legyen kemény pereme a mintának. */
+.carousel__rays{ position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:repeating-conic-gradient(from 0deg at var(--ring-x) var(--ring-y),
+    rgba(255,255,255,.075) 0deg 4deg, rgba(255,255,255,0) 4deg 11deg);
+  -webkit-mask-image:radial-gradient(60% 90% at var(--ring-x) var(--ring-y),
+    rgba(0,0,0,0) 16%, #000 42%, rgba(0,0,0,0) 100%);
+          mask-image:radial-gradient(60% 90% at var(--ring-x) var(--ring-y),
+    rgba(0,0,0,0) 16%, #000 42%, rgba(0,0,0,0) 100%); }
+
+/* a korong és a gyűrűk egymásra vannak rétegezve (grid-area:1/1) */
+.carousel__ring{ position:absolute; z-index:1; left:var(--ring-x); top:var(--ring-y);
+  translate:-50% -50%; pointer-events:none; display:grid; place-items:center; }
+.carousel__ring i{ grid-area:1/1; display:block; aspect-ratio:1; border-radius:50%; }
+/* A méretekben NINCS vh-korlát: a termékfotó szélessége a dia oszlopából
+   származik (nem a viewport magasságából), ezért egy vh-cap alacsony
+   ablaknál a korong alá nyomta volna a terméket, és a korong eltűnt.
+   A tömör korong szándékosan NAGYOBB a termék látható peremnél, hogy
+   körben kilátsszon mögüle. */
+.carousel__ring .disc{   width:min(49vw,560px); background:rgba(255,255,255,.24); }
+.carousel__ring .ring--1{ width:min(60vw,685px); border:1.6px solid rgba(255,255,255,.22); }
+.carousel__ring .ring--2{ width:min(72vw,825px); border:1.5px solid rgba(255,255,255,.13); }
+.carousel__ring .ring--3{ width:min(86vw,990px); border:1.5px solid rgba(255,255,255,.075); }
 /* A cím feljebb ül: a felső hullám alja és a felirat között ~120px üres zöld
    volt, alatta viszont azonnal jött a tartalom.
 
@@ -627,7 +664,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      befolyásol — így a JS nem korrigálja vissza. Erre azért van szükség,
      mert a kép közepe egyébként a képernyő közepére van szögezve, és
      balra a terméknév korlátozta a méretét. Jobbra tolva nagyobb lehet. */
-  transform:translate(55px, var(--media-shift,0)); display:grid; place-items:center; width:100%; }
+  transform:translate(var(--media-x), var(--media-shift,0)); display:grid; place-items:center; width:100%; }
 .slide__media img{
   position:relative; z-index:2;
   /* az -fx.webp fájlokba bele van sütve az árnyék (Pillow-val előre legenerálva),
@@ -1820,6 +1857,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   <!-- KARUSSZEL -->
   <div class="carousel" id="carousel">
     <h2 class="products__head">Termékeink</h2>
+
+    <div class="carousel__rays" aria-hidden="true"></div>
+    <div class="carousel__ring" aria-hidden="true">
+      <i class="ring ring--3"></i>
+      <i class="ring ring--2"></i>
+      <i class="ring ring--1"></i>
+      <i class="disc"></i>
+    </div>
+
     <div class="carousel__track" id="track">
 
       <!-- 01 — FRISS GOMBÁK -->
@@ -1847,7 +1893,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 03 — GOMBACSÍRA -->
       <article class="slide"
         data-bg="#2E9B57" data-deep="#1C6B3A" data-deeper="#0F4526" data-acc="#D9E34E" data-ui="#F9F4FF"
-        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526; --media-shift:50px">
+        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526; --media-shift:8px">
         <div class="slide__media"><img src="images/assets/products/csira-fx.webp" alt="Gombacsíra" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Szaporítóanyag</p>
@@ -1858,7 +1904,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 04 — GOMBAKOMPOSZT -->
       <article class="slide"
         data-bg="#E1432B" data-deep="#A32E1D" data-deeper="#611B11" data-acc="#F0B93C" data-ui="#FFF2EE"
-        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11; --media-shift:48px">
+        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11; --media-shift:7px">
         <div class="slide__media"><img src="images/assets/products/komposzt-fx.webp" alt="Gombakomposzt" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Alapanyag</p>
