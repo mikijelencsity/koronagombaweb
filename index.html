@@ -604,6 +604,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 .slide{
   flex:0 0 min(1000px,66vw);
+  position:relative;   /* a .slide__pola horgonya gépen */
   background:transparent; color:var(--fg);
   display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr); align-items:center;
   gap:clamp(10px,1.6vw,26px);
@@ -652,22 +653,69 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .slide.is-active .slide__body > *:nth-child(4){ transition-delay:.40s; }
 .slide.is-active .slide__body > *:nth-child(5){ transition-delay:.48s; }
 
+/* KICKER — kis címke a terméknév FÖLÖTT, nem helyette.
+   Korábban clamp(26px,2.9vw,36px) volt, vagyis MINDEN képernyőméreten
+   NAGYOBB, mint maga a terméknév (17,6-30,4px) — a dekoratív felirat
+   túlkiabálta a terméket. Most alárendelt méretben van.
+   Szín: a --acc (arany/lime) a színes háttéren 1,78-2,53:1 kontrasztot
+   adott, ami még a nagy szövegre vonatkozó 3:1-et sem érte el egyik dián
+   sem. A krém --ui 2,94-3,81:1 — lásd a megjegyzést a .slide__name-nél. */
 .slide__kicker{ font-family:'Caveat',cursive;
-  font-size:clamp(26px,2.9vw,36px); font-weight:600; letter-spacing:.01em; text-transform:none;
-  color:var(--acc); margin-bottom:12px; }
+  font-size:clamp(17px,1.6vw,22px); font-weight:600; letter-spacing:.01em; text-transform:none;
+  color:var(--ui); opacity:.92; margin-bottom:6px; }
 /* sima, tömör kitöltés, csak egy vékony körvonallal a kontraszthoz —
    nem a régi vastag fehér keret, csak épp annyi, hogy elváljon a háttértől */
-.slide__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(1.1rem,2.3vw,1.9rem);
-  line-height:1.02; letter-spacing:-.015em; text-transform:uppercase; margin-bottom:26px;
-  white-space:nowrap;
+/* TERMÉKNÉV — a dia legnagyobb szövegeleme.
+   A SZÍN szándékosan maradt a sötét --stroke: kimértük, hogy a színes
+   diahátterek középtónusúak, ezért RAJTUK SEM a világos, SEM a sötét szöveg
+   nem éri el a 4,5:1-et. Nagy szövegre a küszöb 3:1, és ott a sötét jobb:
+     zöld 3,94 | piros 3,30 | zöld2 3,13 | piros2 3,01  -> mind átmegy
+     (krémmel ugyanez: 2,94 | 3,72 | 3,27 | 3,81 -> a zöldön megbukna)
+   A név baja tehát nem a szín volt, hanem hogy 17,6px-en jelent meg, ahol
+   az 1,5px-es kontúr a betűvastagság harmadát elette.
+   A nowrap helyett tördelhet: emiatt lehet végre nagy, anélkül hogy
+   belelógna a termékfotóba (ezért kellett korábban lekicsinyíteni). */
+.slide__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(26px,3.4vw,44px);
+  line-height:1.0; letter-spacing:-.02em; text-transform:uppercase; margin-bottom:22px;
+  text-wrap:balance;
   color:var(--stroke,var(--ink)); -webkit-text-stroke:1.5px var(--cream); paint-order:stroke fill; }
+
+/* ===== POLAROID-PÁR a termékfotó mellé ==================================
+   Ugyanaz a matrica-nyelv, mint a Történetünk szekcióban (--r-sm sarok,
+   krém perem, alul vastagabb szegély, --sh-float-md) — ezért nem idegen
+   testként ül a diában, hanem összeköti a két szekciót.
+
+   GÉPEN a .slide__media-hoz képest abszolút, a nagy termékfotó két
+   ellentétes sarkába bújik. MOBILON (<=980px) statikussá válik és a
+   szöveg alá kerül két hasábban — lásd a lenti breakpointot.
+
+   FONTOS: a csírához és a komposzthoz NEM étel-, hanem üzemi fotó megy —
+   azok alapanyag/szaporítóanyag, nincs hozzájuk elkészített étel. */
+.slide__pola{ position:absolute; inset:0; z-index:4; pointer-events:none; }
+.slide__pola figure{ position:absolute; width:clamp(96px,11.5%,150px);
+  background:var(--cream); padding:6px 6px clamp(14px,2.2vw,20px);
+  border-radius:var(--r-sm); box-shadow:var(--sh-float-md);
+  transform:rotate(var(--rot,0deg)) scale(.86); opacity:0;
+  transition:opacity .5s var(--ease), transform .6s var(--ease); }
+.slide__pola figure img{ width:100%; aspect-ratio:1; object-fit:cover; display:block;
+  border-radius:calc(var(--r-sm) - 3px); }
+/* csak az AKTÍV dián ússzanak be — a szomszédos diákon ne vonják el a fókuszt */
+.slide.is-active .slide__pola figure{ opacity:1; transform:rotate(var(--rot,0deg)); }
+.slide.is-active .slide__pola figure:nth-child(1){ transition-delay:.18s; }
+.slide.is-active .slide__pola figure:nth-child(2){ transition-delay:.30s; }
+/* A .slide__pola a .slide közvetlen gyereke (nem a .slide__media-n belül),
+   hogy mobilon ki tudjon lépni a kép alól a szöveg alá. Gépen ezért a
+   koordináták a TELJES diára vonatkoznak: a jobb oldali (kép-)oszlop
+   nagyjából 46%-nál kezdődik, oda lógatjuk a két polaroidot. */
+.slide__pola figure:nth-child(1){ left:42%; top:4%; }
+.slide__pola figure:nth-child(2){ right:1%; bottom:16%; }
 /* a "Gombakomposzt" a leghosszabb név — kisebb betűmérettel fér csak el
    ütközés nélkül a kép mellett.
    (2026-08: a dia szélessége 1000px->800px lett a szomszédos diák
    belógásához, ami az egész oszlopot keskenyítette — ezért kellett a fenti
    alapméretet is jelentősen csökkenteni, különben minden terméknév
    belelógott volna a képbe, nem csak a leghosszabb "Gombakomposzt".) */
-.slide__name--long{ font-size:clamp(1rem,2vw,1.7rem); }
+.slide__name--long{ font-size:clamp(23px,3vw,38px); }
 /* a méret (font-size/padding) MINDIG ugyanaz, aktív és inaktív dián is —
    korábban csak az aktívra volt megadva, az inaktív a .btn--lg alap
    (nagyobb) méretét kapta, ezért diaváltáskor a gomb láthatóan
@@ -1421,6 +1469,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .slide__body{ text-align:center; order:2; }
   .slide__media{ order:1; }
   .slide__media img{ width:min(85%,422px); }
+  /* MOBIL: a polaroidok kilépnek az abszolút pozícióból és a terméknév alá
+     kerülnek két hasábban. Ezért van a .slide__pola a .slide gyereke — így
+     tud a grid harmadik elemeként a szöveg MÖGÉ sorolódni. */
+  .slide__pola{ position:static; order:3; display:grid; grid-template-columns:repeat(2,1fr);
+    gap:14px; justify-items:center; width:min(86%,340px); margin:2px auto 0; }
+  .slide__pola figure{ position:static; width:100%; }
   .carousel__ring{ left:50%; }
   .carousel__ring .disc, .carousel__ring .rings{ width:min(68vw,340px); }
 }
@@ -1792,6 +1846,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         data-bg="#3DA35D" data-deep="#216B37" data-deeper="#123B20" data-acc="#F0B93C" data-ui="#F9F4FF"
         style="--bg:#3DA35D; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20">
         <div class="slide__media"><img src="images/assets/products/friss-fx.webp" alt="Friss gombák" decoding="async"></div>
+          <div class="slide__pola">
+            <figure style="--rot:-4.5deg"><img src="images/prod/friss-1.webp" alt="Gomba pirítóson, friss fűszerekkel" loading="lazy" decoding="async"></figure>
+            <figure style="--rot:3.5deg"><img src="images/prod/friss-2.webp" alt="Serpenyőben sült csiperke" loading="lazy" decoding="async"></figure>
+          </div>
         <div class="slide__body">
           <p class="slide__kicker">Termesztés</p>
           <h3 class="slide__name">Friss gombák</h3>
@@ -1804,9 +1862,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         data-bg="#F62213" data-deep="#A71106" data-deeper="#620A04" data-acc="#F0B93C" data-ui="#FFF2EE"
         style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04">
         <div class="slide__media"><img src="images/assets/products/konzerv-fx.webp" alt="Korona termesztett csiperke szeletek konzerv" decoding="async"></div>
+          <div class="slide__pola">
+            <figure style="--rot:4deg"><img src="images/prod/konzerv-1.webp" alt="Bruschetta gombás feltéttel" loading="lazy" decoding="async"></figure>
+            <figure style="--rot:-3.5deg"><img src="images/prod/konzerv-2.webp" alt="Korona üveges gomba a grillasztalon" loading="lazy" decoding="async"></figure>
+          </div>
         <div class="slide__body">
           <p class="slide__kicker">Feldolgozás</p>
-          <h3 class="slide__name">Gombakonzerv</h3>
+          <h3 class="slide__name">Gomba<wbr>konzerv</h3>
           <a href="#kapcsolat" class="btn btn--solid btn--lg slide__btn">Kiszerelések <span aria-hidden="true">→</span></a>
         </div>
       </article>
@@ -1816,9 +1878,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         data-bg="#2E9B57" data-deep="#1C6B3A" data-deeper="#0F4526" data-acc="#D9E34E" data-ui="#F9F4FF"
         style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526">
         <div class="slide__media"><img src="images/assets/products/csira-fx.webp" alt="Gombacsíra" decoding="async"></div>
+          <div class="slide__pola">
+            <figure style="--rot:-4deg"><img src="images/prod/csira-1.webp" alt="Steril csíralabor" loading="lazy" decoding="async"></figure>
+            <figure style="--rot:3.5deg"><img src="images/prod/csira-2.webp" alt="Termesztőház belülről" loading="lazy" decoding="async"></figure>
+          </div>
         <div class="slide__body">
           <p class="slide__kicker">Szaporítóanyag</p>
-          <h3 class="slide__name">Gombacsíra</h3>
+          <h3 class="slide__name">Gomba<wbr>csíra</h3>
           <a href="#kapcsolat" class="btn btn--solid btn--lg slide__btn">Csíra ajánlatkérés <span aria-hidden="true">→</span></a>
         </div>
       </article>
@@ -1828,9 +1894,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         data-bg="#E1432B" data-deep="#A32E1D" data-deeper="#611B11" data-acc="#F0B93C" data-ui="#FFF2EE"
         style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11">
         <div class="slide__media"><img src="images/assets/products/komposzt-fx.webp" alt="Gombakomposzt" decoding="async"></div>
+          <div class="slide__pola">
+            <figure style="--rot:4.5deg"><img src="images/prod/komposzt-1.webp" alt="Komposztforgatás" loading="lazy" decoding="async"></figure>
+            <figure style="--rot:-3deg"><img src="images/prod/komposzt-2.webp" alt="Zárt komposztcsarnok" loading="lazy" decoding="async"></figure>
+          </div>
         <div class="slide__body">
           <p class="slide__kicker">Alapanyag</p>
-          <h3 class="slide__name slide__name--long">Gombakomposzt</h3>
+          <h3 class="slide__name">Gomba<wbr>komposzt</h3>
           <a href="#kapcsolat" class="btn btn--solid btn--lg slide__btn">Komposzt ajánlatkérés <span aria-hidden="true">→</span></a>
         </div>
       </article>
