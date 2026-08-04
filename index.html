@@ -481,7 +481,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* ================== 2. GOMBA ÉLET ================== */
 .neon{ position:relative; overflow:hidden; color:var(--ink); text-align:center;
   padding:clamp(70px,9vw,130px) clamp(10px,2vw,28px) clamp(90px,11vw,160px);
-  background:var(--cream-deep); }
+  background:var(--cream-deep);
+  /* A .hero position:sticky, tehát ez a szekció FELÚSZIK rá. Korábban
+     egyenes felső éllel tette, ami éles vízszintes vágásként hatott — a
+     hero gombáit is elmetszette, és a homok/krém közti apró színkülönbség
+     miatt látszott is a seam.
+     Lekerekített felső sarok + felfelé vetett lágy árnyék: így nem vágás,
+     hanem egy lap, ami RÁEMELKEDIK a heróra. A háttérszínekhez nem
+     nyúltunk, a réteg-viszony adja a folytonosságot. */
+  border-radius:clamp(38px,5.5vw,96px) clamp(38px,5.5vw,96px) 0 0;
+  box-shadow:0 -26px 60px -28px rgba(22,17,13,.40); }
 .neon::before{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
   background: radial-gradient(ellipse 50% 44% at 12% 14%, rgba(61,163,93,.26) 0%, transparent 70%),
               radial-gradient(ellipse 42% 36% at 50% 46%, rgba(217,226,78,.14) 0%, transparent 72%); }
@@ -563,6 +572,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* --- blob csík (felül és alul ugyanaz a komponens) --- */
 .pdiv{ position:relative; line-height:0; transition:background-color var(--swap) var(--swap-ease); }
 .pdiv svg{ display:block; width:100%; height:clamp(150px,18vw,300px); }
+/* a FELSŐ csík alacsonyabb: ettől kerül feljebb a "Termékeink" cím,
+   anélkül hogy a karusszelt a hullám fölé kellene húzni (az elvágná). */
+.pdiv--top svg{ height:clamp(118px,13.5vw,220px); }
 /* a hajszálvékony rés eltüntetése a csík és a dia között */
 .pdiv--top svg{ margin-bottom:-1px; }
 .pdiv path{ transition:fill var(--swap) var(--swap-ease); }
@@ -586,7 +598,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* --- karusszel --- */
 .carousel{ position:relative; overflow:hidden; background:var(--c-bg);
   /* mennyivel ül feljebb a cím; lásd .products__head */
-  --head-lift:clamp(46px,5.2vw,86px); margin-top:calc(-1 * var(--head-lift));
+  /* 0 — a karusszel NEM emelkedik a hullám fölé.
+     Korábban felhúztuk, hogy a cím feljebb kerüljön, de a karusszel a
+     hullámra fest, és annak EGYENES felső éle elvágta a hullám görbéjét:
+     ahol a hullám a karusszel teteje alá ért, ott lapos vízszintes
+     szakasz keletkezett a hullámban. A cím helyette attól kerül feljebb,
+     hogy a felső hullámcsík alacsonyabb lett (lásd .pdiv--top svg). */
+  --head-lift:0px; margin-top:calc(-1 * var(--head-lift));
   /* A termékfotó vízszintes eltolása. KÖZÖS változó, mert a háttér-körök és
      a napsugár is ehhez igazodik — így ha ez változik, együtt mozognak. */
   /* 0 = a termékfotó és a háttér-kör PONTOSAN a karusszel közepén ül.
