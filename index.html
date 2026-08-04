@@ -41,15 +41,87 @@
   --green:#3DA35D; --green-deep:#216B37; --green-wash:#E8F3EA;
   --red:#F62213;                             /* ellenpont */
   --n-lime:#D9E34E;                          /* kiemelő */
-  --abt-bg:#2E2820;                          /* Rólunk — világosabb, meleg grafit */
   --sand:#F4E4CB;                            /* második világos felület */
   --font-display:'Archivo Black', 'Archivo', system-ui, sans-serif;
-  --font-lead:'Archivo Black', 'Archivo', system-ui, sans-serif;   /* vastag szövegtörzs a kiemelt bekezdésekhez */
+  /* KENYÉRBETŰ — sima Archivo, NEM Archivo Black.
+     Korábban ez bájtra ugyanaz volt, mint a --font-display, vagyis az egész
+     oldal minden bekezdése egy egysúlyú, ultravastag DISPLAY betűvel volt
+     szedve. Emiatt a hierarchia csak méretből jött, súlyból nem: a cím és a
+     törzsszöveg egyformán "kiabált", ami rendezetlennek hatott.
+     Az 'Archivo' 400-700 vágatai amúgy is le voltak töltve, csak nem
+     használtuk őket. Display méretben (.zoo__sent, .ft__word) továbbra is a
+     --font-display megy. */
+  --font-lead:'Archivo', system-ui, sans-serif;
   --font-ui:'Archivo', system-ui, sans-serif;
   --ease:cubic-bezier(.22,1,.36,1);
   --expo:cubic-bezier(.86,0,.07,1);
   --swap:.9s;                  /* szín- és lapváltás közös ideje */
   --swap-ease:cubic-bezier(.65,.02,.18,1);   /* a diamozgással azonos görbe */
+
+  /* ===== ÁRNYÉK-SKÁLA =====================================================
+     Korábban 21 egyedi box-shadow érték volt, skála nélkül. A SZÁNDÉK viszont
+     jó volt, csak nem következetes, ezért nem dobtuk el, hanem rendbe raktuk.
+     Két családot használunk, szemantikusan:
+
+       MATRICA (--sh-stick-*) — kemény, blur nélküli esés. Olyan elemekre,
+         amik "rá vannak ragasztva a lapra": címkék, kártyák, évszám-chipek.
+         Ez az oldal karaktere (ferde sarkok, ragasztószalag, polaroid).
+
+       LEBEGŐ (--sh-float-*) — lágy, elmosott. Fotókra és a tartalom fölött
+         úszó elemekre: kép, tanúsítvány-korong, tooltip, overlay-kártya.
+
+     Gomb: a "3D perem" NEM árnyék, hanem a gomb színes alja — ezért a színt
+     a felhasználás helyén tesszük mögé: box-shadow:var(--sh-btn) var(--red);
+     ======================================================================= */
+  --sh-stick-sm:0 4px 0 0 rgba(22,17,13,.18);
+  --sh-stick-md:0 6px 0 0 rgba(22,17,13,.18);
+  --sh-stick-lg:0 10px 0 0 rgba(22,17,13,.18);
+  --sh-stick-xl:0 16px 0 0 rgba(22,17,13,.18);   /* hover: a lap kiemelkedik */
+  --sh-float-sm:0 8px 18px -6px rgba(22,17,13,.22);
+  --sh-float-md:0 16px 34px -12px rgba(22,17,13,.28);
+  --sh-float-lg:0 28px 60px -22px rgba(22,17,13,.34);
+  --sh-btn:0 4px 0 0;          /* mögé kerül a szín */
+  --sh-btn-hover:0 7px 0 0;
+  --sh-btn-press:0 2px 0 0;    /* lenyomott gomb */
+
+  /* ===== SAROKSUGÁR-SKÁLA ================================================
+     Korábban 21 egyedi statikus érték volt. Három csoport létezik, és csak
+     az első kettőt egységesítettük:
+
+       1. SIMA sugarak — eddig 5/18/20/22/24px, vagyis öt önkényes szám
+          skála nélkül. Most három lépcső.
+       2. "KÉZZEL RAJZOLT" ferde sarkok — ez az oldal karaktere (matricák,
+          kiemelő foltok). Eddig hat, egymáshoz nagyon közeli, de mégis
+          eltérő érték volt (pl. 6/14/8/12 és 5/12/7/10) — ezek különbsége
+          nem szándék, hanem szórás. Most négy nevesített token.
+       3. ORGANIKUS blobok (preloader-fedél, tanúsítvány-morf, menügomb) —
+          ezeket SZÁNDÉKOSAN NEM vontuk össze: külön formák, külön céllal,
+          és a tanúsítvány-jelvénynél a két érték egy hover-morf két fázisa.
+     ======================================================================= */
+  --r-sm:6px;
+  --r-md:18px;
+  --r-lg:24px;
+  --r-pill:100px;
+  --r-mark:6px 14px 8px 12px;       /* kiemelő folt a szövegben */
+  --r-mark-alt:12px 6px 14px 8px;   /* tükrözött változat */
+  --r-chip:18px 11px 16px 13px;     /* évszám-chip, kis matrica */
+  --r-card:30px 18px 28px 20px;     /* matrica-kártya */
+  --r-card-top:29px 17px 0 0;       /* a kártya felső 2 sarka (kifutó kép) */
+  --r-card-top-r:17px 29px 0 0;     /* ugyanaz tükrözve */
+
+  /* ===== ÁTLÁTSZÓSÁG-SKÁLA ==============================================
+     Az --ink és a --cream 12, illetve 16 különböző alfával volt kézzel
+     újraírva a CSS-ben (rgba(22,17,13,.30) / .32 / .34 / .35 — ezek
+     vizuálisan azonosak, a különbség szórás, nem szándék).
+     Itt a ténylegesen megkülönböztethető lépcsők maradtak.        */
+  --ink-a16:rgba(22,17,13,.16);      /* hajszálvonal, alig látszó keret */
+  --ink-a22:rgba(22,17,13,.22);      /* látható keret, finom réteg */
+  --ink-a30:rgba(22,17,13,.30);      /* hangsúlyos réteg, sötétítés */
+  --cream-a16:rgba(250,246,239,.16); /* hajszálvonal sötét háttéren */
+  --cream-a28:rgba(250,246,239,.28); /* látható keret sötét háttéren */
+  --cream-a60:rgba(250,246,239,.60); /* tompított szöveg */
+  --cream-a70:rgba(250,246,239,.70); /* másodlagos szöveg */
+  --cream-a82:rgba(250,246,239,.82); /* majdnem teljes értékű szöveg */
 }
 
 *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
@@ -81,16 +153,16 @@ body::after{
 .tx-sticker--green{ text-shadow:3px 4px 0 var(--green-deep); -webkit-text-stroke-color:var(--green-deep); }
 
 .tx-cut{ color:var(--cream); -webkit-text-stroke:1.3px var(--green-deep); paint-order:stroke fill;
-  text-shadow:2px 2px 0 var(--green-deep), 5px 5px 0 rgba(22,17,13,.20); }
+  text-shadow:2px 2px 0 var(--green-deep), 5px 5px 0 var(--ink-a22); }
 
 .mark{ background:var(--n-lime); color:var(--ink);
   box-decoration-break:clone; -webkit-box-decoration-break:clone;
-  padding:.06em .24em; border-radius:6px 14px 8px 12px; }
-.mark--red{ background:var(--red); color:var(--cream); border-radius:12px 6px 14px 8px; }
+  padding:.06em .24em; border-radius:var(--r-mark); }
+.mark--red{ background:var(--red); color:var(--cream); border-radius:var(--r-mark-alt); }
 .mark--cream{ background:var(--cream); color:var(--ink); }
 
 /* vastag, rövid szövegtörzs */
-.lead-thick{ font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em; }
+.lead-thick{ font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em; }
 
 /* ===================== PRELOADER ===================== */
 /* A görgetősáv teljesen el van rejtve (lásd lejjebb), így a feloldáskor
@@ -163,8 +235,8 @@ html.no-js.is-intro .est{ animation-play-state:running; }
 
 /* a logó kapszula — csak akkor jelenik meg, ha a hero kigördült */
 .brand{ display:flex; align-items:center; gap:11px; text-decoration:none; color:var(--ink); pointer-events:auto;
-  background:#fff; border:1.5px solid var(--cream-line); border-radius:100px; padding:9px 20px 9px 10px;
-  box-shadow:0 10px 26px rgba(22,17,13,.10);
+  background:#fff; border:1.5px solid var(--cream-line); border-radius:var(--r-pill); padding:9px 20px 9px 10px;
+  box-shadow:var(--sh-float-sm);
   opacity:0; transform:translateY(-140%); transition:opacity .45s var(--ease), transform .6s var(--ease); }
 .nav.is-shown .brand{ opacity:1; transform:none; }
 .brand__logo{ width:52px; height:52px; object-fit:contain; display:block; }
@@ -178,10 +250,10 @@ html.no-js.is-intro .est{ animation-play-state:running; }
   width:clamp(98px,10.5vw,122px); height:clamp(70px,7.5vw,88px); display:grid; place-items:center;
   opacity:0; transform:translateY(-140%) scale(.9); transition:opacity .45s var(--ease), transform .6s var(--ease) .06s; }
 .nav.is-shown .mbtn{ opacity:1; transform:none; }
-.mbtn:focus-visible{ outline:3px solid var(--ink); outline-offset:6px; border-radius:24px; }
+.mbtn:focus-visible{ outline:3px solid var(--ink); outline-offset:6px; border-radius:var(--r-lg); }
 
 .mbtn__sticker{ position:absolute; inset:0; background:var(--n-lime); border:5px solid var(--cream);
-  filter:drop-shadow(0 7px 0 rgba(22,17,13,.22));
+  filter:drop-shadow(0 7px 0 var(--ink-a22));
   animation:mbMorph 7s ease-in-out infinite, mbSway 4.6s ease-in-out infinite;
   transition:filter .35s var(--ease); }
 @keyframes mbMorph{
@@ -194,8 +266,8 @@ html.no-js.is-intro .est{ animation-play-state:running; }
   0%,100%{ transform:rotate(-7deg)  scale(1); }
   50%    { transform:rotate(3.5deg) scale(1.04); }
 }
-.mbtn:hover .mbtn__sticker{ filter:drop-shadow(0 11px 0 rgba(22,17,13,.26)); animation-duration:3.4s, 1.6s; }
-.mbtn:active .mbtn__sticker{ filter:drop-shadow(0 3px 0 rgba(22,17,13,.26)); }
+.mbtn:hover .mbtn__sticker{ filter:drop-shadow(0 11px 0 var(--ink-a22)); animation-duration:3.4s, 1.6s; }
+.mbtn:active .mbtn__sticker{ filter:drop-shadow(0 3px 0 var(--ink-a22)); }
 
 .mbtn__label{ position:relative; z-index:3; font-family:var(--font-display); font-weight:400;
   font-size:clamp(14px,1.35vw,17px); letter-spacing:.1em; text-transform:uppercase; color:var(--ink);
@@ -282,7 +354,7 @@ body.menu-open .menu__list a{ transition-duration:.8s; }
 /* hover: azonnali színváltás + kifutó aláhúzás + elcsúszás */
 .menu__list a{ position:relative; }
 .menu__list a::after{ content:""; position:absolute; left:0; right:0; bottom:.1em; height:.09em;
-  background:var(--n-lime); border-radius:100px;
+  background:var(--n-lime); border-radius:var(--r-pill);
   transform:scaleX(0); transform-origin:right; transition:transform .34s var(--ease); }
 body.menu-open .menu__list a{ transition:transform .8s var(--expo), color .12s linear, padding-left .35s var(--ease); }
 .menu__list a:hover{ color:var(--n-lime); padding-left:.14em; }
@@ -297,22 +369,22 @@ body.menu-open .menu__list a{ transition:transform .8s var(--expo), color .12s l
   opacity:0; transform:translateY(26px); transition:opacity .55s var(--ease) 0s, transform .7s var(--expo) 0s; }
 body.menu-open .menu__foot{ opacity:1; transform:none;
   transition:opacity .5s var(--ease) .68s, transform .6s var(--ease) .68s; }
-.menu__foot span{ font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:rgba(250,246,239,.7); }
+.menu__foot span{ font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--cream-a70); }
 
 /* nyelvváltó — nagyobb, kapszulás */
 .menu__lang{ display:flex; gap:8px; }
-.menu__lang button{ background:transparent; border:1.6px solid rgba(250,246,239,.28); cursor:pointer;
+.menu__lang button{ background:transparent; border:1.6px solid var(--cream-a28); cursor:pointer;
   font-family:var(--font-display); font-size:15px; font-weight:400; letter-spacing:.08em;
-  color:rgba(250,246,239,.7); padding:9px 16px; border-radius:100px;
+  color:var(--cream-a70); padding:9px 16px; border-radius:var(--r-pill);
   transition:color .25s, background .25s, border-color .25s, transform .3s var(--ease); }
 .menu__lang button:hover{ color:var(--cream); border-color:var(--cream); transform:translateY(-2px); }
 .menu__lang button.is-on{ background:var(--n-lime); border-color:var(--n-lime); color:var(--ink); }
 
 
 
-.btn{ display:inline-flex; align-items:center; justify-content:center; gap:9px; font-family:var(--font-ui); font-size:12px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; text-decoration:none; cursor:pointer; border:none; padding:14px 24px; border-radius:100px; transition:transform .3s var(--ease), box-shadow .3s var(--ease), background .3s, color .3s; }
-.btn--solid{ background:var(--ink); color:var(--cream); box-shadow:0 4px 0 0 var(--green-deep); }
-.btn--solid:hover{ transform:translateY(-3px); box-shadow:0 7px 0 0 var(--green-deep); }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:9px; font-family:var(--font-ui); font-size:12px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; text-decoration:none; cursor:pointer; border:none; padding:14px 24px; border-radius:var(--r-pill); transition:transform .3s var(--ease), box-shadow .3s var(--ease), background .3s, color .3s; }
+.btn--solid{ background:var(--ink); color:var(--cream); box-shadow:var(--sh-btn) var(--green-deep); }
+.btn--solid:hover{ transform:translateY(-3px); box-shadow:var(--sh-btn-hover) var(--green-deep); }
 .btn--ghost{ background:transparent; color:var(--ink); border:1.5px solid var(--ink); }
 .btn--ghost:hover{ background:var(--ink); color:var(--cream); transform:translateY(-3px); }
 .btn--lg{ padding:clamp(20px,2vw,26px) clamp(34px,3.4vw,50px); font-size:clamp(13px,1.15vw,16px); }
@@ -343,19 +415,19 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .olog{ position:relative; display:inline-block; width:1em; height:1em; margin:0 -.07em;
   transform:translateY(.015em); animation:oIn 1.1s var(--ease) .55s backwards; }
 .olog img{ display:block; width:100%; height:100%; object-fit:contain;
-  filter:drop-shadow(0 8px 14px rgba(22,17,13,.24)); }
+  filter:drop-shadow(0 8px 14px var(--ink-a22)); }
 @keyframes oIn{ from{ opacity:0; transform:translateY(.015em) scale(.2) rotate(-220deg); } }
 .ogomb{ display:inline-block; width:.78em; height:.78em; margin:0 -.01em;
   transform:translateY(.02em) rotate(-6deg); animation:oIn2 1.1s var(--ease) .7s backwards; }
 .ogomb img{ display:block; width:100%; height:100%; object-fit:contain;
-  filter:drop-shadow(0 3px 3px rgba(22,17,13,.18)) drop-shadow(0 16px 22px rgba(22,17,13,.26)); }
+  filter:drop-shadow(0 3px 3px var(--ink-a16)) drop-shadow(0 16px 22px var(--ink-a22)); }
 @keyframes oIn2{ from{ opacity:0; transform:translateY(.02em) scale(.2) rotate(200deg); } }
 
 /* --- divider + gombok --- */
 .after{ position:relative; z-index:12; display:grid; justify-items:center; gap:clamp(20px,2.4vw,32px);
   margin:clamp(38px,4.6vw,68px) auto 0; pointer-events:auto;
   opacity:0; animation:fadeUp .9s var(--ease) 1.15s forwards; }
-.divider{ width:min(40vw,540px); height:2px; background:rgba(22,17,13,.28); border-radius:100px; }
+.divider{ width:min(40vw,540px); height:2px; background:var(--ink-a30); border-radius:var(--r-pill); }
 .cta{ display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(10px,1.2vw,16px); }
 @keyframes fadeUp{ from{ opacity:0; transform:translateY(22px) } to{ opacity:1; transform:none } }
 @keyframes fadeIn{ to{ opacity:1 } }
@@ -365,8 +437,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   transform:translateX(-50%) rotate(-1.2deg);
   display:flex; align-items:center; gap:clamp(12px,1.4vw,20px);
   padding:clamp(9px,1vw,14px) clamp(18px,2vw,30px);
-  background:var(--cream); border:2.4px solid var(--ink); border-radius:100px;
-  box-shadow:0 5px 0 0 var(--green-deep), 0 14px 26px rgba(22,17,13,.14);
+  background:var(--cream); border:2.4px solid var(--ink); border-radius:var(--r-pill);
+  box-shadow:var(--sh-btn) var(--green-deep), var(--sh-float-sm);
   opacity:0; animation:estIn .8s cubic-bezier(.34,1.56,.64,1) .2s forwards; }
 .est b{ font-family:var(--font-display); font-size:clamp(14px,1.5vw,22px); letter-spacing:-.02em;
   text-transform:uppercase; color:var(--ink); }
@@ -384,7 +456,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .hsticker{ position:absolute; z-index:12; font-family:var(--font-display); text-transform:uppercase;
   font-size:clamp(13px,1.45vw,21px); line-height:1.12; text-align:center; padding:14px 20px;
   color:var(--ink); background:var(--n-lime); border:4px solid var(--cream);
-  border-radius:50% 50% 48% 52% / 52% 48% 52% 48%; box-shadow:0 10px 22px rgba(22,17,13,.16);
+  border-radius:50% 50% 48% 52% / 52% 48% 52% 48%; box-shadow:var(--sh-stick-md);
   opacity:var(--reveal);
   transform:rotate(calc(var(--deg) * 1deg + (1 - var(--reveal)) * -14deg))
             scale(calc(.45 + var(--reveal) * .55))
@@ -397,7 +469,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* extra gombák CSAK telefonra — gépen rejtve, hogy a laptopos nézet ne változzon */
 .mextra{ display:none; }
 
-.shroom img{ display:block; width:100%; height:auto; filter:drop-shadow(0 22px 30px rgba(22,17,13,.20)); opacity:0;
+.shroom img{ display:block; width:100%; height:auto; filter:drop-shadow(0 22px 30px var(--ink-a22)); opacity:0;
   animation: bob var(--dur,7s) ease-in-out var(--del,0s) infinite, popIn .85s var(--ease) var(--del,0s) forwards; }
 @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(var(--rot,0deg)); } 50%{ transform:translateY(-16px) rotate(calc(var(--rot,0deg) + 4deg)); } }
 @keyframes popIn{ from{ opacity:0; } to{ opacity:1; } }
@@ -416,11 +488,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* fény-folt a fotó-trió mögött, mint egy kis „színpad” */
 .neon__spot{ position:absolute; z-index:1; left:50%; top:64%; translate:-50% -50%;
   width:min(80vw,1100px); height:min(60vw,560px); pointer-events:none;
-  background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(250,246,239,.9) 0%, rgba(250,246,239,0) 72%); }
+  background:radial-gradient(ellipse 50% 50% at 50% 50%, var(--cream-a82) 0%, rgba(250,246,239,0) 72%); }
 .neon__tag{ position:relative; z-index:2; display:inline-block; font-family:var(--font-display); font-weight:400;
   font-size:clamp(13px,1.5vw,17px); letter-spacing:.02em; text-transform:uppercase; color:var(--red);
-  background:var(--cream); padding:.5em 1.1em; border-radius:100px; transform:rotate(-4deg);
-  box-shadow:3px 4px 0 rgba(22,17,13,.18); margin-bottom:clamp(18px,2.6vw,30px);
+  background:var(--cream); padding:.5em 1.1em; border-radius:var(--r-pill); transform:rotate(-4deg);
+  box-shadow:var(--sh-stick-sm); margin-bottom:clamp(18px,2.6vw,30px);
   opacity:0; transition:opacity .6s ease, transform .6s var(--ease); }
 .neon.lit .neon__tag{ opacity:1; transform:rotate(-4deg); }
 
@@ -438,7 +510,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .neon__head .r:nth-child(2) .neon__word:nth-child(2) span{ transition-delay:.38s; }
 
 .neon__sub{ position:relative; z-index:2; max-width:58ch; margin:clamp(20px,2.8vw,32px) auto 0;
-  font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em; color:#3A3128;
+  font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em; color:#3A3128;
   font-size:clamp(16px,1.6vw,23px); line-height:1.58;
   opacity:0; transform:translateY(14px); transition:opacity .7s ease .5s, transform .7s var(--ease) .5s; }
 .neon.lit .neon__sub{ opacity:1; transform:none; }
@@ -446,8 +518,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* --- lebegő, döntött fotó-trió --- */
 .neon__trio{ position:relative; z-index:2; display:flex; justify-content:center; align-items:flex-end;
   margin-top:clamp(40px,6vw,70px); }
-.neon__photo{ width:min(34vw,480px); aspect-ratio:4/3; border-radius:20px; background-size:cover; background-position:center;
-  border:7px solid var(--cream); box-shadow:0 24px 46px rgba(22,17,13,.26);
+.neon__photo{ width:min(34vw,480px); aspect-ratio:4/3; border-radius:var(--r-md); background-size:cover; background-position:center;
+  border:7px solid var(--cream); box-shadow:var(--sh-float-lg);
   opacity:0; transform:translateY(40px) rotate(0deg); transition:opacity .8s ease, transform .8s var(--ease); }
 .neon.lit .neon__photo{ opacity:1; transform:translateY(0) rotate(var(--rot,0deg));
   animation:bobPhoto var(--pdur,7s) ease-in-out var(--pdel,0s) infinite; }
@@ -458,11 +530,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 .neon__cta{ position:relative; z-index:2; display:inline-flex; align-items:center; gap:.5em; margin-top:clamp(34px,4.4vw,52px);
   font-family:var(--font-display); font-weight:400; text-transform:uppercase; font-size:clamp(15px,1.3vw,19px); letter-spacing:.02em;
-  background:var(--red); color:var(--cream); padding:1.05em 2.1em; border-radius:100px;
-  box-shadow:4px 5px 0 var(--ink); text-decoration:none;
+  background:var(--red); color:var(--cream); padding:1.05em 2.1em; border-radius:var(--r-pill);
+  box-shadow:var(--sh-btn) var(--ink); text-decoration:none;
   opacity:0; transform:translateY(14px); transition:opacity .7s ease 1.1s, transform .7s var(--ease) 1.1s, box-shadow .2s ease, translate .2s ease; }
 .neon.lit .neon__cta{ opacity:1; transform:none; }
-.neon__cta:hover{ box-shadow:2px 3px 0 var(--ink); translate:2px 2px; }
+.neon__cta:hover{ box-shadow:var(--sh-btn-press) var(--ink); translate:2px 2px; }
 
 @media (max-width:640px){
   /* egy nagy alapkép (p2), a másik kettő matricaként rárakva a sarkokba —
@@ -607,9 +679,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    belépéshez szükséges .32s-os késleltetést (a "3. gyerek" stagger-jét), de a
    box-shadow-nak SOSE legyen késleltetése — se be-, se kihoverelésnél —
    különben az előző javítás után is lomhának/laggosnak tűnt a visszaállás */
-.slide.is-active .slide__body > .slide__btn{ box-shadow:0 4px 0 0 var(--stroke);
+.slide.is-active .slide__body > .slide__btn{ box-shadow:var(--sh-btn) var(--stroke);
   transition:opacity .6s ease .32s, transform .3s var(--ease) .32s, box-shadow .3s var(--ease) 0s; }
-.slide.is-active .slide__body > .slide__btn:hover{ box-shadow:0 7px 0 0 var(--stroke); }
+.slide.is-active .slide__body > .slide__btn:hover{ box-shadow:var(--sh-btn-hover) var(--stroke); }
 /* a lapozó most egy középre zárt csoport a kép alatt, nem a szélekre szórva */
 .carousel__ui{
   position:absolute; z-index:12; left:50%; translate:-50% 0; bottom:clamp(20px,2.8vw,38px);
@@ -621,7 +693,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .carousel.is-busy .arrow{ opacity:.4; pointer-events:none; }
 .carousel.is-busy .dot{ pointer-events:none; }
 .carousel__dots{ display:flex; gap:8px; pointer-events:auto; }
-.dot{ width:9px; height:9px; border-radius:100px; border:none; cursor:pointer; padding:0; -webkit-appearance:none; appearance:none; color:var(--ink); background:currentColor; opacity:.34; transition:opacity .3s, width .35s var(--ease); }
+.dot{ width:9px; height:9px; border-radius:var(--r-pill); border:none; cursor:pointer; padding:0; -webkit-appearance:none; appearance:none; color:var(--ink); background:currentColor; opacity:.34; transition:opacity .3s, width .35s var(--ease); }
 .dot.is-on{ opacity:1; width:30px; }
 .carousel__right{ display:flex; align-items:center; gap:18px; pointer-events:auto; }
 .carousel__count{ font-family:var(--font-display); font-weight:400; font-size:13px; letter-spacing:.06em; opacity:.75; }
@@ -648,7 +720,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .certs__title em{ display:block; font-family:var(--font-display); font-style:normal; font-weight:400; text-transform:uppercase;
   font-size:clamp(1.45rem,4.3vw,3.2rem); line-height:1.08; letter-spacing:-.02em; margin-top:.12em;
   color:var(--green-deep); }
-.certs__lead{ max-width:600px; margin:30px auto 0; font-family:var(--font-lead); font-weight:400;
+.certs__lead{ max-width:600px; margin:30px auto 0; font-family:var(--font-lead); font-weight:500;
   letter-spacing:-.015em; font-size:clamp(13.5px,1vw,15.5px); line-height:1.62; color:var(--ink); }
 
 .certs__grid{ position:relative; z-index:2; max-width:1320px; margin:0 auto;
@@ -669,13 +741,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   border-radius:58% 42% 47% 53% / 45% 50% 50% 55%; transform:rotate(var(--r,0deg));
   transition:transform .55s var(--ease), border-radius .55s var(--ease); }
 .cert__disc{ position:relative; width:70%; height:70%; border-radius:50%; background:#fff; overflow:hidden;
-  display:grid; place-items:center; box-shadow:0 7px 16px rgba(22,17,13,.16); }
+  display:grid; place-items:center; box-shadow:var(--sh-float-sm); }
 .cert__disc img{ width:78%; height:78%; object-fit:contain; }
 .cert:hover .cert__badge::before{ transform:rotate(calc(var(--r,0deg) + 13deg)) scale(1.07); border-radius:47% 53% 58% 42% / 52% 45% 55% 48%; }
 
 .cert__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(1.05rem,1.5vw,1.5rem); line-height:1.02; letter-spacing:-.025em; text-transform:uppercase; }
 .cert__full{ font-size:9.5px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--ct,var(--green-deep)); margin-top:7px; }
-.cert__tag{ display:inline-flex; align-items:center; gap:7px; margin-top:12px; font-size:9.5px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--ink); border:1.5px solid var(--ink); border-radius:100px; padding:6px 12px; }
+.cert__tag{ display:inline-flex; align-items:center; gap:7px; margin-top:12px; font-size:9.5px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--ink); border:1.5px solid var(--ink); border-radius:var(--r-pill); padding:6px 12px; }
 .cert__tag::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--c); flex-shrink:0; }
 
 /* ============================================================
@@ -685,7 +757,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .deco-sticker{ position:absolute; z-index:6; right:0; top:-14%; pointer-events:none;
   opacity:calc(1 - var(--zp,0) * 2.6); }
 .deco-sticker img{ display:block; width:clamp(180px,16vw,300px); height:auto; transform-origin:50% 50%;
-  filter:drop-shadow(0 20px 26px rgba(22,17,13,.30));
+  filter:drop-shadow(0 20px 26px var(--ink-a30));
   animation: bob-deco 7.5s ease-in-out .2s infinite; }
 @keyframes bob-deco{ 0%,100%{ transform:rotate(-23deg) translateY(0); } 50%{ transform:rotate(-17deg) translateY(-14px); } }
 
@@ -697,13 +769,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .zoo-logo{ position:absolute; z-index:6; right:-6%; bottom:2%; pointer-events:none;
   opacity:calc(1 - var(--zp,0) * 2.6); }
 .zoo-logo img{ display:block; width:clamp(220px,24vw,400px); height:auto;
-  filter:drop-shadow(0 12px 20px rgba(22,17,13,.30));
+  filter:drop-shadow(0 12px 20px var(--ink-a30));
   animation: bob-logo 8s ease-in-out .4s infinite; }
 @keyframes bob-logo{ 0%,100%{ transform:rotate(-9deg) translateY(0); } 50%{ transform:rotate(-3deg) translateY(-14px); } }
 .zoo-shroom{ position:absolute; z-index:6; left:-6%; bottom:1%; pointer-events:none;
   opacity:calc(1 - var(--zp,0) * 2.6); }
 .zoo-shroom img{ display:block; width:clamp(220px,24vw,400px); height:auto;
-  filter:drop-shadow(0 14px 22px rgba(22,17,13,.32));
+  filter:drop-shadow(0 14px 22px var(--ink-a30));
   animation: bob-shroom 6.6s ease-in-out .1s infinite; }
 @keyframes bob-shroom{ 0%,100%{ transform:rotate(3deg) translateY(0); } 50%{ transform:rotate(9deg) translateY(-14px); } }
 
@@ -716,11 +788,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 .zoo__sent{ position:relative; z-index:3; display:flex; align-items:center; justify-content:center;
   gap:.05em; flex-wrap:nowrap; padding:0 3vw;
-  font-family:var(--font-lead); font-weight:400; text-transform:uppercase;
+  font-family:var(--font-display); font-weight:400; text-transform:uppercase;
   font-size:clamp(2.4rem,11.5vw,10rem); line-height:.88; letter-spacing:-.035em;
   color:var(--green-deep);
   -webkit-text-stroke:clamp(3px,.55vw,8px) #FFFFFF; paint-order:stroke fill;
-  text-shadow:0 .06em 0 rgba(22,17,13,.14);
+  text-shadow:0 .06em 0 var(--ink-a16);
   opacity:calc(1 - var(--zp,0) * 1.6); }
 .zoo__slot{ position:relative; display:inline-block; width:.78em; height:.78em; vertical-align:middle; }
 /* mobilon a "KORONA" / "GOMBA" 2 sorba törik, hogy ne csússzon ki —
@@ -729,7 +801,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 /* a média a pinhez képest abszolút — így a mondat nem tördelődik újra */
 .zoo__media{ position:absolute; z-index:4; overflow:hidden; background:var(--ink);
-  will-change:left,top,width,height; box-shadow:0 30px 60px rgba(22,17,13,.28); }
+  will-change:left,top,width,height; box-shadow:var(--sh-float-lg); }
 .zoo__media video{ width:100%; height:100%; object-fit:cover; display:block; }
 
 /* a kéz+fazék png — úgy nyúlik be az oldal bal széléről, mintha valaki
@@ -738,7 +810,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    a viewport fölé lógott ki, ott levágódott). */
 .zoo__hand{ position:absolute; z-index:5; left:clamp(-150px,-9vw,-40px); top:8%;
   width:clamp(400px,40vw,720px); pointer-events:none;
-  filter:drop-shadow(0 20px 40px rgba(22,17,13,.35));
+  filter:drop-shadow(0 20px 40px var(--ink-a30));
   opacity:calc(1 - var(--zp,0) * 2.6); }
 .zoo__hand img{ width:100%; height:auto; display:block;
   animation: bob-hand 7s ease-in-out .3s infinite; }
@@ -778,14 +850,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   padding-left:clamp(20px,4vw,60px); }
 
 .gal__card{ flex:0 0 auto; width:clamp(230px,22vw,340px); height:clamp(290px,28vw,430px);
-  border-radius:18px; overflow:hidden; background:#fff;
+  border-radius:var(--r-md); overflow:hidden; background:#fff;
   transition:transform .25s ease; }
 .gal__card img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
 .gal__card:hover{ transform:translateY(-6px) rotate(0deg) !important; z-index:2; }
 
 .gal__nav{ position:absolute; top:50%; transform:translateY(-50%); width:clamp(48px,5vw,64px); height:clamp(48px,5vw,64px);
   border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--ink); cursor:pointer;
-  box-shadow:0 10px 24px rgba(22,17,13,.35); z-index:6; user-select:none; }
+  box-shadow:var(--sh-float-md); z-index:6; user-select:none; }
 .gal__nav.prev{ left:clamp(14px,2.4vw,34px); background:var(--green); }
 .gal__nav.next{ right:clamp(14px,2.4vw,34px); background:var(--n-lime); }
 .gal__nav svg{ width:44%; height:44%; }
@@ -826,11 +898,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   letter-spacing:-.036em; text-transform:uppercase; }
 .tl__title em{ display:block; font-style:normal; margin-top:.08em;
   color:var(--green-deep); }
-.tl__lead{ max-width:52ch; margin:26px auto 0; font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em;
+.tl__lead{ max-width:52ch; margin:26px auto 0; font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em;
   font-size:clamp(13px,.98vw,15px); line-height:1.64; color:var(--ink); }
 .tl__lead strong{ font-weight:400; background:var(--n-lime); color:var(--ink);
   box-decoration-break:clone; -webkit-box-decoration-break:clone;
-  padding:.06em .24em; border-radius:6px 14px 8px 12px; }
+  padding:.06em .24em; border-radius:var(--r-mark); }
 
 /* teljes szélességű pálya, három vízszintes sávval */
 /* A magasság a fotós kártyákhoz van szabva: azok ~100px-szel magasabbak a
@@ -842,7 +914,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 /* az útvonal */
 .tl__path{ position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; overflow:visible; }
-.tl__line{ fill:none; stroke:rgba(22,17,13,.16); stroke-width:5; stroke-linecap:round; stroke-dasharray:18 26; }
+.tl__line{ fill:none; stroke:var(--ink-a16); stroke-width:5; stroke-linecap:round; stroke-dasharray:18 26; }
 .tl__line--on{ stroke:var(--green); stroke-dasharray:18 26;
   stroke-dashoffset:0; }
 
@@ -852,7 +924,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   opacity:var(--mk,0); transition:opacity .3s ease; }
 .tl__marker img{ width:100%; height:100%; object-fit:contain; display:block;
   filter:drop-shadow(0 0 3px var(--certs-bg)) drop-shadow(0 0 3px var(--certs-bg))
-         drop-shadow(3px 5px 0 rgba(22,17,13,.22)); }
+         drop-shadow(3px 5px 0 var(--ink-a22)); }
 
 /* az állomások — az útvonal mellé szórva, nem szimmetrikus rendben */
 .tl__list{ position:absolute; inset:0; z-index:3; list-style:none; }
@@ -867,8 +939,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* évszám matricaként */
 .tl__year{ flex:0 0 auto; font-family:var(--font-display); font-weight:400;
   font-size:clamp(1.15rem,1.8vw,1.62rem); letter-spacing:-.01em;
-  background:var(--red); color:var(--cream); padding:11px 19px; border-radius:18px 11px 16px 13px;
-  transform:rotate(-6deg); box-shadow:0 6px 0 0 rgba(22,17,13,.22);
+  background:var(--red); color:var(--cream); padding:11px 19px; border-radius:var(--r-chip);
+  transform:rotate(-6deg); box-shadow:var(--sh-stick-md);
   border:3px solid var(--cream); }
 .tl__item--r .tl__year{ transform:rotate(6deg); }
 .tl__item--now .tl__year{ background:var(--green-deep); }
@@ -876,33 +948,33 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* A kártya polaroid: felül teljes szélességű fotó, alatta a (szándékosan
    kicsi) szöveg. A padding kisebb, mint korábban — a fotó viszi a helyet. */
 .tl__card{ background:var(--cream); border:1.5px solid var(--cream-line);
-  border-radius:30px 18px 28px 20px; padding:clamp(15px,1.6vw,22px);
-  box-shadow:0 10px 0 0 rgba(22,17,13,.12); overflow:hidden;
+  border-radius:var(--r-card); padding:clamp(15px,1.6vw,22px);
+  box-shadow:var(--sh-stick-lg); overflow:hidden;
   transition:transform .4s var(--ease), box-shadow .4s var(--ease); }
 .tl__card{ flex:1; }
-.tl__item:hover .tl__card{ transform:translateY(-5px); box-shadow:0 16px 0 0 rgba(22,17,13,.16); }
+.tl__item:hover .tl__card{ transform:translateY(-5px); box-shadow:var(--sh-stick-xl); }
 
 /* a fotó kifut a kártya felső éléig (negatív margó a paddingon), a saroksugár
    a kártya bal/jobb felső sarkát követi, hogy ne lógjon ki a keretből */
 .tl__shot{ margin:calc(clamp(15px,1.6vw,22px) * -1) calc(clamp(15px,1.6vw,22px) * -1) clamp(13px,1.4vw,18px);
   aspect-ratio:16/10; overflow:hidden; background:var(--cream-line);
-  border-radius:29px 17px 0 0; }
+  border-radius:var(--r-card-top); }
 .tl__shot img{ width:100%; height:100%; object-fit:cover; display:block;
   transition:transform .6s var(--ease); }
 .tl__item:hover .tl__shot img{ transform:scale(1.05); }
 /* jobbra igazított állomásoknál a tükrözött saroksugár */
-.tl__item--r .tl__shot{ border-radius:17px 29px 0 0; }
+.tl__item--r .tl__shot{ border-radius:var(--r-card-top-r); }
 
 .tl__card h3{ font-family:var(--font-display); font-weight:400; font-size:clamp(1rem,1.5vw,1.32rem);
   line-height:1.04; letter-spacing:-.024em; text-transform:uppercase; }
-.tl__card p{ margin-top:8px; font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em;
+.tl__card p{ margin-top:8px; font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em;
   font-size:clamp(12.5px,.88vw,14px); line-height:1.5; color:#3A3128; }
 .tl__card p strong{ font-weight:400; background:var(--n-lime); color:var(--ink);
   box-decoration-break:clone; -webkit-box-decoration-break:clone;
-  padding:.05em .22em; border-radius:5px 12px 7px 10px; }
+  padding:.05em .22em; border-radius:var(--r-mark); }
 .tl__tag{ display:inline-flex; align-items:center; gap:7px; margin-top:12px; font-size:9.5px; font-weight:700;
   letter-spacing:.16em; text-transform:uppercase; color:var(--ink);
-  border:1.5px solid var(--ink); border-radius:100px; padding:6px 13px; }
+  border:1.5px solid var(--ink); border-radius:var(--r-pill); padding:6px 13px; }
 .tl__tag::before{ content:""; width:5px; height:5px; border-radius:50%; background:var(--green); }
 
 /* --- szórt fotó-matricák: a pálya melletti üres krém foltokat töltik ki ---
@@ -914,7 +986,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   width:clamp(150px,13vw,215px);
   background:var(--cream); border:1.5px solid var(--cream-line);
   padding:9px 9px clamp(24px,2.4vw,34px);   /* alul vastagabb perem: polaroid */
-  border-radius:5px; box-shadow:0 12px 26px -12px rgba(22,17,13,.4);
+  border-radius:var(--r-sm); box-shadow:var(--sh-float-md);
   opacity:0; transform:translate(-50%,-50%) rotate(var(--rot,0deg)) translateY(30px) scale(.96);
   transition:opacity .8s var(--ease), transform .9s var(--ease); }
 .tl__pola.is-in{ opacity:1; transform:translate(-50%,-50%) rotate(var(--rot,0deg)); }
@@ -922,8 +994,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* a "ragasztószalag" a matrica tetején */
 .tl__pola::before{ content:''; position:absolute; left:50%; top:-11px; width:58px; height:21px;
   transform:translateX(-50%) rotate(-3deg);
-  background:rgba(217,227,78,.55); border-left:1px dashed rgba(22,17,13,.18);
-  border-right:1px dashed rgba(22,17,13,.18); }
+  background:rgba(217,227,78,.55); border-left:1px dashed var(--ink-a16);
+  border-right:1px dashed var(--ink-a16); }
 
 /* mobil útvonal + jelölő — lásd JS "5c-mobil" blokk, ami a viewBox-ot és a
    "d" attribútumot valós pixelben, az állomások tényleges pozíciója alapján
@@ -940,7 +1012,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* mobilon a kártya keskenyebb, így a fotó magasabb aránnyal jobban mutat.
      A saroksugár egységes, mert itt az oldalt a :nth-child dönti el, nem a
      --r osztály — így a kettő elcsúszna egymástól. */
-  .tl__shot, .tl__item--r .tl__shot{ aspect-ratio:3/2; border-radius:29px 17px 0 0; }
+  .tl__shot, .tl__item--r .tl__shot{ aspect-ratio:3/2; border-radius:var(--r-card-top); }
   .tl__card h3{ font-size:clamp(1.05rem,4.4vw,1.35rem); }
   .tl__card p{ font-size:clamp(13px,3.5vw,14.5px); }
   .tl__list{ position:relative; display:grid; gap:34px; }
@@ -965,7 +1037,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     pointer-events:none; opacity:var(--mk,0); transition:opacity .3s ease; }
   .tl__marker--m img{ width:100%; height:100%; object-fit:contain; display:block;
     filter:drop-shadow(0 0 3px var(--certs-bg)) drop-shadow(0 0 3px var(--certs-bg))
-           drop-shadow(3px 5px 0 rgba(22,17,13,.22)); }
+           drop-shadow(3px 5px 0 var(--ink-a22)); }
 }
 
 /* ============================================================
@@ -998,8 +1070,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 1 1 1 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
           mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 1 1 1 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
   -webkit-mask-composite:source-in; mask-composite:intersect; }
-.prt__lead{ max-width:46ch; margin-top:clamp(20px,2.4vw,30px); font-family:var(--font-lead); font-weight:400;
-  letter-spacing:-.015em; font-size:clamp(13px,.98vw,15px); line-height:1.64; color:rgba(250,246,239,.86); }
+.prt__lead{ max-width:46ch; margin-top:clamp(20px,2.4vw,30px); font-family:var(--font-lead); font-weight:500;
+  letter-spacing:-.015em; font-size:clamp(13px,.98vw,15px); line-height:1.64; color:var(--cream-a82); }
 
 /* a logórács — nagy, tág, kártya nélkül */
 .prt__rows{ position:relative; z-index:3; max-width:1240px; margin:0 auto;
@@ -1093,17 +1165,17 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* az egér/ujj alatti ország neve — buborék, közvetlenül a kurzor fölött */
 .eumap__tooltip{ position:absolute; left:0; top:0; z-index:3; transform:translate(-50%,calc(-100% - 16px));
   background:var(--ink); color:var(--cream); font-family:var(--font-display); font-weight:400;
-  font-size:clamp(15px,1.15vw,19px); letter-spacing:.01em; white-space:nowrap; padding:8px 18px; border-radius:100px;
+  font-size:clamp(15px,1.15vw,19px); letter-spacing:.01em; white-space:nowrap; padding:8px 18px; border-radius:var(--r-pill);
   pointer-events:none; opacity:0; transition:opacity .16s ease;
-  box-shadow:0 12px 28px -10px rgba(0,0,0,.45); }
+  box-shadow:var(--sh-float-md); }
 .eumap__tooltip.is-on{ opacity:1; }
 
 /* egyetlen "kattints" felirat, középen alul */
 .eumap__hint{ position:absolute; z-index:5; left:50%; bottom:clamp(28px,5vh,54px); transform:translate(-50%,10px);
   display:flex; align-items:center; gap:10px; margin:0; padding:10px 20px 10px 16px;
-  background:rgba(18,24,19,.62); border:1.3px solid rgba(250,246,239,.20); border-radius:100px;
+  background:rgba(18,24,19,.62); border:1.3px solid var(--cream-a16); border-radius:var(--r-pill);
   backdrop-filter:blur(8px); pointer-events:none; white-space:nowrap;
-  font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:rgba(250,246,239,.82);
+  font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--cream-a82);
   opacity:0; transition:opacity .5s var(--ease), transform .5s var(--ease); }
 .eumap__hint.is-on{ opacity:1; transform:translate(-50%,0); }
 .eumap__hint span{ width:9px; height:9px; border-radius:50%; background:var(--green); flex:none;
@@ -1116,8 +1188,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* a kattintással kiemelt ország adatlapja — bal alul, a térkép fölött */
 .eumap__card{ position:absolute; z-index:6; left:clamp(24px,7vw,120px); bottom:clamp(60px,12vh,140px);
   width:min(38ch,84vw); text-align:left; background:var(--cream);
-  border:1.5px solid var(--cream-line); border-radius:22px; padding:26px 28px 28px;
-  box-shadow:0 26px 60px -26px rgba(0,0,0,.35);
+  border:1.5px solid var(--cream-line); border-radius:var(--r-lg); padding:26px 28px 28px;
+  box-shadow:var(--sh-float-lg);
   opacity:0; transform:translateY(16px) scale(.98); pointer-events:none;
   transition:opacity .45s var(--ease), transform .45s var(--ease); }
 .eumap__card.is-on{ opacity:1; transform:none; pointer-events:auto; }
@@ -1129,14 +1201,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   color:var(--green); margin-bottom:10px; }
 .eumap__card-title{ font-family:var(--font-display); font-weight:400; letter-spacing:-.02em; line-height:1;
   font-size:clamp(26px,2.6vw,40px); color:var(--ink); margin:0 0 12px; }
-.eumap__card-text{ font-family:var(--font-lead); font-size:clamp(14px,1.15vw,17px); line-height:1.55;
+.eumap__card-text{ font-family:var(--font-lead); font-weight:500; font-size:clamp(14px,1.15vw,17px); line-height:1.55;
   color:var(--ink-soft); margin:0; }
 
 /* márkaüzenet — mindjárt az elején, a szekció tetején; görgetésre elúszik */
 /* --- szerkesztői keret: hajszálvékony vonal + sarokjelek --- */
 .eumap__frame{ position:absolute; z-index:3; pointer-events:none;
   inset:clamp(18px,3.2vw,54px);
-  border:1px solid rgba(250,246,239,.16); }
+  border:1px solid var(--cream-a16); }
 .eumap__corner{ position:absolute; width:14px; height:14px; }
 .eumap__corner::before,
 .eumap__corner::after{ content:''; position:absolute; background:var(--n-lime); }
@@ -1164,8 +1236,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   color:var(--n-lime); margin-bottom:12px; }
 .eumap__msg-title{ font-family:var(--font-display); font-weight:400; letter-spacing:-.02em; line-height:.94;
   font-size:clamp(30px,3.6vw,58px); color:var(--cream); margin:0 0 12px; }
-.eumap__msg-lead{ font-family:var(--font-lead); font-size:clamp(14px,1.15vw,18px); line-height:1.5;
-  color:rgba(250,246,239,.68); margin:0; max-width:28ch; }
+.eumap__msg-lead{ font-family:var(--font-lead); font-weight:500; font-size:clamp(14px,1.15vw,18px); line-height:1.5;
+  color:var(--cream-a70); margin:0; max-width:28ch; }
 
 
 /* --- TARTALÉK NÉZET, ha nincs WebGL (lásd eumapFallback az eumap-scene.js-ben) ---
@@ -1236,8 +1308,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .ft__marquee{ position:relative; z-index:3; overflow:hidden; line-height:1;
   margin:calc(clamp(60px,8vw,110px) * -1) calc(clamp(20px,4vw,60px) * -1) clamp(46px,6vw,80px);
   padding:clamp(22px,2.6vw,38px) 0;
-  border-top:1.5px solid rgba(250,246,239,.14);
-  border-bottom:1.5px solid rgba(250,246,239,.14);
+  border-top:1.5px solid var(--cream-a16);
+  border-bottom:1.5px solid var(--cream-a16);
   /* a két szélén elhalványul, hogy ne legyen kemény vágás */
   -webkit-mask-image:linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
           mask-image:linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%); }
@@ -1253,7 +1325,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   font-size:clamp(30px,4.2vw,64px); text-transform:uppercase; white-space:nowrap;
   /* kontúros betű: kitöltés nélkül, csak vékony vonal — nem viszi el a fókuszt
      a lenti óriás KORONA GOMBA felirattól */
-  color:transparent; -webkit-text-stroke:1.4px rgba(250,246,239,.5); }
+  color:transparent; -webkit-text-stroke:1.4px var(--cream-a60); }
 /* lime elválasztó pont a nevek között */
 .ft__marquee-track li::after{ content:''; width:9px; height:9px; border-radius:50%; flex:none;
   background:var(--n-lime); opacity:.85; -webkit-text-stroke:0; }
@@ -1270,22 +1342,22 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .ft__brand img{ width:clamp(86px,7vw,112px); height:clamp(86px,7vw,112px); object-fit:contain; display:block; }
 .ft__brand b{ display:block; font-family:var(--font-display); font-weight:400; font-size:clamp(34px,3vw,52px); letter-spacing:-.02em; line-height:.92; }
 .ft__brand i{ display:block; font-style:normal; font-size:clamp(12px,1vw,16px); letter-spacing:.2em; text-transform:uppercase;
-  color:rgba(250,246,239,.6); margin-top:6px; }
-.ft__note{ margin-top:20px; max-width:34ch; font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em;
-  font-size:clamp(17px,1.25vw,22px); line-height:1.56; color:rgba(250,246,239,.78); }
+  color:var(--cream-a60); margin-top:6px; }
+.ft__note{ margin-top:20px; max-width:34ch; font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em;
+  font-size:clamp(17px,1.25vw,22px); line-height:1.56; color:var(--cream-a82); }
 
 .ft__col h4{ font-size:clamp(15px,1vw,18px); font-weight:700; letter-spacing:.24em; text-transform:uppercase;
   color:var(--n-lime); margin-bottom:20px; }
 .ft__links{ display:flex; flex-direction:column; gap:12px; }
 .ft__links a, .ft__contact a{ font-family:var(--font-display); font-weight:400; font-size:clamp(22px,1.8vw,30px); letter-spacing:-.01em;
-  color:rgba(250,246,239,.86); text-decoration:none; width:max-content; transition:color .25s, transform .3s var(--ease); }
+  color:var(--cream-a82); text-decoration:none; width:max-content; transition:color .25s, transform .3s var(--ease); }
 .ft__links a:hover, .ft__contact a:hover{ color:var(--n-lime); transform:translateX(4px); }
 .ft__contact{ display:flex; flex-direction:column; gap:12px; }
-.ft__contact p{ font-size:clamp(17px,1.2vw,21px); line-height:1.55; color:rgba(250,246,239,.66); margin-top:6px; }
+.ft__contact p{ font-size:clamp(17px,1.2vw,21px); line-height:1.55; color:var(--cream-a70); margin-top:6px; }
 .ft__lang{ display:flex; gap:12px; margin-top:14px; }
-.ft__lang button{ background:transparent; border:1.6px solid rgba(250,246,239,.26); cursor:pointer;
+.ft__lang button{ background:transparent; border:1.6px solid var(--cream-a28); cursor:pointer;
   font-family:var(--font-display); font-size:clamp(18px,1.3vw,23px); font-weight:400; letter-spacing:.08em;
-  color:rgba(250,246,239,.7); padding:10px 18px; border-radius:100px;
+  color:var(--cream-a70); padding:10px 18px; border-radius:var(--r-pill);
   transition:color .25s, background .25s, border-color .25s, transform .3s var(--ease); }
 .ft__lang button.is-on{ background:var(--n-lime); border-color:var(--n-lime); color:var(--ink); }
 .ft__lang button:hover{ color:var(--cream); border-color:var(--cream); transform:translateY(-2px); }
@@ -1299,7 +1371,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* a felirat és a dobált gombák nem lóghatnak ki a sávból */
   overflow:hidden; }
 .ft__word{ position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-  font-family:var(--font-lead); font-weight:400;
+  font-family:var(--font-display); font-weight:400;
   /* korábban 22vw/20rem volt: a "KORONA"/"GOMBA" szó ekkor szélesebb lett,
      mint az .ft__stage (aminek van oldalpaddingje) — mivel overflow:hidden
      vágja, mindkét szél levágódott. Kisebb, biztonságos méret. */
@@ -1319,11 +1391,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* a záró sáv vonala teljes szélességben fut végig */
 .ft__bar{ position:relative; z-index:3; margin:0 calc(clamp(20px,4vw,60px) * -1);
   margin-top:clamp(18px,2.4vw,34px); padding:24px clamp(20px,4vw,60px) 28px;
-  border-top:1.5px solid rgba(250,246,239,.16);
+  border-top:1.5px solid var(--cream-a16);
   display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
-  font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:rgba(250,246,239,.58); }
+  font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cream-a60); }
 .ft__legal{ display:flex; gap:22px; }
-.ft__legal a{ color:rgba(250,246,239,.5); text-decoration:none; transition:color .25s; }
+.ft__legal a{ color:var(--cream-a60); text-decoration:none; transition:color .25s; }
 .ft__legal a:hover{ color:var(--n-lime); }
 
 @media (max-width:860px){
