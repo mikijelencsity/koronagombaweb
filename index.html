@@ -821,7 +821,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .certs__title{ font-family:var(--font-display); font-weight:400; font-size:clamp(2.1rem,6.6vw,5.1rem); line-height:.88; letter-spacing:-.03em; text-transform:uppercase; }
 .certs__title em{ display:block; font-family:var(--font-display); font-style:normal; font-weight:400; text-transform:uppercase;
   font-size:clamp(1.45rem,4.3vw,3.2rem); line-height:1.08; letter-spacing:-.02em; margin-top:.12em;
-  color:var(--green-deep); }
+  color:var(--green-deep);
+  /* width:fit-content + margin-inline:auto — a sor a SZÖVEG szélességére
+     zsugorodik (középen marad), különben az aláhúzás a teljes sávot érné,
+     nem a szöveget. A display:block megmarad, hogy külön sorba törjön. */
+  position:relative; width:fit-content; margin-inline:auto; }
+
+/* animált aláhúzás: a szekció beúszásakor balról jobbra kihúzódik.
+   A .certs.is-in osztályt a meglévő IntersectionObserver adja hozzá. */
+.certs__title em::after{ content:''; position:absolute; left:0; right:0; bottom:-.16em;
+  height:.085em; min-height:3px; border-radius:100px; background:var(--green-deep);
+  transform:scaleX(0); transform-origin:left center;
+  transition:transform 1s var(--ease) .45s; }
+.certs.is-in .certs__title em::after{ transform:scaleX(1); }
+
 .certs__lead{ max-width:600px; margin:30px auto 0; font-family:var(--font-lead); font-weight:500;
   letter-spacing:-.015em; font-size:clamp(13.5px,1vw,15.5px); line-height:1.62; color:var(--ink); }
 
@@ -2093,15 +2106,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     <div class="gal__track">
       <div class="gal__track-inner" id="galTrack">
         <div class="gal__card"><img src="images/koronakepek/ai-2.webp" alt=""></div>
-        <div class="gal__card"><img src="images/koronakepek/fb-1.webp" alt=""></div>
         <div class="gal__card"><img src="images/koronakepek/ai-4.webp" alt=""></div>
-        <div class="gal__card"><img src="images/koronakepek/fb-2.webp" alt=""></div>
         <div class="gal__card"><img src="images/koronakepek/ai-5.webp" alt=""></div>
-        <div class="gal__card"><img src="images/koronakepek/fb-3.webp" alt=""></div>
         <div class="gal__card"><img src="images/koronakepek/ai-6.webp" alt=""></div>
-        <div class="gal__card"><img src="images/koronakepek/fb-4.webp" alt=""></div>
         <div class="gal__card"><img src="images/koronakepek/ai-7.webp" alt=""></div>
-        <div class="gal__card"><img src="images/koronakepek/ai-8.webp" alt=""></div>
         <div class="gal__card"><img src="images/koronakepek/ai-9.webp" alt=""></div>
         <div class="gal__card"><img src="images/koronakepek/ai-3.webp" alt=""></div>
         <div class="gal__card"><img src="images/koronakepek/ai-10.webp" alt=""></div>
