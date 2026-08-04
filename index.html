@@ -661,7 +661,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    adott, ami még a nagy szövegre vonatkozó 3:1-et sem érte el egyik dián
    sem. A krém --ui 2,94-3,81:1 — lásd a megjegyzést a .slide__name-nél. */
 .slide__kicker{ font-family:'Caveat',cursive;
-  font-size:clamp(17px,1.6vw,22px); font-weight:600; letter-spacing:.01em; text-transform:none;
+  font-size:clamp(21px,2.1vw,30px); font-weight:600; letter-spacing:.01em; text-transform:none;
   /* FIGYELEM: ide NEM szabad opacity-t írni. A szomszédos (inaktív) diák
      szövegét a `.slide__body > *{opacity:0}` rejti el, aminek a
      specificitása (0,1,0) — pontosan annyi, mint egy sima osztályé. Egy
@@ -669,21 +669,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      a szomszéd dia kickere ("Feldolgozás") átlóg a képernyő szélén. */
   color:var(--ui); margin-bottom:6px; }
 /* TERMÉKNÉV — a dia legnagyobb szövegeleme.
-   A SZÍN szándékosan maradt a sötét --stroke: kimértük, hogy a színes
-   diahátterek középtónusúak, ezért RAJTUK SEM a világos, SEM a sötét szöveg
-   nem éri el a 4,5:1-et. Nagy szövegre a küszöb 3:1, és ott a sötét jobb:
-     zöld 3,94 | piros 3,30 | zöld2 3,13 | piros2 3,01  -> mind átmegy
-     (krémmel ugyanez: 2,94 | 3,72 | 3,27 | 3,81 -> a zöldön megbukna)
-   A név baja tehát nem a szín volt, hanem hogy 17,6px-en jelent meg.
-   A nowrap helyett tördelhet: emiatt lehet végre nagy, anélkül hogy
-   belelógna a termékfotóba (ezért kellett korábban lekicsinyíteni).
-   NINCS -webkit-text-stroke: a fehér körvonal a nagy méretben már nem
-   kellett a kontraszthoz (3,0-3,9:1 nagy szövegre bőven elég), viszont
-   piszkította a betűformákat. */
-.slide__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(26px,3.4vw,44px);
-  line-height:1.0; letter-spacing:-.02em; text-transform:uppercase; margin-bottom:22px;
+   SZÍN: világos (--ui). A diahátterek középtónusúak, ezért egyik szövegszín
+   sem éri el a 4,5:1-et — nagy szövegre viszont a küszöb 3:1, és a fehér
+   ezen a négy háttéren így áll:
+     piros 3,72 | zöld2 3,27 | piros2 3,81  -> átmegy
+     zöld #3DA35D 2,94 -> MEGBUKOTT, ezért az 1. dia háttere 4%-kal
+     sötétebb lett (#3DA35D -> #399957 = 3,31:1). A változás a márkazöldön
+     alig látható, viszont így mind a négy dia megfelel.
+   NINCS -webkit-text-stroke: a fehér körvonal piszkította a betűformákat.
+   A nowrap helyett tördelhet (<wbr> az összetett szavakban) — emiatt lehet
+   nagy, anélkül hogy belelógna a termékfotóba. */
+.slide__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(32px,4.1vw,54px);
+  line-height:.98; letter-spacing:-.025em; text-transform:uppercase; margin-bottom:0;
   text-wrap:balance;
-  color:var(--stroke,var(--ink)); }
+  color:var(--ui,var(--cream)); }
 
 /* ===== POLAROID-PÁR a termékfotó mellé ==================================
    Ugyanaz a matrica-nyelv, mint a Történetünk szekcióban (--r-sm sarok,
@@ -727,6 +726,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    korábban csak az aktívra volt megadva, az inaktív a .btn--lg alap
    (nagyobb) méretét kapta, ezért diaváltáskor a gomb láthatóan
    ugrott/megnőtt, ahogy aktívvá vált */
+/* MEGJEGYZÉS: a .slide__btn jelenleg NINCS a HTML-ben — a CTA gombokat
+   kivettük a diákból. A szabályokat szándékosan meghagytuk, hogy a gomb
+   visszatétele egyetlen sor HTML legyen; ha véglegesen nem kell, ez a
+   négy szabály törölhető. */
 .slide__btn{ font-size:clamp(13px,1.1vw,15px); padding:clamp(15px,1.65vw,21px) clamp(26px,2.6vw,36px); }
 /* a .slide__body > * szabály (a belépő animációhoz) felülírja a .btn saját
    transition-jét — itt explicit visszaadjuk neki, magasabb specificitással,
@@ -1850,8 +1853,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
       <!-- 01 — FRISS GOMBÁK -->
       <article class="slide"
-        data-bg="#3DA35D" data-deep="#216B37" data-deeper="#123B20" data-acc="#F0B93C" data-ui="#F9F4FF"
-        style="--bg:#3DA35D; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20">
+        data-bg="#399957" data-deep="#216B37" data-deeper="#123B20" data-acc="#F0B93C" data-ui="#F9F4FF"
+        style="--bg:#399957; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20">
         <div class="slide__media"><img src="images/assets/products/friss-fx.webp" alt="Friss gombák" decoding="async"></div>
           <div class="slide__pola">
             <figure style="--rot:-4.5deg"><img src="images/prod/friss-1.webp" alt="Gomba pirítóson, friss fűszerekkel" loading="lazy" decoding="async"></figure>
@@ -1860,7 +1863,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         <div class="slide__body">
           <p class="slide__kicker">Termesztés</p>
           <h3 class="slide__name">Friss gombák</h3>
-          <a href="#kapcsolat" class="btn btn--solid btn--lg slide__btn">Terméklista és árak <span aria-hidden="true">→</span></a>
         </div>
       </article>
 
@@ -1876,7 +1878,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         <div class="slide__body">
           <p class="slide__kicker">Feldolgozás</p>
           <h3 class="slide__name">Gomba<wbr>konzerv</h3>
-          <a href="#kapcsolat" class="btn btn--solid btn--lg slide__btn">Kiszerelések <span aria-hidden="true">→</span></a>
         </div>
       </article>
 
@@ -1892,7 +1893,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         <div class="slide__body">
           <p class="slide__kicker">Szaporítóanyag</p>
           <h3 class="slide__name">Gomba<wbr>csíra</h3>
-          <a href="#kapcsolat" class="btn btn--solid btn--lg slide__btn">Csíra ajánlatkérés <span aria-hidden="true">→</span></a>
         </div>
       </article>
 
@@ -1908,7 +1908,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         <div class="slide__body">
           <p class="slide__kicker">Alapanyag</p>
           <h3 class="slide__name">Gomba<wbr>komposzt</h3>
-          <a href="#kapcsolat" class="btn btn--solid btn--lg slide__btn">Komposzt ajánlatkérés <span aria-hidden="true">→</span></a>
         </div>
       </article>
 
