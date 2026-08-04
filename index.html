@@ -711,10 +711,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    hogy mobilon ki tudjon lépni a kép alól a szöveg alá. Gépen ezért a
    koordináták a TELJES diára vonatkoznak: a jobb oldali (kép-)oszlop
    nagyjából 46%-nál kezdődik, oda lógatjuk a két polaroidot. */
-/* 42% helyett 47%: a kétsoros neveknél (GOMBA/CSÍRA, GOMBA/KOMPOSZT) a
-   második sor szélesebb, és 42%-nál 44px-en átfedte a bal felső polaroidot. */
-.slide__pola figure:nth-child(1){ left:48.5%; top:4%; }
-.slide__pola figure:nth-child(2){ right:1%; bottom:16%; }
+/* A két polaroid a termékfotót KÖZREFOGJA, nem rajta ül: az egyik balra,
+   a másik jobbra lóg ki alóla.
+   A bal oldali nyugodtan mehet a szövegoszlop fölé, mert a terméknévvel
+   FÜGGŐLEGESEN nem fedi egymást (polaroid y 32-169, név y 258-363) —
+   ezért a vízszintes helyzetét a név nem korlátozza.
+   A jobb oldali kilóghat a dia jobb széle mögül: a .slide overflow-ja
+   visible, és a .carousel (overflow:hidden) széléig még bőven van hely. */
+.slide__pola figure:nth-child(1){ left:29%;  top:3%; }
+.slide__pola figure:nth-child(2){ right:-6%; bottom:14%; }
 /* a "Gombakomposzt" a leghosszabb név — kisebb betűmérettel fér csak el
    ütközés nélkül a kép mellett.
    (2026-08: a dia szélessége 1000px->800px lett a szomszédos diák
