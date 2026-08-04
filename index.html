@@ -589,7 +589,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   --head-lift:clamp(46px,5.2vw,86px); margin-top:calc(-1 * var(--head-lift));
   /* A termékfotó vízszintes eltolása. KÖZÖS változó, mert a háttér-körök és
      a napsugár is ehhez igazodik — így ha ez változik, együtt mozognak. */
-  --media-x:55px;
+  /* 0 = a termékfotó és a háttér-kör PONTOSAN a karusszel közepén ül.
+     Korábban 55px volt, hogy a kép nagyobb lehessen anélkül, hogy a
+     terméknévbe érne — de ettől az egész csoport láthatóan jobbra
+     csúszott. A helyet inkább a dia BAL PADDINGJÁBÓL nyertük vissza
+     (lásd .slide), így a kép nagy maradhat és középen is van. */
+  --media-x:0px;
   --ring-x:calc(50% + var(--media-x));
   --ring-y:58%;
   transition:background-color var(--swap) var(--swap-ease);
@@ -693,7 +698,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      8%), ezért a legkisebb margójú kettőnél a termék tényleges pereme
      26px-en átfedte a nevet. A karusszel JS a kép KÖZEPÉT igazítja a
      képernyő közepére, tehát oldalra tolni nem lehet — csak kisebbre venni. */
-  width:min(150%,1150px); height:auto;
+  /* 150% -> 124%: a 150% csak +55px-es jobbra tolással fért el; középre
+     igazítva a terméknév limitálja. Mérve, középen: 126%-nál 7px a
+     legszűkebb hézag (csíra/komposzt), 134%-nál már -7px (átfedés).
+     124% biztonságos tartalékkal. */
+  width:min(124%,950px); height:auto;
   /* nincs már drága filter, úgyhogy ez most olcsó: mindig legyen kész,
      előre kirajzolt rétege a képnek — enélkül a klón-diák (amiket a
      böngésző még sosem rajzolt ki) a hurok-váltás csúsztatása KÖZBEN
@@ -1512,8 +1521,22 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   .slide{ flex-basis:86vw; grid-template-columns:1fr; text-align:center; padding-left:clamp(4px,1.2vw,18px); }
   .slide__body{ text-align:center; order:2; }
-  .slide__media{ order:1; }
+  .slide__media{ order:1;
+    /* A --media-shift értékek a GÉPES elrendezéshez lettek bemérve (ott a
+       kép a szöveg mellett áll); itt egyoszlopos a dia, ezért nullázzuk. */
+    transform:none; position:relative; }
   .slide__media img{ width:min(85%,422px); }
+
+  /* A .carousel__ring fix koordinátákkal ül a karusszelen — az a GÉPES
+     elrendezés kép-pozíciójához van igazítva, mobilon nem talál rá.
+     Helyette a korongot magához a képhez kötjük (::before), így bármilyen
+     magasságnál biztosan mögötte van és vele együtt mozog. */
+  .carousel__ring{ display:none; }
+  .slide__media::before{ content:''; position:absolute; left:50%; top:50%;
+    translate:-50% -50%; width:min(86vw,470px); aspect-ratio:1; border-radius:50%;
+    background:rgba(255,255,255,.24); z-index:-1; }
+  /* a napsugár középpontja a kép magasságához igazítva */
+  .carousel__rays{ --ring-y:40%; }
 }
 @media (max-width:640px){
   /* Telefonon a termékkép feljebb ül, mint a dekor körgyűrű (a gyűrű a
@@ -1888,7 +1911,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 01 — FRISS GOMBÁK -->
       <article class="slide"
         data-bg="#399957" data-deep="#216B37" data-deeper="#123B20" data-acc="#F0B93C" data-ui="#F9F4FF"
-        style="--bg:#399957; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20; --media-shift:-16px">
+        style="--bg:#399957; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20; --media-shift:-20px">
         <div class="slide__media"><img src="images/assets/products/friss-fx.webp" alt="Friss gombák" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Termesztés</p>
@@ -1899,7 +1922,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 02 — GOMBAKONZERV -->
       <article class="slide"
         data-bg="#F62213" data-deep="#A71106" data-deeper="#620A04" data-acc="#F0B93C" data-ui="#FFF2EE"
-        style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04; --media-shift:16px">
+        style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04; --media-shift:6px">
         <div class="slide__media"><img src="images/assets/products/konzerv-fx.webp" alt="Korona termesztett csiperke szeletek konzerv" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Feldolgozás</p>
@@ -1910,7 +1933,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 03 — GOMBACSÍRA -->
       <article class="slide"
         data-bg="#2E9B57" data-deep="#1C6B3A" data-deeper="#0F4526" data-acc="#D9E34E" data-ui="#F9F4FF"
-        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526; --media-shift:8px">
+        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526; --media-shift:1px">
         <div class="slide__media"><img src="images/assets/products/csira-fx.webp" alt="Gombacsíra" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Szaporítóanyag</p>
@@ -1921,7 +1944,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 04 — GOMBAKOMPOSZT -->
       <article class="slide"
         data-bg="#E1432B" data-deep="#A32E1D" data-deeper="#611B11" data-acc="#F0B93C" data-ui="#FFF2EE"
-        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11; --media-shift:7px">
+        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11; --media-shift:-1px">
         <div class="slide__media"><img src="images/assets/products/komposzt-fx.webp" alt="Gombakomposzt" decoding="async"></div>
         <div class="slide__body">
           <p class="slide__kicker">Alapanyag</p>
