@@ -230,7 +230,13 @@ body.menu-open .mbtn__label--close{ opacity:1; }
   transition:visibility 0s linear 1.65s; }
 body.menu-open .menu{ visibility:visible; pointer-events:auto; transition-delay:0s; }
 
-.menu__goo{ position:absolute; inset:0; z-index:1; filter:url(#gooMenu); will-change:filter; }
+/* FONTOS — a will-change:filter CSAK nyitott menünél lehet bekapcsolva.
+   Állandóan bekapcsolva a Chrome zárt menü mellett is fenntartja a réteget, és
+   ráfesti az SVG-szűrő régióját a réteg origójára: ez a képernyő BAL FELSŐ
+   sarkában egy ~78x75px-es fekete négyzetként látszik, folyamatosan
+   (78 ≈ 3 × a gooMenu blur stdDeviation="26" értéke). */
+.menu__goo{ position:absolute; inset:0; z-index:1; filter:url(#gooMenu); }
+body.menu-open .menu__goo{ will-change:filter; }
 .menu__goo i{ position:absolute; border-radius:50%; background:var(--green-deep); transform:scale(0);
   will-change:transform; transition:transform 1.15s var(--expo); }
 body.menu-open .menu__goo i{ transition-duration:.9s; }
@@ -827,8 +833,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   padding:.06em .24em; border-radius:6px 14px 8px 12px; }
 
 /* teljes szélességű pálya, három vízszintes sávval */
+/* A magasság a fotós kártyákhoz van szabva: azok ~100px-szel magasabbak a
+   korábbi, csak szöveges változatnál, és a régi 1140px-es pályáról a "Ma"
+   állomás alul kilógott. A --px/--py értékek ehhez a magassághoz vannak
+   belőve — ha ezt átírod, az állomásokat és a szórt matricákat is ellenőrizd. */
 .tl__track{ position:relative; width:100%; margin:0 auto;
-  height:clamp(1140px, 142vh, 1680px); }
+  height:clamp(1440px, 150vh, 1980px); }
 
 /* az útvonal */
 .tl__path{ position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; overflow:visible; }
@@ -863,23 +873,57 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .tl__item--r .tl__year{ transform:rotate(6deg); }
 .tl__item--now .tl__year{ background:var(--green-deep); }
 
+/* A kártya polaroid: felül teljes szélességű fotó, alatta a (szándékosan
+   kicsi) szöveg. A padding kisebb, mint korábban — a fotó viszi a helyet. */
 .tl__card{ background:var(--cream); border:1.5px solid var(--cream-line);
-  border-radius:30px 18px 28px 20px; padding:clamp(22px,2.6vw,36px);
-  box-shadow:0 10px 0 0 rgba(22,17,13,.12);
+  border-radius:30px 18px 28px 20px; padding:clamp(15px,1.6vw,22px);
+  box-shadow:0 10px 0 0 rgba(22,17,13,.12); overflow:hidden;
   transition:transform .4s var(--ease), box-shadow .4s var(--ease); }
 .tl__card{ flex:1; }
 .tl__item:hover .tl__card{ transform:translateY(-5px); box-shadow:0 16px 0 0 rgba(22,17,13,.16); }
-.tl__card h3{ font-family:var(--font-display); font-weight:400; font-size:clamp(1.2rem,2.2vw,1.85rem);
+
+/* a fotó kifut a kártya felső éléig (negatív margó a paddingon), a saroksugár
+   a kártya bal/jobb felső sarkát követi, hogy ne lógjon ki a keretből */
+.tl__shot{ margin:calc(clamp(15px,1.6vw,22px) * -1) calc(clamp(15px,1.6vw,22px) * -1) clamp(13px,1.4vw,18px);
+  aspect-ratio:16/10; overflow:hidden; background:var(--cream-line);
+  border-radius:29px 17px 0 0; }
+.tl__shot img{ width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .6s var(--ease); }
+.tl__item:hover .tl__shot img{ transform:scale(1.05); }
+/* jobbra igazított állomásoknál a tükrözött saroksugár */
+.tl__item--r .tl__shot{ border-radius:17px 29px 0 0; }
+
+.tl__card h3{ font-family:var(--font-display); font-weight:400; font-size:clamp(1rem,1.5vw,1.32rem);
   line-height:1.04; letter-spacing:-.024em; text-transform:uppercase; }
-.tl__card p{ margin-top:12px; font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em;
-  font-size:clamp(14px,1.08vw,16.5px); line-height:1.58; color:#3A3128; }
+.tl__card p{ margin-top:8px; font-family:var(--font-lead); font-weight:400; letter-spacing:-.015em;
+  font-size:clamp(12.5px,.88vw,14px); line-height:1.5; color:#3A3128; }
 .tl__card p strong{ font-weight:400; background:var(--n-lime); color:var(--ink);
   box-decoration-break:clone; -webkit-box-decoration-break:clone;
   padding:.05em .22em; border-radius:5px 12px 7px 10px; }
-.tl__tag{ display:inline-flex; align-items:center; gap:8px; margin-top:18px; font-size:10.5px; font-weight:700;
+.tl__tag{ display:inline-flex; align-items:center; gap:7px; margin-top:12px; font-size:9.5px; font-weight:700;
   letter-spacing:.16em; text-transform:uppercase; color:var(--ink);
-  border:1.5px solid var(--ink); border-radius:100px; padding:8px 16px; }
-.tl__tag::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--green); }
+  border:1.5px solid var(--ink); border-radius:100px; padding:6px 13px; }
+.tl__tag::before{ content:""; width:5px; height:5px; border-radius:50%; background:var(--green); }
+
+/* --- szórt fotó-matricák: a pálya melletti üres krém foltokat töltik ki ---
+   Nem tartoznak egyetlen állomáshoz sem, csak hangulat. A .tl__list-tel
+   megegyező koordinátarendszerben ülnek (--px/--py), de z-indexük alacsonyabb,
+   így a kártyák mindig fölöttük vannak, ha átfednének. */
+.tl__polas{ position:absolute; inset:0; z-index:2; pointer-events:none; }
+.tl__pola{ position:absolute; left:var(--px); top:var(--py);
+  width:clamp(150px,13vw,215px);
+  background:var(--cream); border:1.5px solid var(--cream-line);
+  padding:9px 9px clamp(24px,2.4vw,34px);   /* alul vastagabb perem: polaroid */
+  border-radius:5px; box-shadow:0 12px 26px -12px rgba(22,17,13,.4);
+  opacity:0; transform:translate(-50%,-50%) rotate(var(--rot,0deg)) translateY(30px) scale(.96);
+  transition:opacity .8s var(--ease), transform .9s var(--ease); }
+.tl__pola.is-in{ opacity:1; transform:translate(-50%,-50%) rotate(var(--rot,0deg)); }
+.tl__pola img{ width:100%; aspect-ratio:1; object-fit:cover; display:block; }
+/* a "ragasztószalag" a matrica tetején */
+.tl__pola::before{ content:''; position:absolute; left:50%; top:-11px; width:58px; height:21px;
+  transform:translateX(-50%) rotate(-3deg);
+  background:rgba(217,227,78,.55); border-left:1px dashed rgba(22,17,13,.18);
+  border-right:1px dashed rgba(22,17,13,.18); }
 
 /* mobil útvonal + jelölő — lásd JS "5c-mobil" blokk, ami a viewBox-ot és a
    "d" attribútumot valós pixelben, az állomások tényleges pozíciója alapján
@@ -890,6 +934,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:900px){
   .tl__track{ height:auto; position:relative; }
   .tl__path, .tl__marker{ display:none; }
+  /* a szórt matricák abszolút pozíciója a gépes pályához van hangolva —
+     a mobil egyoszlopos rácsban nincs hova tenni őket, ezért kikapcsolva */
+  .tl__polas{ display:none; }
+  /* mobilon a kártya keskenyebb, így a fotó magasabb aránnyal jobban mutat.
+     A saroksugár egységes, mert itt az oldalt a :nth-child dönti el, nem a
+     --r osztály — így a kettő elcsúszna egymástól. */
+  .tl__shot, .tl__item--r .tl__shot{ aspect-ratio:3/2; border-radius:29px 17px 0 0; }
+  .tl__card h3{ font-size:clamp(1.05rem,4.4vw,1.35rem); }
+  .tl__card p{ font-size:clamp(13px,3.5vw,14.5px); }
   .tl__list{ position:relative; display:grid; gap:34px; }
   .tl__item, .tl__item--r{ position:static; width:100%;
     transform:translateY(28px) rotate(var(--rot,0deg)); }
@@ -1112,6 +1165,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   color:rgba(250,246,239,.68); margin:0; max-width:28ch; }
 
 
+/* A ScrollTrigger pin:true a .eumap köré egy .pin-spacer burkolót generál.
+   Ez alapból ÁTLÁTSZÓ, a szekció magassága pedig tört képpont (pl. 737.6px) —
+   így a spacer alján a krém body villant át egy hajszálvékony világos csíkként,
+   közvetlenül a lábléc fölött. A spacert is a lábléc színére festjük. */
+.pin-spacer:has(> .eumap){ background:var(--ink); }
+
 @media (max-width:760px){
   .eumap__frame{ inset:12px; }
   .eumap__msg{ left:24px; right:24px; top:30px; width:auto; }
@@ -1123,8 +1182,69 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* ============================================================
    7. LÁBLÉC — óriás felirat, felugráló gombákkal
    ============================================================ */
-.ft{ position:relative; background:var(--ink); color:var(--cream); overflow:hidden;
-  padding:clamp(60px,8vw,110px) clamp(20px,4vw,60px) 0; }
+/* A háttér UGYANAZ a rétegzés, mint az Európai jelenlét (.eumap) szekcióé:
+   reflektor-fény + sötét színátmenet, fölötte úszó aurora-felhők és papírszemcse.
+   A felső él pontosan var(--ink) — ezzel a zászlós szekció alja vágás nélkül
+   folytatódik a láblécben, a gradiens pedig innen "visszafelé" fut. */
+.ft{ position:relative; color:var(--cream); overflow:hidden;
+  padding:clamp(60px,8vw,110px) clamp(20px,4vw,60px) 0;
+  background:
+    radial-gradient(96% 58% at 50% 52%, rgba(70,92,72,.42), rgba(0,0,0,0) 70%),
+    linear-gradient(to bottom, var(--ink) 0%, var(--ink) 12%, #171D18 46%, #1A2018 100%); }
+
+/* lassan úszó zöld fény-felhők — mint az .eumap::before */
+.ft::before{ content:''; position:absolute; inset:-20%; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(38% 42% at 22% 30%, rgba(61,163,93,.30), transparent 65%),
+    radial-gradient(34% 38% at 78% 62%, rgba(217,227,78,.16), transparent 65%),
+    radial-gradient(30% 34% at 58% 18%, rgba(33,107,55,.26), transparent 68%);
+  filter:blur(34px);
+  /* a felső sávban nincs fény: ott a háttér pontosan var(--ink), így a zászlós
+     szekció aljához képest nincs tónusugrás a határon */
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, transparent 8%, #000 22%);
+          mask-image:linear-gradient(to bottom, transparent 0, transparent 8%, #000 22%);
+  animation:eumapAurora 26s ease-in-out infinite alternate; }
+
+/* finom papírszemcse — mint az .eumap::after */
+.ft::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+  opacity:.5; mix-blend-mode:soft-light;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, transparent 6%, #000 18%);
+          mask-image:linear-gradient(to bottom, transparent 0, transparent 6%, #000 18%);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E"); }
+
+/* --- ÁTVEZETŐ SZALAG: a zászlós szekció célországai, végtelenítve úszva ---
+   A lábléc ELSŐ eleme, negatív margóval kitör a .ft paddingjéből, így pontosan
+   a szekcióhatárra ül. Azért a láblécen BELÜL van, és nem külön szekcióként,
+   mert így ugyanazt a hátteret kapja — nem keletkezhet új, látható él. */
+.ft__marquee{ position:relative; z-index:3; overflow:hidden; line-height:1;
+  margin:calc(clamp(60px,8vw,110px) * -1) calc(clamp(20px,4vw,60px) * -1) clamp(46px,6vw,80px);
+  padding:clamp(22px,2.6vw,38px) 0;
+  border-top:1.5px solid rgba(250,246,239,.14);
+  border-bottom:1.5px solid rgba(250,246,239,.14);
+  /* a két szélén elhalványul, hogy ne legyen kemény vágás */
+  -webkit-mask-image:linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+          mask-image:linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%); }
+/* két egyforma sáv egymás mellett: az egyik pont akkor ér a helyére, amikor
+   a másik kifutna — ettől szakadásmentes a hurok */
+.ft__marquee-track{ display:flex; width:max-content;
+  animation:ftMarquee 46s linear infinite; }
+.ft__marquee:hover .ft__marquee-track{ animation-play-state:paused; }
+.ft__marquee-track ul{ display:flex; align-items:center; gap:clamp(26px,3vw,52px);
+  padding-right:clamp(26px,3vw,52px); margin:0; list-style:none; flex:none; }
+.ft__marquee-track li{ display:flex; align-items:center; gap:clamp(26px,3vw,52px);
+  font-family:var(--font-display); font-weight:400; letter-spacing:-.01em;
+  font-size:clamp(30px,4.2vw,64px); text-transform:uppercase; white-space:nowrap;
+  /* kontúros betű: kitöltés nélkül, csak vékony vonal — nem viszi el a fókuszt
+     a lenti óriás KORONA GOMBA felirattól */
+  color:transparent; -webkit-text-stroke:1.4px rgba(250,246,239,.5); }
+/* lime elválasztó pont a nevek között */
+.ft__marquee-track li::after{ content:''; width:9px; height:9px; border-radius:50%; flex:none;
+  background:var(--n-lime); opacity:.85; -webkit-text-stroke:0; }
+@keyframes ftMarquee{ from{ transform:translate3d(0,0,0); } to{ transform:translate3d(-50%,0,0); } }
+
+@media (prefers-reduced-motion: reduce){
+  .ft__marquee-track{ animation:none; }
+}
 
 .ft__top{ position:relative; z-index:3; width:100%; margin:0 0 clamp(50px,7vw,90px);
   display:grid; grid-template-columns:minmax(360px,1.45fr) minmax(190px,.7fr) minmax(260px,.85fr);
@@ -1420,7 +1540,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   <div class="pre__ring pre__ring--2"></div>
 
   <div class="pre__core">
-    <img class="pre__logo" src="images/assets/logo.webp" alt="">
+    <img class="pre__logo" src="images/assets/logo-320.webp" alt="">
     <div class="pre__num"><span id="preNum">0</span><i>%</i></div>
     <div class="pre__word" id="preWord" data-letters="Gombaipari Egyesülés"></div>
   </div>
@@ -1437,7 +1557,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 <!-- ===================== NAV ===================== -->
 <nav class="nav">
   <a class="brand" href="#">
-    <img class="brand__logo" src="images/assets/logo.webp" alt="Korona Gombaipari Egyesülés logó">
+    <img class="brand__logo" src="images/assets/logo-320.webp" alt="Korona Gombaipari Egyesülés logó">
     <span><span class="brand__name">KORONA</span><span class="brand__sub">Gombaipari Egyesülés</span></span>
   </a>
 
@@ -1504,34 +1624,34 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   <div class="hsticker"            style="--deg:-11; left:13%; bottom:47%;">Saját<br>komposzt</div>
   <div class="hsticker hsticker--green" style="--deg:11; right:15%; bottom:28%;">12 ország<br>export</div>
 
-  <div class="shroom s1" data-depth="14" style="--x:-9vw; --y:4vh;  --w:33vw; --kx:-13; --ky:-2; --kr:-9;  --rot:-6deg; --dur:7.4s; --del:.05s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-0.png" alt=""></div>
-  <div class="shroom s2" data-depth="18" style="--x:1vw;  --y:46vh; --w:27vw; --kx:-15; --ky:3;  --kr:7;   --rot:9deg;  --dur:6.4s; --del:.18s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-3.png" alt=""></div>
-  <div class="shroom s3" data-depth="24" style="--x:13vw; --y:-6vh; --w:21vw; --kx:-21; --ky:-4; --kr:-15; --rot:-12deg;--dur:8.2s; --del:.30s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-5.png" alt=""></div>
-  <div class="shroom s4" data-depth="20" style="--x:9vw;  --y:66vh; --w:23vw; --kx:-19; --ky:5;  --kr:12;  --rot:5deg;  --dur:7s;   --del:.42s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-6.png" alt=""></div>
-  <div class="shroom s5" data-depth="30" style="--x:23vw; --y:24vh; --w:15vw; --kx:-26; --ky:-6; --kr:-18; --rot:14deg; --dur:6.1s; --del:.54s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-8.png" alt=""></div>
+  <div class="shroom s1" data-depth="14" style="--x:-9vw; --y:4vh;  --w:33vw; --kx:-13; --ky:-2; --kr:-9;  --rot:-6deg; --dur:7.4s; --del:.05s"><img src="images/mushrooms/mushroom-0.webp" alt=""></div>
+  <div class="shroom s2" data-depth="18" style="--x:1vw;  --y:46vh; --w:27vw; --kx:-15; --ky:3;  --kr:7;   --rot:9deg;  --dur:6.4s; --del:.18s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
+  <div class="shroom s3" data-depth="24" style="--x:13vw; --y:-6vh; --w:21vw; --kx:-21; --ky:-4; --kr:-15; --rot:-12deg;--dur:8.2s; --del:.30s"><img src="images/mushrooms/mushroom-5.webp" alt=""></div>
+  <div class="shroom s4" data-depth="20" style="--x:9vw;  --y:66vh; --w:23vw; --kx:-19; --ky:5;  --kr:12;  --rot:5deg;  --dur:7s;   --del:.42s"><img src="images/mushrooms/mushroom-6.webp" alt=""></div>
+  <div class="shroom s5" data-depth="30" style="--x:23vw; --y:24vh; --w:15vw; --kx:-26; --ky:-6; --kr:-18; --rot:14deg; --dur:6.1s; --del:.54s"><img src="images/mushrooms/mushroom-8.webp" alt=""></div>
 
-  <div class="shroom shroom--r r1" data-depth="14" style="--x:-8vw; --y:2vh;  --w:32vw; --kx:13; --ky:-2; --kr:10;  --rot:8deg;  --dur:7.8s; --del:.10s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-1.png" alt=""></div>
-  <div class="shroom shroom--r r2" data-depth="18" style="--x:0vw;  --y:48vh; --w:28vw; --kx:16; --ky:3;  --kr:-8;  --rot:-7deg; --dur:6.7s; --del:.24s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-7.png" alt=""></div>
-  <div class="shroom shroom--r r3" data-depth="24" style="--x:12vw; --y:-4vh; --w:20vw; --kx:22; --ky:-5; --kr:16;  --rot:11deg; --dur:8.5s; --del:.36s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-2.png" alt=""></div>
-  <div class="shroom shroom--r r4" data-depth="20" style="--x:8vw;  --y:68vh; --w:22vw; --kx:19; --ky:6;  --kr:-13; --rot:-9deg; --dur:7.2s; --del:.48s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-4.png" alt=""></div>
-  <div class="shroom shroom--r r5" data-depth="30" style="--x:24vw; --y:26vh; --w:14vw; --kx:28; --ky:-6; --kr:20;  --rot:-15deg;--dur:6.3s; --del:.60s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-9.png" alt=""></div>
+  <div class="shroom shroom--r r1" data-depth="14" style="--x:-8vw; --y:2vh;  --w:32vw; --kx:13; --ky:-2; --kr:10;  --rot:8deg;  --dur:7.8s; --del:.10s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
+  <div class="shroom shroom--r r2" data-depth="18" style="--x:0vw;  --y:48vh; --w:28vw; --kx:16; --ky:3;  --kr:-8;  --rot:-7deg; --dur:6.7s; --del:.24s"><img src="images/mushrooms/mushroom-7.webp" alt=""></div>
+  <div class="shroom shroom--r r3" data-depth="24" style="--x:12vw; --y:-4vh; --w:20vw; --kx:22; --ky:-5; --kr:16;  --rot:11deg; --dur:8.5s; --del:.36s"><img src="images/mushrooms/mushroom-2.webp" alt=""></div>
+  <div class="shroom shroom--r r4" data-depth="20" style="--x:8vw;  --y:68vh; --w:22vw; --kx:19; --ky:6;  --kr:-13; --rot:-9deg; --dur:7.2s; --del:.48s"><img src="images/mushrooms/mushroom-4.webp" alt=""></div>
+  <div class="shroom shroom--r r5" data-depth="30" style="--x:24vw; --y:26vh; --w:14vw; --kx:28; --ky:-6; --kr:20;  --rot:-15deg;--dur:6.3s; --del:.60s"><img src="images/mushrooms/mushroom-9.webp" alt=""></div>
 
   <!-- EXTRA gombák — csak telefonon jelennek meg (.mextra), a sokkal telibb
        oldalakhoz és hogy az EST. tábla mögé is kerüljön belőlük -->
-  <div class="shroom mextra"          style="--x:16vw; --y:-2vh; --w:27vw; --kx:-9; --ky:-2; --kr:-6; --rot:-6deg; --dur:7.1s; --del:.12s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-2.png" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:18vw; --y:-1vh; --w:26vw; --kx:9;  --ky:-2; --kr:7;  --rot:8deg;  --dur:6.6s; --del:.20s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-4.png" alt=""></div>
-  <div class="shroom mextra"          style="--x:-4vw; --y:11vh; --w:24vw; --kx:-12;--ky:-3; --kr:-9; --rot:10deg; --dur:7.6s; --del:.28s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-8.png" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-4vw; --y:13vh; --w:23vw; --kx:12; --ky:-3; --kr:8;  --rot:-11deg;--dur:6.9s; --del:.34s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-1.png" alt=""></div>
-  <div class="shroom mextra"          style="--x:-11vw;--y:60vh; --w:24vw; --kx:-16;--ky:4;  --kr:-12;--rot:7deg;  --dur:7.3s; --del:.42s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-5.png" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-11vw;--y:63vh; --w:23vw; --kx:16; --ky:4;  --kr:11; --rot:-8deg; --dur:6.4s; --del:.50s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-7.png" alt=""></div>
+  <div class="shroom mextra"          style="--x:16vw; --y:-2vh; --w:27vw; --kx:-9; --ky:-2; --kr:-6; --rot:-6deg; --dur:7.1s; --del:.12s"><img src="images/mushrooms/mushroom-2.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:18vw; --y:-1vh; --w:26vw; --kx:9;  --ky:-2; --kr:7;  --rot:8deg;  --dur:6.6s; --del:.20s"><img src="images/mushrooms/mushroom-4.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:-4vw; --y:11vh; --w:24vw; --kx:-12;--ky:-3; --kr:-9; --rot:10deg; --dur:7.6s; --del:.28s"><img src="images/mushrooms/mushroom-8.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-4vw; --y:13vh; --w:23vw; --kx:12; --ky:-3; --kr:8;  --rot:-11deg;--dur:6.9s; --del:.34s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:-11vw;--y:60vh; --w:24vw; --kx:-16;--ky:4;  --kr:-12;--rot:7deg;  --dur:7.3s; --del:.42s"><img src="images/mushrooms/mushroom-5.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-11vw;--y:63vh; --w:23vw; --kx:16; --ky:4;  --kr:11; --rot:-8deg; --dur:6.4s; --del:.50s"><img src="images/mushrooms/mushroom-7.webp" alt=""></div>
 
   <!-- MÉG több nagy gomba (2. kör) — még telibb oldalak -->
-  <div class="shroom mextra"          style="--x:-9vw; --y:40vh; --w:28vw; --kx:-14;--ky:2;  --kr:-10;--rot:-9deg; --dur:7.8s; --del:.16s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-3.png" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-9vw; --y:43vh; --w:27vw; --kx:14; --ky:2;  --kr:10; --rot:9deg;  --dur:6.8s; --del:.24s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-6.png" alt=""></div>
-  <div class="shroom mextra"          style="--x:5vw;  --y:6vh;  --w:24vw; --kx:-10;--ky:-4; --kr:-7; --rot:12deg; --dur:7.2s; --del:.32s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-0.png" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:4vw;  --y:8vh;  --w:23vw; --kx:10; --ky:-4; --kr:7;  --rot:-12deg;--dur:6.5s; --del:.40s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-9.png" alt=""></div>
-  <div class="shroom mextra"          style="--x:-13vw;--y:86vh; --w:30vw; --kx:-18;--ky:5;  --kr:-14;--rot:6deg;  --dur:7.5s; --del:.46s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-1.png" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-13vw;--y:84vh; --w:29vw; --kx:18; --ky:5;  --kr:14; --rot:-6deg; --dur:6.7s; --del:.54s"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-3.png" alt=""></div>
+  <div class="shroom mextra"          style="--x:-9vw; --y:40vh; --w:28vw; --kx:-14;--ky:2;  --kr:-10;--rot:-9deg; --dur:7.8s; --del:.16s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-9vw; --y:43vh; --w:27vw; --kx:14; --ky:2;  --kr:10; --rot:9deg;  --dur:6.8s; --del:.24s"><img src="images/mushrooms/mushroom-6.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:5vw;  --y:6vh;  --w:24vw; --kx:-10;--ky:-4; --kr:-7; --rot:12deg; --dur:7.2s; --del:.32s"><img src="images/mushrooms/mushroom-0.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:4vw;  --y:8vh;  --w:23vw; --kx:10; --ky:-4; --kr:7;  --rot:-12deg;--dur:6.5s; --del:.40s"><img src="images/mushrooms/mushroom-9.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:-13vw;--y:86vh; --w:30vw; --kx:-18;--ky:5;  --kr:-14;--rot:6deg;  --dur:7.5s; --del:.46s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-13vw;--y:84vh; --w:29vw; --kx:18; --ky:5;  --kr:14; --rot:-6deg; --dur:6.7s; --del:.54s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
 
 
 </header>
@@ -1669,7 +1789,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- 01 — GLOBALG.A.P. -->
     <article class="cert cert--a" style="--c:var(--green); --ct:var(--green-deep); --r:-8deg">
-      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/globalgap.webp" alt="GLOBALG.A.P. tanúsítvány"></span></div>
+      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/globalgap-200.webp" alt="GLOBALG.A.P. tanúsítvány"></span></div>
       <h3 class="cert__name">GAP</h3>
       <p class="cert__full">Global G.A.P.</p>
       <span class="cert__tag">Mezőgazdaság</span>
@@ -1685,7 +1805,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- 05 — HACCP -->
     <article class="cert cert--wide" style="--c:var(--sand); --ct:var(--ink-soft); --r:7deg">
-      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/haccp.webp" alt="HACCP élelmiszer-biztonsági tanúsítvány"></span></div>
+      <div class="cert__badge"><span class="cert__disc"><img src="images/assets/certs/haccp-200.webp" alt="HACCP élelmiszer-biztonsági tanúsítvány"></span></div>
       <h3 class="cert__name">HACCP</h3>
       <p class="cert__full">Veszélyelemzés &amp; Kritikus Pontok</p>
       <span class="cert__tag">Élelmiszer-biztonság</span>
@@ -1847,7 +1967,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     <!-- az úton haladó jelölő -->
     <div class="tl__marker" id="tlMarker" aria-hidden="true">
-      <img src="images/assets/logo.webp" alt="">
+      <img src="images/assets/logo-320.webp" alt="">
     </div>
 
     <ol class="tl__list">
@@ -1855,15 +1975,17 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <li class="tl__item" style="--px:13%; --py:15%; --rot:-2.4deg">
         <span class="tl__year">1990</span>
         <div class="tl__card">
+          <figure class="tl__shot"><img src="images/tl/1990-konzervuzem.webp" alt="A demjéni konzervüzem gyártósora" loading="lazy" decoding="async"></figure>
           <h3>Az alapítás</h3>
           <p>Komposztüzem, az első termesztőházak és a konzervüzem Demjénben.</p>
           <span class="tl__tag">Demjén</span>
         </div>
       </li>
 
-      <li class="tl__item tl__item--r" style="--px:47%; --py:9%;  --rot:2deg">
+      <li class="tl__item tl__item--r" style="--px:47%; --py:12%; --rot:2deg">
         <span class="tl__year">1995</span>
         <div class="tl__card">
+          <figure class="tl__shot"><img src="images/tl/1995-labor.webp" alt="Laborvizsgálat mikroszkóppal a csíraüzemben" loading="lazy" decoding="async"></figure>
           <h3>Saját csíra, saját labor</h3>
           <p>Steril csíraüzem és labor — <strong>Magyarországon elsőként</strong> üzemi méretben.</p>
           <span class="tl__tag">Le Champion</span>
@@ -1873,15 +1995,17 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <li class="tl__item" style="--px:85%; --py:31%; --rot:1.6deg">
         <span class="tl__year">1998</span>
         <div class="tl__card">
+          <figure class="tl__shot"><img src="images/tl/1998-komposzt.webp" alt="Komposztforgató gép munka közben" loading="lazy" decoding="async"></figure>
           <h3>III. fázis</h3>
           <p>A régió első III. fázisú komposztüzeme — a teljes vertikum a kezünkben.</p>
           <span class="tl__tag">Komposzt</span>
         </div>
       </li>
 
-      <li class="tl__item" style="--px:56%; --py:50%; --rot:-1.8deg">
+      <li class="tl__item" style="--px:53%; --py:50%; --rot:-1.8deg">
         <span class="tl__year">2014</span>
         <div class="tl__card">
+          <figure class="tl__shot"><img src="images/tl/2014-haz.webp" alt="Holland típusú termesztőház belülről" loading="lazy" decoding="async"></figure>
           <h3>60 automatizált ház</h3>
           <p>60 holland típusú ház — <strong>az ország legnagyobb termesztőfelülete</strong>.</p>
           <span class="tl__tag">45 000 m²</span>
@@ -1891,15 +2015,17 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <li class="tl__item tl__item--r" style="--px:17%; --py:60%; --rot:2.6deg">
         <span class="tl__year">2015</span>
         <div class="tl__card">
+          <figure class="tl__shot"><img src="images/tl/2015-zart.webp" alt="Zárt komposztcsarnok és biofilter kívülről" loading="lazy" decoding="async"></figure>
           <h3>Zárt technológia</h3>
           <p>Zárt komposztcsarnok és vezérelt biofilter a szagterhelés ellen.</p>
           <span class="tl__tag">Környezet</span>
         </div>
       </li>
 
-      <li class="tl__item tl__item--now" style="--px:60%; --py:88%; --rot:-1.4deg">
+      <li class="tl__item tl__item--now" style="--px:60%; --py:85%; --rot:-1.4deg">
         <span class="tl__year">Ma</span>
         <div class="tl__card">
+          <figure class="tl__shot"><img src="images/tl/ma-termek.webp" alt="Korona üveges csiperke késztermékek" loading="lazy" decoding="async"></figure>
           <h3>Heti 1 100 tonna</h3>
           <p>Heti 1 100 tonna komposzt, 45 000 m² felület, 12 exportpiac.</p>
           <span class="tl__tag">Közép-Európa</span>
@@ -1908,6 +2034,25 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     </ol>
 
+    <!-- Szórt fotó-matricák: NEM állomások, csak a pálya melletti üres krém
+         foltokat töltik ki. A --px/--py értékek a fenti .tl__item-ek közé
+         vannak belőve (72/13, 26/40, 88/65, 14/86) — ha egy állomás
+         koordinátája változik, ezeket is újra kell hangolni, különben átfednek. -->
+    <div class="tl__polas" aria-hidden="true">
+      <figure class="tl__pola" style="--px:76%; --py:9%;  --rot:4deg">
+        <img src="images/tl/pola-rakodo.webp" alt="" loading="lazy" decoding="async">
+      </figure>
+      <figure class="tl__pola" style="--px:26%; --py:38%; --rot:-5deg">
+        <img src="images/tl/pola-labor.webp" alt="" loading="lazy" decoding="async">
+      </figure>
+      <figure class="tl__pola" style="--px:88%; --py:65%; --rot:3.4deg">
+        <img src="images/tl/pola-gomba.webp" alt="" loading="lazy" decoding="async">
+      </figure>
+      <figure class="tl__pola" style="--px:14%; --py:86%; --rot:-3.6deg">
+        <img src="images/tl/pola-telep.webp" alt="" loading="lazy" decoding="async">
+      </figure>
+    </div>
+
     <!-- mobil: függőleges, görgetésre rajzolódó útvonal + haladó logó-jelölő
          (a gépes vízszintes tekergő pálya helyett) — lásd .tl__path--m -->
     <svg class="tl__path tl__path--m" id="tlPathM" preserveAspectRatio="none" aria-hidden="true">
@@ -1915,7 +2060,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <path id="tlLineMOn" class="tl__line tl__line--on"></path>
     </svg>
     <div class="tl__marker tl__marker--m" id="tlMarkerM" aria-hidden="true">
-      <img src="images/assets/logo.webp" alt="">
+      <img src="images/assets/logo-320.webp" alt="">
     </div>
   </div>
 
@@ -1976,10 +2121,29 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 <!-- ================== 7. LÁBLÉC ================== -->
 <footer class="ft" id="kapcsolat">
 
+  <!-- átvezetés a zászlós térképről: a 12 célország végtelenített szalagon.
+       A lista forrása az assets/eumap-scene.js DELIVER halmaza — ha ott
+       változik egy piac, ITT is át kell írni. A második <ul> a hurokhoz kell,
+       szó szerinti másolat (aria-hidden). -->
+  <div class="ft__marquee">
+    <div class="ft__marquee-track">
+      <ul aria-label="Exportpiacaink">
+        <li>Magyarország</li><li>Szlovákia</li><li>Ausztria</li><li>Románia</li>
+        <li>Horvátország</li><li>Szerbia</li><li>Szlovénia</li><li>Csehország</li>
+        <li>Lengyelország</li><li>Ukrajna</li><li>Németország</li><li>Bosznia-Hercegovina</li>
+      </ul>
+      <ul aria-hidden="true">
+        <li>Magyarország</li><li>Szlovákia</li><li>Ausztria</li><li>Románia</li>
+        <li>Horvátország</li><li>Szerbia</li><li>Szlovénia</li><li>Csehország</li>
+        <li>Lengyelország</li><li>Ukrajna</li><li>Németország</li><li>Bosznia-Hercegovina</li>
+      </ul>
+    </div>
+  </div>
+
   <div class="ft__top">
     <div class="ft__col">
       <a class="ft__brand" href="#">
-        <img src="images/assets/logo.webp" alt="Korona Gombaipari Egyesülés logó">
+        <img src="images/assets/logo-320.webp" alt="Korona Gombaipari Egyesülés logó">
         <span><b>KORONA</b><i>Gombaipari Egyesülés</i></span>
       </a>
       <p class="ft__note">Családi vállalkozások szövetsége 1990 óta — komposzttól a konzervig, egy kézben.</p>
@@ -2123,6 +2287,28 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     var MIN   = reduce ? 300 : 2300;    /* legalább ennyi ideig fut a koreográfia */
     var start = performance.now();
     var loaded = false, exited = false;
+
+    /* ---- MI SZÁMÍT "betöltöttnek"? ----
+       NEM a window.load: az megvárja az oldal ÖSSZES képét, a videót és a 3D
+       modelleket is — az több tíz másodperc, addig a látogató a preloadert
+       bámulná. Helyette csak azt várjuk meg, ami az első képernyőn tényleg
+       látszik: a hero képei + a preloader/nav logó. Ha ezek megvannak, az oldal
+       valóban kész — innentől a % nem időzítés, hanem valódi haladás.
+       A hibára futó képek is "kész"-nek számítanak (errorra is lépünk),
+       különben egyetlen elérhetetlen kép örökre bent ragasztaná a preloadert. */
+    var critical = [].slice.call(document.querySelectorAll('.hero img, .pre__logo, .brand__logo'));
+    var done = 0;
+    var total = critical.length || 1;
+
+    function oneDone(){ done++; if(done >= total) loaded = true; }
+    critical.forEach(function(img){
+      if(img.complete){ oneDone(); return; }
+      img.addEventListener('load',  oneDone, { once:true });
+      img.addEventListener('error', oneDone, { once:true });   /* hibás kép se akasszon meg */
+    });
+    if(!critical.length) loaded = true;
+
+    /* a window.load csak megerősítés — ha hamarabb jön, annál jobb */
     window.addEventListener('load', function(){ loaded = true; window.scrollTo(0,0); });
 
     /* Kilépés három ütemben, hogy ne legyen ugrás:
@@ -2149,28 +2335,42 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       setTimeout(function(){ pre.classList.add('is-gone'); }, 1700);
     }
 
+    /* A kijelzett % a KETTŐ közül a lassabbat mutatja: a koreográfia haladását
+       és a képek tényleges betöltöttségét. Így a szám nem hazudik — ha a képek
+       lassan jönnek, a szám is lassabban kúszik, és 99-en vár rájuk. */
     function tick(ts){
-      var p = Math.min(1, (ts - start) / MIN);
-      var shown = Math.round((1 - Math.pow(1 - p, 2.4)) * 100);
-      if(p >= 1 && !loaded) shown = 99;          /* 99-en vár, amíg tényleg betölt minden */
+      var pTime = Math.min(1, (ts - start) / MIN);
+      var pLoad = done / total;
+      var eased = 1 - Math.pow(1 - pTime, 2.4);
+      var shown = Math.round(Math.min(eased, pLoad) * 100);
+      if(!loaded) shown = Math.min(shown, 99);   /* 100 csak akkor, ha tényleg kész */
       num.textContent = shown;
-      if(p < 1 || !loaded){ requestAnimationFrame(tick); }
+      if(pTime < 1 || !loaded){ requestAnimationFrame(tick); }
       else { num.textContent = 100; setTimeout(exit, 200); }
     }
     requestAnimationFrame(tick);
 
-    /* KEMÉNY vészfék: a fenti koreográfia a requestAnimationFrame-re épül, ami
-       háttérben lévő fülön leáll (és lassú eszközön/ tabváltáskor is akadhat) —
-       ilyenkor a preloader sosem lépne ki. Ez a setTimeout a rAF-tól FÜGGETLENÜL
-       mindenképp kilépteti a preloadert, legkésőbb 3.2 mp-nél. */
-    setTimeout(exit, 3200);
+    /* A tick() rAF-on fut (a % animációjához ez kell), de a rAF HÁTTÉRBEN LÉVŐ
+       FÜLÖN NEM FUT. Ha valaki háttérfülön nyitja meg az oldalt, a kilépés
+       kizárólag a lenti vészfékre maradna — vagyis a 10 mp-re. Ez a setInterval
+       a rAF-tól függetlenül fut (háttérben 1 mp-re ritkítva, de fut), és amint
+       a koreográfia letelt ÉS a kritikus képek megvannak, kilép. */
+    var poll = setInterval(function(){
+      if(exited){ clearInterval(poll); return; }
+      if(loaded && performance.now() - start >= MIN){ clearInterval(poll); exit(); }
+    }, 250);
 
-    /* NEM várunk a teljes window.load-ra: a hero sok külső/nagy képet tölt,
-       ami éles hostingon (pl. GitHub Pages) több másodperc — addig a látogató
-       csak a preloadert látná. Ezért a koreográfia (MIN) lejárta után rövid
-       vészfékkel mindenképp kilépünk; a hero képei a saját popIn animációjukkal
-       úsznak be. (Localhoston a cache miatt ez eddig nem látszott.) */
-    setTimeout(function(){ loaded = true; }, 1800);
+    /* VÉSZFÉK — és tényleg csak az.
+       A koreográfia requestAnimationFrame-re épül, ami háttérben lévő fülön
+       leáll; ilyenkor a preloader sosem lépne ki. Ez a setTimeout a rAF-tól
+       FÜGGETLENÜL kilépteti. Korábban 3.2 mp volt, ami a gyakorlatban NEM
+       vészfékként, hanem normál kilépési útként működött (a lassabb gépeken
+       mindig ez sült el). Most 10 mp: ennyi idő alatt a fenti kritikus képek
+       reális hálózaton biztosan megvannak, tehát ide már csak akkor jutunk,
+       ha valami tényleg elakadt. 6 mp: elég hosszú, hogy ne szóljon bele a
+       normál működésbe, és elég rövid, hogy egy döglött külső kiszolgáló
+       (lásd a hero hotlinkelt gombaképeit) ne tartsa fogva a látogatót. */
+    setTimeout(exit, 6000);
   })();
 
   document.addEventListener('dragstart', function(e){
@@ -2236,11 +2436,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     }
     l1.insertAdjacentHTML('beforeend',
       letters('KOR')
-      + '<span class="olog"><img src="images/assets/logo.webp" alt="Korona Gombaipari Egyesülés"></span>'
+      + '<span class="olog"><img src="images/assets/logo-320.webp" alt="Korona Gombaipari Egyesülés"></span>'
       + letters('NA'));
     l2.innerHTML =
       letters('G')
-      + '<span class="ogomb"><img src="https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-0.png" alt=""></span>'
+      + '<span class="ogomb"><img src="images/mushrooms/mushroom-0.webp" alt=""></span>'
       + letters('MBA');
     l1.querySelectorAll('.ch').forEach(function(ch, i){ ch.style.animationDelay = (i*0.055).toFixed(3)+'s'; });
     l2.querySelectorAll('.ch').forEach(function(ch, i){ ch.style.animationDelay = (0.28 + i*0.055).toFixed(3)+'s'; });
@@ -2690,8 +2890,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     window.addEventListener('resize', onS);
     paint();
 
-    /* az állomások egyenként úsznak be */
-    var items = track.querySelectorAll('.tl__item');
+    /* az állomások — és a szórt fotó-matricák — egyenként úsznak be */
+    var items = track.querySelectorAll('.tl__item, .tl__pola');
     if('IntersectionObserver' in window && !reduce){
       var ioT = new IntersectionObserver(function(en){
         en.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('is-in'); ioT.unobserve(e.target); } });
@@ -2832,7 +3032,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     if(yr) yr.textContent = new Date().getFullYear();
     if(!host || reduce) return;
 
-    var SRC = 'https://www.highlinemushrooms.com/wp-content/themes/_highline/dist/images/mushrooms/mushroom-';
+    var SRC = 'images/mushrooms/mushroom-';
     var rnd = function(a,b){ return a + Math.random() * (b - a); };
     var visible = false, timer = null;
 
@@ -2849,7 +3049,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
       el.style.left  = x0 + '%';
       el.style.width = size + '%';
-      el.innerHTML   = '<img src="' + SRC + Math.floor(rnd(0,10)) + '.png" alt="">';
+      el.innerHTML   = '<img src="' + SRC + Math.floor(rnd(0,10)) + '.webp" alt="">';
       host.appendChild(el);
 
       /* a dobás magasságát a sáv magasságához igazítjuk, hogy soha ne
