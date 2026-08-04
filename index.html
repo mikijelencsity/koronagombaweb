@@ -662,23 +662,28 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    sem. A krém --ui 2,94-3,81:1 — lásd a megjegyzést a .slide__name-nél. */
 .slide__kicker{ font-family:'Caveat',cursive;
   font-size:clamp(17px,1.6vw,22px); font-weight:600; letter-spacing:.01em; text-transform:none;
-  color:var(--ui); opacity:.92; margin-bottom:6px; }
-/* sima, tömör kitöltés, csak egy vékony körvonallal a kontraszthoz —
-   nem a régi vastag fehér keret, csak épp annyi, hogy elváljon a háttértől */
+  /* FIGYELEM: ide NEM szabad opacity-t írni. A szomszédos (inaktív) diák
+     szövegét a `.slide__body > *{opacity:0}` rejti el, aminek a
+     specificitása (0,1,0) — pontosan annyi, mint egy sima osztályé. Egy
+     itteni opacity tehát később jön a forrásban, felülírja a rejtést, és
+     a szomszéd dia kickere ("Feldolgozás") átlóg a képernyő szélén. */
+  color:var(--ui); margin-bottom:6px; }
 /* TERMÉKNÉV — a dia legnagyobb szövegeleme.
    A SZÍN szándékosan maradt a sötét --stroke: kimértük, hogy a színes
    diahátterek középtónusúak, ezért RAJTUK SEM a világos, SEM a sötét szöveg
    nem éri el a 4,5:1-et. Nagy szövegre a küszöb 3:1, és ott a sötét jobb:
      zöld 3,94 | piros 3,30 | zöld2 3,13 | piros2 3,01  -> mind átmegy
      (krémmel ugyanez: 2,94 | 3,72 | 3,27 | 3,81 -> a zöldön megbukna)
-   A név baja tehát nem a szín volt, hanem hogy 17,6px-en jelent meg, ahol
-   az 1,5px-es kontúr a betűvastagság harmadát elette.
+   A név baja tehát nem a szín volt, hanem hogy 17,6px-en jelent meg.
    A nowrap helyett tördelhet: emiatt lehet végre nagy, anélkül hogy
-   belelógna a termékfotóba (ezért kellett korábban lekicsinyíteni). */
+   belelógna a termékfotóba (ezért kellett korábban lekicsinyíteni).
+   NINCS -webkit-text-stroke: a fehér körvonal a nagy méretben már nem
+   kellett a kontraszthoz (3,0-3,9:1 nagy szövegre bőven elég), viszont
+   piszkította a betűformákat. */
 .slide__name{ font-family:var(--font-display); font-weight:400; font-size:clamp(26px,3.4vw,44px);
   line-height:1.0; letter-spacing:-.02em; text-transform:uppercase; margin-bottom:22px;
   text-wrap:balance;
-  color:var(--stroke,var(--ink)); -webkit-text-stroke:1.5px var(--cream); paint-order:stroke fill; }
+  color:var(--stroke,var(--ink)); }
 
 /* ===== POLAROID-PÁR a termékfotó mellé ==================================
    Ugyanaz a matrica-nyelv, mint a Történetünk szekcióban (--r-sm sarok,
@@ -692,8 +697,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    FONTOS: a csírához és a komposzthoz NEM étel-, hanem üzemi fotó megy —
    azok alapanyag/szaporítóanyag, nincs hozzájuk elkészített étel. */
 .slide__pola{ position:absolute; inset:0; z-index:4; pointer-events:none; }
-.slide__pola figure{ position:absolute; width:clamp(96px,11.5%,150px);
-  background:var(--cream); padding:6px 6px clamp(14px,2.2vw,20px);
+.slide__pola figure{ position:absolute; width:clamp(128px,16.5%,210px);
+  background:var(--cream); padding:8px 8px clamp(18px,2.6vw,26px);
   border-radius:var(--r-sm); box-shadow:var(--sh-float-md);
   transform:rotate(var(--rot,0deg)) scale(.86); opacity:0;
   transition:opacity .5s var(--ease), transform .6s var(--ease); }
@@ -707,7 +712,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    hogy mobilon ki tudjon lépni a kép alól a szöveg alá. Gépen ezért a
    koordináták a TELJES diára vonatkoznak: a jobb oldali (kép-)oszlop
    nagyjából 46%-nál kezdődik, oda lógatjuk a két polaroidot. */
-.slide__pola figure:nth-child(1){ left:42%; top:4%; }
+/* 42% helyett 47%: a kétsoros neveknél (GOMBA/CSÍRA, GOMBA/KOMPOSZT) a
+   második sor szélesebb, és 42%-nál 44px-en átfedte a bal felső polaroidot. */
+.slide__pola figure:nth-child(1){ left:48.5%; top:4%; }
 .slide__pola figure:nth-child(2){ right:1%; bottom:16%; }
 /* a "Gombakomposzt" a leghosszabb név — kisebb betűmérettel fér csak el
    ütközés nélkül a kép mellett.
