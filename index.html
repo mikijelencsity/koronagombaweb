@@ -606,7 +606,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 .slide{
   flex:0 0 min(1000px,66vw);
-  position:relative;   /* a .slide__shrooms horgonya */
+  position:relative;
   background:transparent; color:var(--fg);
   display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr); align-items:center;
   gap:clamp(10px,1.6vw,26px);
@@ -622,7 +622,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      kör kivétele után diánként mást kellett igazítani ahhoz, hogy a
      termék fölött és alatt nagyjából egyforma üres hely maradjon.
      Az értékeket mérésből kaptuk, lásd az <article> inline stílusát. */
-  transform:translateY(var(--media-shift,0)); display:grid; place-items:center; width:100%; }
+  /* A vízszintes eltolás azért lehetséges, mert a karusszel centerOn()
+     függvénye offsetLeft/offsetWidth alapján számol, amit a transform NEM
+     befolyásol — így a JS nem korrigálja vissza. Erre azért van szükség,
+     mert a kép közepe egyébként a képernyő közepére van szögezve, és
+     balra a terméknév korlátozta a méretét. Jobbra tolva nagyobb lehet. */
+  transform:translate(55px, var(--media-shift,0)); display:grid; place-items:center; width:100%; }
 .slide__media img{
   position:relative; z-index:2;
   /* az -fx.webp fájlokba bele van sütve az árnyék (Pillow-val előre legenerálva),
@@ -634,7 +639,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      8%), ezért a legkisebb margójú kettőnél a termék tényleges pereme
      26px-en átfedte a nevet. A karusszel JS a kép KÖZEPÉT igazítja a
      képernyő közepére, tehát oldalra tolni nem lehet — csak kisebbre venni. */
-  width:min(118%,900px); height:auto;
+  width:min(150%,1150px); height:auto;
   /* nincs már drága filter, úgyhogy ez most olcsó: mindig legyen kész,
      előre kirajzolt rétege a képnek — enélkül a klón-diák (amiket a
      böngésző még sosem rajzolt ki) a hurok-váltás csúsztatása KÖZBEN
@@ -696,31 +701,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   line-height:.98; letter-spacing:-.025em; text-transform:uppercase; margin-bottom:0;
   text-wrap:balance;
   color:var(--ui,var(--cream)); }
-
-/* ===== SZÓRT GOMBA-KIVÁGATOK a termék körül ==========================
-   Ugyanazok a kivágott PNG-k, mint a hero-ban (images/mushrooms/) — így a
-   nyitókép és a termékrész ugyanazt a vizuális nyelvet beszéli.
-
-   SZABÁLY: EGYIK SEM érhet rá a termékfotóra. A termék látható pereme a
-   képelem 8,7-92,4% (vízszintes) és 5,1-92,8% (függőleges) sávjában van
-   (a -fx fájlok átlátszó margója képenként eltér, ezek a legrosszabb
-   esetek). A pozíciókat ehhez mértük be, lásd a HTML-ben a --x/--y-t.
-
-   z-index:1 — a termékfotó (.slide__media, z-index:3) MINDIG fölöttük van,
-   így ha egy jövőbeli elrendezés-változás mégis összehozná őket, a termék
-   akkor sem sérül. */
-.slide__shrooms{ position:absolute; inset:0; z-index:1; pointer-events:none; }
-.slide__shrooms img{ position:absolute;
-  left:var(--x); top:var(--y); width:var(--w);
-  transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(.8);
-  opacity:0; transition:opacity .6s var(--ease), transform .8s var(--ease);
-  filter:drop-shadow(0 10px 16px rgba(22,17,13,.28)); }
-.slide.is-active .slide__shrooms img{ opacity:1;
-  transform:translate(-50%,-50%) rotate(var(--rot,0deg)); }
-.slide.is-active .slide__shrooms img:nth-child(1){ transition-delay:.14s; }
-.slide.is-active .slide__shrooms img:nth-child(2){ transition-delay:.24s; }
-.slide.is-active .slide__shrooms img:nth-child(3){ transition-delay:.34s; }
-.slide.is-active .slide__shrooms img:nth-child(4){ transition-delay:.44s; }
 
 .slide__name--long{ font-size:clamp(23px,3vw,38px); }
 /* a méret (font-size/padding) MINDIG ugyanaz, aktív és inaktív dián is —
@@ -1845,13 +1825,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 01 — FRISS GOMBÁK -->
       <article class="slide"
         data-bg="#399957" data-deep="#216B37" data-deeper="#123B20" data-acc="#F0B93C" data-ui="#F9F4FF"
-        style="--bg:#399957; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20; --media-shift:-10px">
+        style="--bg:#399957; --fg:#F9F4FF; --acc:#F0B93C; --ui:#F9F4FF; --stroke:#123B20; --media-shift:-16px">
         <div class="slide__media"><img src="images/assets/products/friss-fx.webp" alt="Friss gombák" decoding="async"></div>
-          <div class="slide__shrooms" aria-hidden="true">
-            <img src="images/mushrooms/mushroom-0.webp" alt="" style="--x:7%; --y:10%; --w:clamp(62px,9vw,108px); --rot:-12deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-5.webp" alt="" style="--x:15%; --y:90%; --w:clamp(54px,7.6vw,92px); --rot:9deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-8.webp" alt="" style="--x:103%; --y:40%; --w:clamp(46px,6.4vw,78px); --rot:16deg" loading="lazy" decoding="async">
-          </div>
         <div class="slide__body">
           <p class="slide__kicker">Termesztés</p>
           <h3 class="slide__name">Friss gombák</h3>
@@ -1861,13 +1836,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 02 — GOMBAKONZERV -->
       <article class="slide"
         data-bg="#F62213" data-deep="#A71106" data-deeper="#620A04" data-acc="#F0B93C" data-ui="#FFF2EE"
-        style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04; --media-shift:15px">
+        style="--bg:#F62213; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#620A04; --media-shift:16px">
         <div class="slide__media"><img src="images/assets/products/konzerv-fx.webp" alt="Korona termesztett csiperke szeletek konzerv" decoding="async"></div>
-          <div class="slide__shrooms" aria-hidden="true">
-            <img src="images/mushrooms/mushroom-2.webp" alt="" style="--x:8%; --y:12%; --w:clamp(58px,8.4vw,100px); --rot:11deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-7.webp" alt="" style="--x:13%; --y:88%; --w:clamp(52px,7.4vw,88px); --rot:-10deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-1.webp" alt="" style="--x:102%; --y:46%; --w:clamp(48px,6.6vw,80px); --rot:-15deg" loading="lazy" decoding="async">
-          </div>
         <div class="slide__body">
           <p class="slide__kicker">Feldolgozás</p>
           <h3 class="slide__name">Gomba<wbr>konzerv</h3>
@@ -1877,13 +1847,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 03 — GOMBACSÍRA -->
       <article class="slide"
         data-bg="#2E9B57" data-deep="#1C6B3A" data-deeper="#0F4526" data-acc="#D9E34E" data-ui="#F9F4FF"
-        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526; --media-shift:32px">
+        style="--bg:#2E9B57; --fg:#F9F4FF; --acc:#D9E34E; --ui:#F9F4FF; --stroke:#0F4526; --media-shift:50px">
         <div class="slide__media"><img src="images/assets/products/csira-fx.webp" alt="Gombacsíra" decoding="async"></div>
-          <div class="slide__shrooms" aria-hidden="true">
-            <img src="images/mushrooms/mushroom-4.webp" alt="" style="--x:6%; --y:11%; --w:clamp(56px,8vw,96px); --rot:8deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-9.webp" alt="" style="--x:16%; --y:89%; --w:clamp(50px,7vw,86px); --rot:-13deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-0.webp" alt="" style="--x:110%; --y:44%; --w:clamp(46px,6.4vw,78px); --rot:14deg" loading="lazy" decoding="async">
-          </div>
         <div class="slide__body">
           <p class="slide__kicker">Szaporítóanyag</p>
           <h3 class="slide__name">Gomba<wbr>csíra</h3>
@@ -1893,13 +1858,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       <!-- 04 — GOMBAKOMPOSZT -->
       <article class="slide"
         data-bg="#E1432B" data-deep="#A32E1D" data-deeper="#611B11" data-acc="#F0B93C" data-ui="#FFF2EE"
-        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11; --media-shift:31px">
+        style="--bg:#E1432B; --fg:#FFF2EE; --acc:#F0B93C; --ui:#FFF2EE; --stroke:#611B11; --media-shift:48px">
         <div class="slide__media"><img src="images/assets/products/komposzt-fx.webp" alt="Gombakomposzt" decoding="async"></div>
-          <div class="slide__shrooms" aria-hidden="true">
-            <img src="images/mushrooms/mushroom-6.webp" alt="" style="--x:7%; --y:12%; --w:clamp(58px,8.2vw,98px); --rot:-9deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-3.webp" alt="" style="--x:14%; --y:89%; --w:clamp(52px,7.2vw,88px); --rot:12deg" loading="lazy" decoding="async">
-            <img src="images/mushrooms/mushroom-5.webp" alt="" style="--x:110%; --y:43%; --w:clamp(46px,6.4vw,78px); --rot:-16deg" loading="lazy" decoding="async">
-          </div>
         <div class="slide__body">
           <p class="slide__kicker">Alapanyag</p>
           <h3 class="slide__name">Gomba<wbr>komposzt</h3>
