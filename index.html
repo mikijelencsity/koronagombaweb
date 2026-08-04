@@ -570,7 +570,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .pdiv--top{ background:var(--cream-deep); }
 .pdiv--top .lay-one{ fill:var(--c-bg); transition:fill var(--swap) var(--swap-ease); }
 
-.pdiv--bot{ background:var(--c-bg); }
+/* margin-top:-1px — a .carousel alja és ez a csík két külön doboz, azonos
+   zöld háttérrel. Tört képpontos magasságnál (a szekció clamp-jei miatt) a
+   határukon hajszálvékony világos vonal villant át a teljes szélességben.
+   A .pdiv--top-nál ugyanezt a lenti svg-margó oldja meg; itt a doboz
+   FÖLÖTTI találkozás a kritikus, ezért kell ide is. */
+.pdiv--bot{ background:var(--c-bg); margin-top:-1px; }
 .pdiv--bot svg{ margin-bottom:-1px; }
 .pdiv--bot .lay-one{ fill:var(--certs-bg); }
 
@@ -598,15 +603,27 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    származik, tehát a termék pontosan a közepükön ül. */
 
 /* napsugár — teljes szélességben, a kör közepéből indulva.
-   repeating-conic-gradient adja a sugarakat; a radiális maszk kifelé
-   elhalványítja őket, hogy ne legyen kemény pereme a mintának. */
+   repeating-conic-gradient adja a sugarakat.
+
+   KÉT maszk metszete (mask-composite:intersect):
+     1. radiális — a kör közepénél és a legkülső peremnél halványít, hogy a
+        minta ne legyen se a korong alatt zavaró, se kemény peremű
+     2. FÜGGŐLEGES — ez a lényeg: a .carousel overflow:hidden-je a felső és
+        alsó élénél EGYENES VONALBAN elvágta a sugarakat, és mivel a szekció
+        hullám-elválasztói (.pdiv) fölötte/alatta ugyanolyan zöldek, ott egy
+        látható vízszintes seam keletkezett. Ez a maszk a széleken nullára
+        viszi a mintát, így nincs mit elvágni. */
 .carousel__rays{ position:absolute; inset:0; z-index:0; pointer-events:none;
   background:repeating-conic-gradient(from 0deg at var(--ring-x) var(--ring-y),
     rgba(255,255,255,.075) 0deg 4deg, rgba(255,255,255,0) 4deg 11deg);
   -webkit-mask-image:radial-gradient(60% 90% at var(--ring-x) var(--ring-y),
-    rgba(0,0,0,0) 16%, #000 42%, rgba(0,0,0,0) 100%);
+      rgba(0,0,0,0) 16%, #000 42%, rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0) 0, #000 24%, #000 62%, rgba(0,0,0,0) 86%);
           mask-image:radial-gradient(60% 90% at var(--ring-x) var(--ring-y),
-    rgba(0,0,0,0) 16%, #000 42%, rgba(0,0,0,0) 100%); }
+      rgba(0,0,0,0) 16%, #000 42%, rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0) 0, #000 24%, #000 62%, rgba(0,0,0,0) 86%);
+  -webkit-mask-composite:source-in;
+          mask-composite:intersect; }
 
 /* a korong és a gyűrűk egymásra vannak rétegezve (grid-area:1/1) */
 .carousel__ring{ position:absolute; z-index:1; left:var(--ring-x); top:var(--ring-y);
