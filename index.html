@@ -735,14 +735,21 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    hogy mobilon ki tudjon lépni a kép alól a szöveg alá. Gépen ezért a
    koordináták a TELJES diára vonatkoznak: a jobb oldali (kép-)oszlop
    nagyjából 46%-nál kezdődik, oda lógatjuk a két polaroidot. */
-/* A két polaroid a termékfotót KÖZREFOGJA, nem rajta ül: az egyik balra,
-   a másik jobbra lóg ki alóla.
-   A bal oldali nyugodtan mehet a szövegoszlop fölé, mert a terméknévvel
-   FÜGGŐLEGESEN nem fedi egymást (polaroid y 32-169, név y 258-363) —
-   ezért a vízszintes helyzetét a név nem korlátozza.
+/* A két polaroid átlósan ül a termékfotón: bal felül, jobb alul.
+
+   MIÉRT NEM MEHET A BAL OLDALI "KIJJEBB", A KÉPTŐL BALRA?
+   A 800px-es dia vízszintes felosztása (mért):
+       0- 77  bal padding
+      77-385  SZÖVEG (kicker + terméknév)
+     365-826  TERMÉKKÉP
+   A szövegtől balra egyszerűen NINCS üres sáv. Ezért a bal polaroid csak
+   a szöveg fölé, alá, vagy a képre mehet. A bal ALSÓ sarok kipróbálva:
+   ott elszakad a terméktől és lebegőnek hat, ezért maradt a kép bal felső
+   sarka, 50%-tól — így a szövegoszloppal (77-385) vízszintesen sem ér össze.
+
    A jobb oldali kilóghat a dia jobb széle mögül: a .slide overflow-ja
    visible, és a .carousel (overflow:hidden) széléig még bőven van hely. */
-.slide__pola figure:nth-child(1){ left:6%;   bottom:0; }
+.slide__pola figure:nth-child(1){ left:50%;  top:2%; }
 .slide__pola figure:nth-child(2){ right:-14%; bottom:22%; }
 /* a "Gombakomposzt" a leghosszabb név — kisebb betűmérettel fér csak el
    ütközés nélkül a kép mellett.
