@@ -629,10 +629,26 @@ async function init() {
   }
 
   /* ---------------- renderer ---------------- */
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile, alpha: true });
-  /* a GLB modellek és a köd kivétele után van hely az élesebb képre */
-  const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+  /* A vászon TELJES KÉPERNYŐS (100vw x 100vh), ezért itt minden képpont drága.
+     Három dolog véd a "szétesik a gép" esettől:
+
+     failIfMajorPerformanceCaveat: ha a böngészőnek nincs igazi GPU-gyorsítása
+       és szoftveresen (SwiftShader, CPU) renderelne, inkább HIBÁZZON. Egy
+       teljes képernyős 3D jelenet CPU-n megfojtja a gépet — jobb a tartalék
+       nézet (lásd eumapFallback), mint egy használhatatlanul akadó oldal.
+     powerPreference: kétGPU-s gépen a dedikált kártyát kérjük.
+     dpr: 2 helyett 1.5 a felső határ. Retina kijelzőn ez 44%-kal kevesebb
+       képpont, a lapos, nagy felületű grafikán viszont alig látszik. */
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: !isMobile && (window.devicePixelRatio || 1) < 1.5,
+    powerPreference: 'high-performance',
+    failIfMajorPerformanceCaveat: true,
+  });
+  const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 1.5);
   renderer.setPixelRatio(dpr);
+
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -804,6 +820,19 @@ async function init() {
   const clock = new THREE.Clock();
   let raf = null, running = false;
 
+  /* Ha a GPU-folyamat menet közben elszáll, a vászon szemetes/fagyott képet
+     mutatna. A preventDefault() nélkül a kontextus nem is állítható helyre.
+     Megállítjuk a ciklust és átváltunk a tartalék nézetre.
+     (Szándékosan ITT áll, a raf/running deklarációja UTÁN — feljebb, a
+     renderer mellett a kezelő TDZ-hibát dobna, ha a kontextus még az init
+     lefutása közben veszne el.) */
+  canvas.addEventListener('webglcontextlost', (ev) => {
+    ev.preventDefault();
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    running = false;
+    eumapFallback('elveszett a WebGL-kontextus');
+  }, false);
+
   function frame() {
     const t = clock.getElapsedTime();
     placeCamera(t);
@@ -848,4 +877,38 @@ async function init() {
   }, { threshold: 0.05 }).observe(section);
 }
 
-init().catch((e) => console.error('[eumap] hiba:', e));
+/* ------------------------------------------------------------------
+   TARTALÉK MEGJELENÉS, ha a 3D nem indul el.
+
+   Ez NEM elméleti eset: ha a GPU-folyamat összeomlik (túlterhelt integrált
+   GPU, driverhiba, vagy egyszerűen sok WebGL-fül), a böngésző utána már NEM
+   ad WebGL-kontextust, amíg újra nem indul — a WebGLRenderer konstruktora
+   dob egy "Error creating WebGL context" hibát.
+
+   Korábban ilyenkor az init() itt elhalt, és mivel a felirat/hint .is-on
+   osztályait is az init() adta hozzá, a látogató egy TELJESEN ÜRES sötét
+   dobozt kapott — se térkép, se szöveg. Most legalább a szekció üzenete
+   megjelenik, a vászon eltűnik, és a szekció összemegy normál magasságra. */
+function eumapFallback(reason) {
+  const section = document.getElementById('eu-jelenlet');
+  if (!section || section.classList.contains('is-nogl')) return;
+  section.classList.add('is-nogl', 'is-in');
+  const message = document.getElementById('eumapMessage');
+  if (message) message.classList.add('is-on');
+  console.warn('[eumap] 3D térkép kikapcsolva, tartalék nézet:', reason);
+}
+
+/* Van egyáltalán használható WebGL? Olcsó próba a nehéz init ELŐTT — így
+   össze sem építjük a jelenetet, ha úgyis elhasalna. */
+function hasWebGL() {
+  try {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl2') || c.getContext('webgl'));
+  } catch (e) { return false; }
+}
+
+if (!hasWebGL()) {
+  eumapFallback('nincs WebGL-kontextus');
+} else {
+  init().catch((e) => { eumapFallback(e && e.message ? e.message : e); });
+}

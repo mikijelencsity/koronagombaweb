@@ -1048,7 +1048,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     radial-gradient(38% 42% at 22% 30%, rgba(61,163,93,.30), transparent 65%),
     radial-gradient(34% 38% at 78% 62%, rgba(217,227,78,.16), transparent 65%),
     radial-gradient(30% 34% at 58% 18%, rgba(33,107,55,.26), transparent 68%);
-  filter:blur(34px);
+  /* NINCS filter:blur() — korábban blur(34px) volt, de a forrás már eleve lágy
+     radiális átmenet, így a blur vizuálisan semmit nem adott hozzá (kép/kép
+     összehasonlítással ellenőrizve), viszont a ~2 megapixeles réteget minden
+     animációs képkockán újra kellett komponálni a 3D jelenet MELLETT. */
   /* a felső sávban ne legyen semmi, hogy a blob alatti él egyszínű maradjon */
   -webkit-mask-image:linear-gradient(to bottom, transparent 0, transparent 22%, #000 34%);
           mask-image:linear-gradient(to bottom, transparent 0, transparent 22%, #000 34%);
@@ -1165,6 +1168,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   color:rgba(250,246,239,.68); margin:0; max-width:28ch; }
 
 
+/* --- TARTALÉK NÉZET, ha nincs WebGL (lásd eumapFallback az eumap-scene.js-ben) ---
+   Ilyenkor a vászon üres marad, ezért elrejtjük, a szekciót összehúzzuk normál
+   magasságra (nem kell 100vh üres hely), és a szöveget középre tesszük, hogy
+   a szekciónak legyen tartalma. A topográfiai háttér és a keret marad. */
+.eumap.is-nogl .eumap__canvas,
+.eumap.is-nogl .eumap__hint,
+.eumap.is-nogl .eumap__tooltip,
+.eumap.is-nogl .eumap__card{ display:none; }
+.eumap.is-nogl .eumap__stage{ height:auto; min-height:clamp(400px,56vh,620px);
+  display:grid; place-items:center; }
+.eumap.is-nogl .eumap__msg{ position:static; width:min(46ch,88vw); text-align:center;
+  opacity:1; transform:none; }
+.eumap.is-nogl .eumap__msg-lead{ max-width:none; margin-inline:auto; }
+
 /* A ScrollTrigger pin:true a .eumap köré egy .pin-spacer burkolót generál.
    Ez alapból ÁTLÁTSZÓ, a szekció magassága pedig tört képpont (pl. 737.6px) —
    így a spacer alján a krém body villant át egy hajszálvékony világos csíkként,
@@ -1198,7 +1215,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     radial-gradient(38% 42% at 22% 30%, rgba(61,163,93,.30), transparent 65%),
     radial-gradient(34% 38% at 78% 62%, rgba(217,227,78,.16), transparent 65%),
     radial-gradient(30% 34% at 58% 18%, rgba(33,107,55,.26), transparent 68%);
-  filter:blur(34px);
+  /* lásd .eumap::before — itt sincs blur; ez a réteg 3,8 megapixel volt */
   /* a felső sávban nincs fény: ott a háttér pontosan var(--ink), így a zászlós
      szekció aljához képest nincs tónusugrás a határon */
   -webkit-mask-image:linear-gradient(to bottom, transparent 0, transparent 8%, #000 22%);
