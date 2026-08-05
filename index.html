@@ -975,7 +975,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    Az opacitás a JS-től kapott --dark, tehát pontosan a sötétedéssel együtt
    úszik be — világos háttéren nem is látszik. */
 .zoo__glow{ position:absolute; inset:0; z-index:1; pointer-events:none;
-  opacity:var(--dark,0);
+  /* --exit: a szekció végére kifut, hogy a határon tiszta --ink legyen és a
+     lenti blob (szintén --ink) észrevétlenül folytassa */
+  opacity:calc(var(--dark,0) * (1 - var(--exit,0)));
   background:
     radial-gradient(64% 52% at 50% 50%, rgba(61,163,93,.46) 0%, rgba(61,163,93,0) 74%),
     radial-gradient(40% 36% at 14% 78%, rgba(217,226,78,.26) 0%, transparent 72%),
@@ -1017,7 +1019,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
              /* FÉNYKISZŰRŐDÉS: a sötét fázisban a képernyő besugározza maga
                 körül a teret, mint egy monitor egy sötét szobában. --dark-hoz
                 kötve, tehát világos háttéren nincs is jelen. */
-             0 0 calc(70px + 130px * var(--dark,0)) rgba(104,214,146,calc(.30 * var(--dark,0)));
+             0 0 calc(70px + 130px * var(--dark,0)) rgba(104,214,146,calc(.30 * var(--dark,0) * (1 - var(--exit,0))));
   /* A KERET A NÉZŐRE FORDUL: megdöntve, perspektívában indul, és ahogy
      nyílik, kiegyenesedik — mintha egy lap fordulna szembe a nézővel.
      Az oldalon semmi más nem használ térbeli mélységet, ezért ez ad neki
@@ -1056,7 +1058,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask-composite:exclude;
   animation:beam-run 5s linear infinite;
-  opacity:var(--dark,0); }
+  /* a csóvák is kifutnak a szekció végére, hogy a határon semmi ne világítson */
+  opacity:calc(var(--dark,0) * (1 - var(--exit,0))); }
 @keyframes beam-run{ to{ --beam:360deg; } }
 
 /* VIGNETTA — nyitás elején erős, a végére alig: a szélek felé sötétít,
@@ -3293,6 +3296,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
          körüli fénycsóvák CSAK a sötét fázisban látszanak, világos háttéren
          semmi értelmük nem lenne */
       pin.style.setProperty('--dark', bp.toFixed(4));
+
+      /* A szekció UTOLSÓ ötödében a hangulatfény és a keret zöld
+         kisugárzása kifut nullára. Enélkül a szekció alja zöldesre színeződik,
+         az utána következő blob viszont tiszta --ink-kel van kitöltve — a
+         kettő nem tudna egybeolvadni, látszana a határ.
+         A kinövés a görgetés 78%-ánál már kész (lásd zp), tehát ez a fázis
+         nem vesz el semmit a hatásból. */
+      pin.style.setProperty('--exit', clamp((p - 0.80) / 0.20, 0, 1).toFixed(4));
     }
     function onS(){ if(!raf){ raf = true; requestAnimationFrame(layout); } }
     window.addEventListener('scroll', onS, { passive:true });
