@@ -546,6 +546,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .neon__cta:hover{ box-shadow:var(--sh-btn-press) var(--ink); translate:2px 2px; }
 
 @media (max-width:640px){
+  /* A "MAGYAR KONYHÁK" egy sorban 465px széles a mobil betűméret-padlónál
+     (a clamp alsó határa 2.8rem = 44.8px), miközben csak 340–370px a hely —
+     a .neon overflow:hidden-je szó nélkül levágná a sor végét. Mobilon ezért
+     minden szó saját sorba kerül: MAGYAR / KONYHÁK / GOMBÁJA. A legszélesebb
+     így 245px, marad ~95px levegő. A szavankénti animáció-késleltetés
+     változatlanul jó, mert az a .r-en belüli sorrendre van kötve, nem a
+     megjelenítési módra. */
+  .neon__head .neon__word{ display:block; }
+
   /* egy nagy alapkép (p2), a másik kettő matricaként rárakva a sarkokba —
      így a fotók jóval nagyobbak, mint a korábbi három egyforma, apró kép.
      Több levegő fent/lent a szöveg és a CTA felé, a matricák pedig csak
@@ -1915,14 +1924,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 <!-- ================== 2. GOMBA ÉLET ================== -->
 <section class="neon" id="neon">
-  <span class="neon__tag">✦ Gomba élet ✦</span>
+  <span class="neon__tag">✦ Nap mint nap ✦</span>
 
   <h2 class="neon__head">
-    <span class="r"><span class="neon__word"><span>Gomba</span></span> <span class="neon__word"><span>Élet</span></span></span>
-    <span class="r"><span class="neon__word"><span>Minden</span></span> <span class="neon__word"><span>Nap</span></span></span>
+    <span class="r"><span class="neon__word"><span>Magyar</span></span> <span class="neon__word"><span>Konyhák</span></span></span>
+    <span class="r"><span class="neon__word"><span>Gombája</span></span></span>
   </h2>
 
-  <p class="neon__sub">Grillen, nyersen, üvegben: a Korona gomba ott van, ahol jó a hangulat.</p>
+  <p class="neon__sub">Grillen, nyersen, üvegben — ünnepi asztalon és hétköznap este is.</p>
 
   <div class="neon__spot" aria-hidden="true"></div>
   <div class="neon__trio">
