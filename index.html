@@ -393,6 +393,23 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .stage{ position:relative; height:260vh; }
 .hero{ position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; --p:0; --reveal:0; }
 .hero{ background:var(--sand); }
+/* ===== APPLE-SZERŰ STACKELŐDÉS =====
+   A hero eddig is sticky volt, a .neon eddig is ráúszott. Ami hiányzott: a
+   hero nem MENT HÁTRA, ezért a találkozásuk egy vágásnak látszott, nem egy
+   pakli tetejéről lecsúszó lapnak — pláne, hogy a két háttérszín szinte
+   azonos, tehát önmagában semmi nem jelezte a rétegsorrendet.
+   A --stack (0..1) azt méri, mennyire takarja már a .neon a herót: 0 = épp
+   belép alulról, 1 = teljesen befedte. Ezzel a hero kicsit összemegy,
+   lekerekedik és tompul — vagyis hátrakerül a rétegben —, a .neon pedig
+   kártyaként fölé emelkedik. Háttérszínhez nem nyúltunk.
+   A scale-t a sticky NEM töri el: a sticky pozicionálás a transform ELŐTT
+   számítódik, tehát a hero ugyanúgy beragad a top:0-ra. */
+.hero{ scale:calc(1 - var(--stack,0) * .07);
+  border-radius:calc(var(--stack,0) * clamp(18px,2.2vw,32px)); }
+/* a tompító fátyol z-index:50, mert a heron belül a legfelső elem az .est (45) —
+   így a szöveg és a gombák IS hátraszürkülnek, nem csak a háttér */
+.hero__stack{ position:absolute; inset:0; z-index:50; pointer-events:none;
+  background:#17120C; opacity:calc(var(--stack,0) * .34); }
 .hero__paper{ position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.55;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E"); }
 .hero__vig{ position:absolute; inset:0; z-index:1; pointer-events:none;
@@ -475,22 +492,23 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @keyframes popIn{ from{ opacity:0; } to{ opacity:1; } }
 .shroom img.broken{ background:var(--green-wash); border:2px dashed rgba(61,163,93,.45); border-radius:50% 50% 44% 44%; aspect-ratio:1/.8; filter:none; opacity:1; }
 
-/* ================== EGYSZERŰ DIVIDER ================== */
-.divider-simple{ height:1.5px; background:var(--cream-line); }
 
 /* ================== 2. GOMBA ÉLET ================== */
-.neon{ position:relative; overflow:hidden; color:var(--ink); text-align:center;
+.neon{ position:relative; z-index:2; overflow:hidden; color:var(--ink); text-align:center;
   padding:clamp(70px,9vw,130px) clamp(10px,2vw,28px) clamp(90px,11vw,160px);
   background:var(--cream-deep);
-  /* A .hero position:sticky, tehát ez a szekció FELÚSZIK rá. Korábban
-     egyenes felső éllel tette, ami éles vízszintes vágásként hatott — a
-     hero gombáit is elmetszette, és a homok/krém közti apró színkülönbség
-     miatt látszott is a seam.
-     Lekerekített felső sarok + felfelé vetett lágy árnyék: így nem vágás,
-     hanem egy lap, ami RÁEMELKEDIK a heróra. A háttérszínekhez nem
-     nyúltunk, a réteg-viszony adja a folytonosságot. */
+  /* MÉRT TÉNY: enélkül a hero alja PONTOSAN egybeesett ezzel a felső éllel —
+     a két szekció egymás UTÁN gördült, nulla átfedéssel. Nem volt tehát mit
+     rétegezni: a lekerekített sarok és az árnyék egy olyan takarást díszített,
+     ami meg sem történt. Ezért látszott mindig sima vágásnak.
+     A negatív margó a hero magasságával húzza fel ezt a szekciót, így a
+     sticky heróra RÁÚSZIK, miközben az még ki van tűzve — ez adja a
+     stackelődést. A --stack pont ezt a felúszást méri. */
+  margin-top:-100vh; margin-top:-100lvh;
+  /* a felső kártya-él: lekerekített sarok + felfelé vetett árnyék, hogy a
+     felúszó lap tényleg lapnak lássék, ne egy felfelé csúszó háttérfoltnak */
   border-radius:clamp(38px,5.5vw,96px) clamp(38px,5.5vw,96px) 0 0;
-  box-shadow:0 -26px 60px -28px rgba(22,17,13,.40); }
+  box-shadow:0 -30px 70px -30px rgba(22,17,13,.45); }
 .neon::before{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
   background: radial-gradient(ellipse 50% 44% at 12% 14%, rgba(61,163,93,.26) 0%, transparent 70%),
               radial-gradient(ellipse 42% 36% at 50% 46%, rgba(217,226,78,.14) 0%, transparent 72%); }
@@ -1771,6 +1789,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .ch{ opacity:1; transform:none; }
   .est, .after{ opacity:1; }
   .shroom img{ opacity:1; }
+  /* a stackelődés mozgás-alapú, csökkentett mozgásnál sík marad */
+  .hero{ scale:1 !important; border-radius:0 !important; }
+  .hero__stack{ opacity:0 !important; }
   .neon__tag, .neon__sub, .neon__cta, .neon__photo{ opacity:1 !important; transform:none !important; animation:none !important; }
   .neon__word span{ transform:none !important; }
   .slide__body > *, .slide__media img, .slide__media::before, .slide__media::after{ opacity:1 !important; transform:none !important; animation:none !important; }
@@ -1855,6 +1876,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 <header class="hero" id="hero">
   <div class="hero__paper"></div>
   <div class="hero__vig"></div>
+  <div class="hero__stack" aria-hidden="true"></div>
 
   <div class="est">
     <b>Est. <u>1990</u></b>
@@ -1912,8 +1934,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 </div>
 
 
-<!-- ===================== DIVIDER ===================== -->
-<div class="divider-simple"></div>
 
 <!-- ================== 2. GOMBA ÉLET ================== -->
 <section class="neon" id="neon">
@@ -2703,6 +2723,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   var stage = document.getElementById('stage');
   var hero  = document.getElementById('hero');
   var nav   = document.querySelector('.nav');
+  /* a stackelődéshez a RÁÚSZÓ szekció kell — külön néven, mert a lentebbi
+     `var neon` csak később kap értéket, itt még undefined lenne */
+  var stackTo = document.getElementById('neon');
   var ticking = false;
   function update(){
     var vh = pageVH();
@@ -2714,8 +2737,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     r = r * r * (3 - 2 * r);
     hero.style.setProperty('--p', e.toFixed(4));
     hero.style.setProperty('--reveal', r.toFixed(4));
-    /* a menü csak akkor jöjjön elő, ha a gombás hero már kigördült */
-    if (nav) nav.classList.toggle('is-shown', stage.getBoundingClientRect().bottom <= vh * 0.9);
+    /* stackelődés: 0 = a .neon épp belép alulról, 1 = teljesen befedte a herót.
+       smoothstep, hogy a hátramaradás ne lineárisan, hanem lágyan induljon
+       és álljon meg — ettől lesz "pakli", nem csúszka. */
+    var st = 0;
+    if (stackTo){
+      st = 1 - Math.min(1, Math.max(0, stackTo.getBoundingClientRect().top / vh));
+      st = st * st * (3 - 2 * st);
+      hero.style.setProperty('--stack', st.toFixed(4));
+    }
+    /* A menü akkor jöjjön elő, ha a hero már gyakorlatilag le van takarva.
+       Korábban ez a stage aljához volt kötve — a negatív margóval viszont a
+       takarás 100vh-val KORÁBBRA került, tehát a stage-hez kötve a menü
+       kínosan későn úszott volna be. Most a takarás mértékét nézzük. */
+    if (nav) nav.classList.toggle('is-shown', st >= 0.9);
     ticking = false;
   }
   function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
