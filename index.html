@@ -2804,13 +2804,65 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     setTimeout(function(){ stableVW = window.innerWidth; stableVH = measureLVH(); }, 200);
   });
 
-  /* A saját, wheel-alapú "sima görgetés" KIVÉVE.
-     Minden képkockában window.scrollTo()-t hívott, ami újabb scroll-eseményt
-     szült, az pedig meghajtotta a többi görgetés-figyelőt — vagyis a JS
-     görgetés kaszkádot indított. Ráadásul volt benne egy szinkron-ág, ami
-     90px eltérésnél ODARÁNTOTTA a pozíciót: ez volt a látható "ugrálás".
-     A natív görgetés simább és pontosabb, a preventDefault miatt ráadásul a
-     touchpad tehetetlensége is sérült. */
+  /* ============ SIMA GÖRGETÉS — VISSZAÁLLÍTVA ============
+     Egy körben kivettem, mert gyanús volt az ugrálásra. TÉVEDÉS volt: ez a
+     blokk a `pointer: fine` feltétel mögött van, vagyis CSAK egérrel fut —
+     telefonon soha nem is kapcsolt be, tehát a mobil ugráláshoz semmi köze.
+     A felhasználó kérésére visszakerült, változatlan formában. */
+  /* ============ SIMA GÖRGETÉS (az egész oldalra) ============
+     Nem transform-alapú, hanem a valódi görgetést lazítja — így a sticky
+     hero, a videó-zoom és az idővonal is pontosan működik tovább. */
+  (function(){
+    var fine = window.matchMedia('(pointer: fine)').matches;
+    if(reduce || !fine) return;                       /* mobilon marad a natív */
+
+    var target  = window.scrollY;
+    var current = window.scrollY;
+    var running = false;
+    var EASE    = 0.062;     /* mennyire „úszik” — kisebb = hosszabb utánfutás */
+    var STEP    = 1.15;      /* egérgörgő érzékenysége */
+
+    /* a görgetési egység böngészőnként más: pixel, sor vagy oldal */
+    function pixels(e){
+      if(e.deltaMode === 1) return e.deltaY * 40;              /* sor */
+      if(e.deltaMode === 2) return e.deltaY * window.innerHeight; /* oldal */
+      return e.deltaY;                                         /* pixel */
+    }
+
+    function maxScroll(){
+      return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    }
+    function loop(){
+      var d = target - current;
+      if(Math.abs(d) < 0.12){
+        current = target;
+        window.scrollTo(0, current);
+        running = false;
+        return;
+      }
+      current += d * EASE;
+      window.scrollTo(0, current);
+      requestAnimationFrame(loop);
+    }
+    function kick(){ if(!running){ running = true; requestAnimationFrame(loop); } }
+
+    window.addEventListener('wheel', function(e){
+      if(document.body.classList.contains('menu-open')) return;   /* nyitott menüben ne */
+      if(document.documentElement.classList.contains('is-locked')) return;
+      if(e.ctrlKey) return;                                       /* nagyítás maradjon natív */
+      e.preventDefault();
+      target = Math.min(maxScroll(), Math.max(0, target + pixels(e) * STEP));
+      kick();
+    }, { passive:false });
+
+    /* ha bárki más görget (billentyű, ugrólink, görgetősáv), szinkronizálunk.
+       Futás közben csak akkor, ha a tényleges pozíció elszaladt tőlünk. */
+    window.addEventListener('scroll', function(){
+      if(!running){ target = current = window.scrollY; }
+      else if(Math.abs(window.scrollY - current) > 90){ target = current = window.scrollY; }
+    }, { passive:true });
+    window.addEventListener('resize', function(){ target = current = window.scrollY; });
+  })();
 
   /* ============ 0. PRELOADER ============ */
   (function(){
