@@ -53,6 +53,23 @@
      --font-display megy. */
   --font-lead:'Archivo', system-ui, sans-serif;
   --font-ui:'Archivo', system-ui, sans-serif;
+
+  /* ===== EGYSÉGES MÉRETSKÁLA =====
+     Korábban minden szekció saját clamp-et vitt, és 54px-től 134px-ig szórtak
+     a címek (Életképek 54, Történetünk 77, Tanúsítványok 82, Termékeink 102,
+     Gomba Élet 131, Partnereink 134) — ettől hatott az oldal rendezetlennek.
+     Mostantól MINDEN szekciócím ugyanez az egy érték.
+     A 2.1rem-es alsó határ mérve van: 360px-es kijelzőn a leghosszabb cím
+     ("Tanúsítványok") 313px, a rendelkezésre álló hely 340px. Nagyobb padlóval
+     kilógna. */
+  --fs-h2:clamp(2.1rem, 8.5vw, 8.2rem);
+  /* a címen belüli MÁSODIK sor (pl. "amik mögöttünk állnak") — szándékosan
+     jóval kisebb, ez adja a hierarchiát a cím és az alcím között */
+  --fs-h2-sub:clamp(1.3rem, 3.4vw, 3.1rem);
+  /* szekció-alcímek. A "Grillen, nyersen…" mérete volt a referencia; a többi
+     alcím 15px-en állt, ami mellette aprónak hatott. */
+  --fs-lead:clamp(16px, 1.6vw, 23px);
+
   --ease:cubic-bezier(.22,1,.36,1);
   --expo:cubic-bezier(.86,0,.07,1);
   --swap:.9s;                  /* szín- és lapváltás közös ideje */
@@ -524,7 +541,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .neon.lit .neon__tag{ opacity:1; transform:rotate(-4deg); }
 
 .neon__head{ position:relative; z-index:2; font-family:var(--font-display); font-weight:400; text-transform:uppercase;
-  line-height:.94; letter-spacing:-.03em; font-size:clamp(2.8rem,9.2vw,8.2rem);
+  line-height:.94; letter-spacing:-.03em; font-size:var(--fs-h2);
   color:var(--red); -webkit-text-stroke:clamp(2px,.4vw,5px) var(--cream); paint-order:stroke fill; }
 .neon__head .r{ display:block; }
 /* Minden szó saját sorba: MAGYAR / KONYHÁK / GOMBÁJA. A .r sorok megmaradtak,
@@ -540,7 +557,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 .neon__sub{ position:relative; z-index:2; max-width:58ch; margin:clamp(20px,2.8vw,32px) auto 0;
   font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em; color:#3A3128;
-  font-size:clamp(16px,1.6vw,23px); line-height:1.58;
+  font-size:var(--fs-lead); line-height:1.58;
   opacity:0; transform:translateY(14px); transition:opacity .7s ease .5s, transform .7s var(--ease) .5s; }
 .neon.lit .neon__sub{ opacity:1; transform:none; }
 
@@ -640,8 +657,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      hullám-divider a kör alját. A külső gyűrű is aszimmetrikusan lógott ki
      (fent 72px, lent 189px).
      50%-on a korong a karusszel függőleges közepére kerül, egybeesik a
-     termékkép középpontjával, a kivágás pedig fent-lent szimmetrikus lesz. */
-  --ring-y:50%;
+     termékkép középpontjával, a kivágás pedig fent-lent szimmetrikus lesz.
+     51%: az egységes méretskála óta a "Termékeink" cím 102px helyett 131px,
+     ami 16px-szel lejjebb tolta a termékképet. Tiszta 50% -> tökéletes
+     szekció-közép, de -16px eltérés a terméktől; tiszta 52% -> illeszkedik a
+     termékhez, de 33px-es fent/lent egyenetlenség. 51% mindkét hibát felezi. */
+  --ring-y:51%;
   transition:background-color var(--swap) var(--swap-ease);
   padding-top:clamp(20px,3vw,45px); }
 
@@ -702,7 +723,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .products__head{ position:relative; z-index:3; text-align:center;
   margin-bottom:calc(clamp(10px,2vw,20px) + var(--head-lift));
   font-family:var(--font-display); font-weight:400; text-transform:uppercase;
-  font-size:clamp(2.4rem,7vw,6.4rem); line-height:.9; letter-spacing:-.03em;
+  font-size:var(--fs-h2); line-height:.9; letter-spacing:-.03em;
   color:var(--c-ui,#fff); transition:color var(--swap) var(--swap-ease); }
 
 .carousel__track{ position:relative; z-index:2; display:flex; align-items:center; gap:clamp(10px,2vw,30px);
@@ -860,12 +881,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .certs__spark{ position:absolute; z-index:1; color:var(--green); opacity:.42; }
 .certs.is-in .certs__spark{ animation:twinkle 3.6s ease-in-out var(--del,0s) infinite; }
 
-.certs__head{ position:relative; z-index:2; text-align:center; max-width:900px; margin:0 auto clamp(46px,5vw,80px); }
+.certs__head{ position:relative; z-index:2; text-align:center; max-width:1300px; margin:0 auto clamp(46px,5vw,80px); }
 .certs__eyebrow{ display:flex; align-items:center; justify-content:center; gap:13px; font-size:11px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:22px; }
 .certs__eyebrow i{ display:block; width:34px; height:1.5px; background:var(--red); font-style:normal; }
-.certs__title{ font-family:var(--font-display); font-weight:400; font-size:clamp(2.1rem,6.6vw,5.1rem); line-height:.88; letter-spacing:-.03em; text-transform:uppercase; }
+.certs__title{ font-family:var(--font-display); font-weight:400; font-size:var(--fs-h2); line-height:.88; letter-spacing:-.03em; text-transform:uppercase; }
 .certs__title em{ display:block; font-family:var(--font-display); font-style:normal; font-weight:400; text-transform:uppercase;
-  font-size:clamp(1.45rem,4.3vw,3.2rem); line-height:1.08; letter-spacing:-.02em; margin-top:.12em;
+  font-size:var(--fs-h2-sub); line-height:1.08; letter-spacing:-.02em; margin-top:.12em;
   color:var(--green-deep);
   /* width:fit-content + margin-inline:auto — a sor a SZÖVEG szélességére
      zsugorodik (középen marad), különben az aláhúzás a teljes sávot érné,
@@ -880,8 +901,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   transition:transform 1s var(--ease) .45s; }
 .certs.is-in .certs__title em::after{ transform:scaleX(1); }
 
-.certs__lead{ max-width:600px; margin:30px auto 0; font-family:var(--font-lead); font-weight:500;
-  letter-spacing:-.015em; font-size:clamp(13.5px,1vw,15.5px); line-height:1.62; color:var(--ink); }
+.certs__lead{ max-width:58ch; margin:30px auto 0; font-family:var(--font-lead); font-weight:500;
+  letter-spacing:-.015em; font-size:var(--fs-lead); line-height:1.62; color:var(--ink); }
 
 .certs__grid{ position:relative; z-index:2; max-width:1320px; margin:0 auto;
   display:grid; grid-template-columns:repeat(5,1fr);
@@ -1145,7 +1166,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 .gal__head{ position:relative; z-index:2; text-align:center; margin-bottom:clamp(30px,4vw,46px); }
 .gal__eyebrow{ display:inline-block; font-family:var(--font-display); font-weight:400; text-transform:uppercase;
-  font-size:clamp(2rem,4.6vw,3.4rem); line-height:.9; letter-spacing:-.01em; color:var(--red); }
+  font-size:var(--fs-h2); line-height:.9; letter-spacing:-.01em; color:var(--red); }
 
 .gal__track-wrap{ position:relative; z-index:2; padding:0; }
 .gal__track-wrap::before{ content:""; position:absolute; left:calc(-50vw + 50%); right:calc(-50vw + 50%);
@@ -1208,16 +1229,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    helyet és ne vágjon bele az idővonal tartalmába */
 .tl{ position:relative; background:var(--certs-bg); overflow:hidden;
   padding:clamp(120px,12vw,190px) clamp(14px,2vw,30px) clamp(210px,25vw,400px); }
-.tl__head{ position:relative; z-index:3; max-width:820px; margin:0 auto clamp(40px,6vw,90px); text-align:center; }
+.tl__head{ position:relative; z-index:3; max-width:1300px; margin:0 auto clamp(40px,6vw,90px); text-align:center; }
 .tl__eyebrow{ display:flex; align-items:center; justify-content:center; gap:12px; font-size:11px; font-weight:700;
   letter-spacing:.26em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:18px; }
 .tl__eyebrow i{ display:block; width:34px; height:1.5px; background:var(--red); }
-.tl__title{ font-family:var(--font-display); font-weight:400; font-size:clamp(2rem,6.3vw,4.8rem); line-height:.9;
+.tl__title{ font-family:var(--font-display); font-weight:400; font-size:var(--fs-h2); line-height:.9;
   letter-spacing:-.036em; text-transform:uppercase; }
 .tl__title em{ display:block; font-style:normal; margin-top:.08em;
   color:var(--green-deep); }
-.tl__lead{ max-width:52ch; margin:26px auto 0; font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em;
-  font-size:clamp(13px,.98vw,15px); line-height:1.64; color:var(--ink); }
+.tl__lead{ max-width:58ch; margin:26px auto 0; font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em;
+  font-size:var(--fs-lead); line-height:1.64; color:var(--ink); }
 .tl__lead strong{ font-weight:400; background:var(--n-lime); color:var(--ink);
   box-decoration-break:clone; -webkit-box-decoration-break:clone;
   padding:.06em .24em; border-radius:var(--r-mark); }
@@ -1382,14 +1403,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   line-height:1; color:var(--cream); margin-bottom:.1em; transform:rotate(-1.5deg);
   transform-origin:left center; display:inline-block; }
 .prt__title{ font-family:var(--font-display); font-weight:400;
-  font-size:clamp(2.6rem,10.6vw,8.4rem); line-height:.86; letter-spacing:-.04em; text-transform:uppercase;
+  font-size:var(--fs-h2); line-height:.86; letter-spacing:-.04em; text-transform:uppercase;
   color:var(--cream);
   /* finom, szemcsés kopás a betűkön */
   -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 1 1 1 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
           mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 1 1 1 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
   -webkit-mask-composite:source-in; mask-composite:intersect; }
-.prt__lead{ max-width:46ch; margin-top:clamp(20px,2.4vw,30px); font-family:var(--font-lead); font-weight:500;
-  letter-spacing:-.015em; font-size:clamp(13px,.98vw,15px); line-height:1.64; color:var(--cream-a82); }
+.prt__lead{ max-width:none; margin-top:clamp(20px,2.4vw,30px); font-family:var(--font-lead); font-weight:500;
+  letter-spacing:-.015em; font-size:var(--fs-lead); line-height:1.64; color:var(--cream-a82); }
 
 /* a logórács — nagy, tág, kártya nélkül */
 .prt__rows{ position:relative; z-index:3; max-width:1240px; margin:0 auto;
