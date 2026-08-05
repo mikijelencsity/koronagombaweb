@@ -1757,12 +1757,32 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .certs__grid{ grid-template-columns:repeat(3,1fr); gap:clamp(26px,4vw,40px) 18px; max-width:620px; }
 
   .slide{ flex-basis:86vw; grid-template-columns:1fr; text-align:center; padding-left:clamp(4px,1.2vw,18px); }
+  /* A terméknév keskeny kijelzőn egyes diáknál KÉT sorba tör (pl. "Friss
+     gombák"), másoknál egybe ("Gombakomposzt"). A sáv align-items:center-je
+     ezért a rövidebb diát középre húzta, és a neve 16px-et csúszott feljebb.
+     Felülre igazítva a diák egy vonalból indulnak, tehát a médiadoboz és a
+     kicker azonos magassága után a NÉV is mindig ugyanott kezdődik. */
+  .carousel__track{ align-items:flex-start; }
   .slide__body{ text-align:center; order:2; }
   .slide__media{ order:1;
     /* A --media-shift értékek a GÉPES elrendezéshez lettek bemérve (ott a
        kép a szöveg mellett áll); itt egyoszlopos a dia, ezért nullázzuk. */
-    transform:none; position:relative; }
-  .slide__media img{ width:min(85%,422px); }
+    transform:none; position:relative;
+    /* FIX MAGASSÁGÚ MÉDIADOBOZ.
+       A termékfotók oldalaránya eltér (mérve: friss/konzerv 1.0, csíra és
+       komposzt 1.34), a szélességük viszont azonos volt — ezért a médiadoboz
+       diánként 198 vagy 277px magas lett, és a terméknév 79px-et ugrált
+       lapozáskor. Fix dobozban a képek középre igazodnak, a név pedig MINDIG
+       ugyanott van. A magasság a korábbi legnagyobb értékre van állítva, így
+       a karusszel nem lett magasabb. */
+    height:min(71vw,300px); display:grid; place-items:center;
+    /* Levegő a cím és a termék közé: a "Termékeink" alja 57px-en van, a fehér
+       kör teteje viszont 36px-en volt — 21px-es átfedés. A címet feljebb vinni
+       nem lehet (már a karusszel felső paddingján ül), ezért a TERMÉKBLOKKOT
+       toljuk lejjebb, és a kört is vele (lásd --ring-y a lenti ágakban). */
+    margin-top:clamp(24px,8vw,44px); }
+  .slide__media img{ width:auto; height:auto;
+    max-width:min(85%,422px); max-height:100%; }
 
   /* EGY darab álló fehér kör az egész karusszelre.
      Korábban a kör a .slide__media::before-ból jött, vagyis MINDEN dia hozta
@@ -1774,7 +1794,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .carousel__ring .ring--1,
   .carousel__ring .ring--2,
   .carousel__ring .ring--3{ display:none; }
-  .carousel__ring .disc{ width:min(86vw,470px); }
+  /* 470 -> 380px felső korlát: tableten (768-980px) a 470px-es kör a
+     megnőtt címmel és a lejjebb tolt termékblokkal együtt 52-61px-t belelógott
+     a "Termékeink" feliratba. Telefonon nincs hatása, mert ott a 86vw a
+     kisebb (390px-en 335, 414px-en 356). */
+  .carousel__ring .disc{ width:min(86vw,380px); }
   .slide__media::before{ content:none; }
   /* Mobilon a kép FELÜL van (order:1), a szöveg alatta, ezért a termékkép
      középpontja NEM a karusszel felénél van — 50%-on a kör a termék alatt ült.
@@ -1782,13 +1806,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      termék egy középpontra néznek.
      Két érték kell, mert az arány a szélességgel változik: tableten a kép
      nagyobb, tehát lejjebb ül a középpontja, mint telefonon.
-     MÉRVE 768px-en: kép közepe 45.5% — itt 45% a jó. */
-  .carousel{ --ring-y:45%; }
+     MÉRVE a lejjebb tolt termékblokk után: a kép közepe 768px-en 48.4%,
+     900px-en 49.5% — 49% mindkettőt 4px-en belül eltalálja. */
+  .carousel{ --ring-y:49%; }
 }
 @media (max-width:640px){
-  /* MÉRVE 360 / 390 / 414px-en: a kép közepe 37.5 / 38.0 / 38.5% —
-     38.5%-kal az eltérés 5 / 2 / 0px. */
-  .carousel{ --ring-y:38.5%; }
+  /* A termékblokk lejjebb került (lásd .slide__media margin-top), ezért a
+     körnek is lejjebb kell ülnie, hogy a terméken maradjon. */
+  .carousel{ --ring-y:42%; }
 }
 /* ===== HERO — 100% zoomon a 80%-os arány visszaállítása (CSAK desktop) =====
    Az oldalt 80% böngésző-zoomon terveztük; 100%-on a hero PX-alapú elemei
