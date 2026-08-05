@@ -952,7 +952,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      vízszintesen kitolni az oldalt (a body-n szándékosan nincs overflow-x).
      A sticky-t ez nem töri: csak a SZÜLŐK nem-visible overflow-ja állítaná
      le, magán a sticky elemen a clip rendben van. */
-  overflow-x:clip; overflow-y:visible; }
+  overflow-x:clip; overflow-y:visible;
+  /* A kamera-behatolás haladása. Azért 2.6x, mert a dekor opacitása is
+     ezzel a szorzóval fogy el (opacity:calc(1 - var(--zp)*2.6)) — így a
+     teljes elsodródás még LÁTHATÓ, mielőtt a dekor eltűnik. A min() 1-en
+     megállítja, hogy utána ne sodródjon tovább a semmibe. */
+  --camera:min(var(--zp,0) * 2.6, 1); }
 
 .zoo__sent{ position:relative; z-index:3; display:flex; align-items:center; justify-content:center;
   gap:.05em; flex-wrap:nowrap; padding:0 3vw;
@@ -992,7 +997,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      A --zp-t (0 = zárt betű-kör, 1 = teljes 16:9) a JS írja a .zoo__pin-re;
      az alábbi rétegek MIND ezt olvassák, ezért nem kellett új JS. */
   box-shadow:0 calc(18px + 46px * var(--zp,0)) calc(40px + 90px * var(--zp,0))
-             calc(-20px - 20px * var(--zp,0)) rgba(0,0,0,calc(.35 + .3 * var(--zp,0))); }
+             calc(-20px - 20px * var(--zp,0)) rgba(0,0,0,calc(.35 + .3 * var(--zp,0)));
+  /* A KERET A NÉZŐRE FORDUL: megdöntve, perspektívában indul, és ahogy
+     nyílik, kiegyenesedik — mintha egy lap fordulna szembe a nézővel.
+     Az oldalon semmi más nem használ térbeli mélységet, ezért ez ad neki
+     külön dimenziót. A dőlés a nyílás TELJES ívén fut (nem gyorsítva), így
+     pontosan akkor áll be laposra, amikor a keret eléri a végméretét.
+     Középpontos forgatás, hogy a keret a betű helyén maradjon: a JS a
+     left/top/width/height-tal pozicionál, azt nem szabad elhúzni. */
+  transform:perspective(1400px) rotateX(calc((1 - var(--zp,0)) * 13deg)); }
 
 /* DOLLY: a videó induláskor ~22%-kal rá van nagyítva, és ahogy a keret
    kinyílik, visszahúzódik 1.0-ra. Ettől nem "nő egy doboz", hanem a kamera
@@ -1032,6 +1045,25 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .zoo__pin:not(.is-in) .zoo-shroom{ transform:translateX(-160px); opacity:0 !important; }
 .zoo__pin:not(.is-in) .deco-sticker,
 .zoo__pin:not(.is-in) .zoo-logo{ transform:translateX(160px); opacity:0 !important; }
+
+/* ===== NEM A VIDEÓ ZOOMOL, HANEM A KAMERA MEGY BE =====
+   A négy dekor pont a kép négy sarkában ül: kéz bal-fent, gomba bal-lent,
+   nyárs jobb-fent, logó jobb-lent. Ahogy a videó nyílik, mindegyik KIFELÉ
+   sodródik a saját sarka irányába és picit nagyobbodik — pontosan az, amit
+   egy előre haladó kamera csinál a képszéli tárgyakkal.
+   Eddig csak a videó mozgott, körülötte minden állt, ezért látszott
+   effektnek; így nem egy doboz nő, hanem a néző megy beljebb.
+
+   translate/scale és NEM transform: a transform-ot a fenti belépő
+   becsúszás és a képeken futó bob-ringatás már használja. Ezek külön CSS
+   tulajdonságok, tehát egymás mellett élnek, nem írják felül egymást.
+
+   vw-ben mérünk, hogy a sodródás a kijelzővel arányos maradjon — fix px-ben
+   telefonon aránytalanul nagy lenne. */
+.zoo__hand   { translate:calc(var(--camera) * -6vw)   calc(var(--camera) * -3vw);   scale:calc(1 + var(--camera) * .12); }
+.zoo-shroom  { translate:calc(var(--camera) * -5vw)   calc(var(--camera) * 2.6vw);  scale:calc(1 + var(--camera) * .10); }
+.deco-sticker{ translate:calc(var(--camera) * 6vw)    calc(var(--camera) * -3vw);   scale:calc(1 + var(--camera) * .12); }
+.zoo-logo    { translate:calc(var(--camera) * 5vw)    calc(var(--camera) * 2.6vw);  scale:calc(1 + var(--camera) * .10); }
 
 /* ============================================================
    5b. RÓLUNK → ÉLETKÉPEK GALÉRIA
@@ -1844,6 +1876,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .zoo__pin:not(.is-in) .zoo__hand, .zoo__pin:not(.is-in) .zoo-shroom,
   .zoo__pin:not(.is-in) .deco-sticker, .zoo__pin:not(.is-in) .zoo-logo{
     transform:none !important; opacity:calc(1 - var(--zp,0) * 2.6) !important; }
+  /* a térbeli dőlés és a kamera-sodródás mozgás-alapú — síkban marad */
+  .zoo__media{ transform:none !important; }
+  .zoo__hand, .zoo-shroom, .deco-sticker, .zoo-logo{
+    translate:none !important; scale:none !important; }
 }
 </style>
 </head>
