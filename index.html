@@ -176,6 +176,20 @@ body::after{
   content:""; position:fixed; inset:0; pointer-events:none; z-index:70; opacity:.05;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+/* ===== A SZEMCSE-RÉTEG MOBILON KI VAN KAPCSOLVA =====
+   Ez a réteg position:fixed, inset:0, z-index:70 — vagyis EGY TELJES
+   KÉPERNYŐS, áttetsző fátyol a teljes tartalom FÖLÖTT, ami minden
+   szekcióban ott van. Görgetéskor a böngészőnek képkockánként át kell
+   kevernie vele az egész látható felületet, és ez megakadályozza a
+   compositor gyors útvonalait is.
+   Ez az egyetlen olyan terhelés, ami az oldal MINDEN pontján egyformán
+   jelen van — pontosan egyezik a bejelentett tünettel ("mindenhol
+   egyformán akad"). Telefonon 5%-os áttetszőségnél a szemcse gyakorlatilag
+   láthatatlan, tehát a látványból semmit nem veszítünk vele.
+   Gépen marad. */
+@media (max-width:900px){
+  body::after{ display:none; }
+}
 
 /* ============================================================
    TIPOGRÁFIAI ANYAGOK — három újrahasznosítható stílus
