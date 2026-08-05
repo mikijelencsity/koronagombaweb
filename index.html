@@ -143,7 +143,25 @@
 
 *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
 html{ -webkit-user-select:none; user-select:none; }
-body{ background:var(--cream); color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased; }
+body{ background:var(--cream); color:var(--ink); font-family:var(--font-ui); -webkit-font-smoothing:antialiased;
+  /* GÖRGETÉS-HORGONYZÁS KIKAPCSOLVA.
+     A böngésző alapból igyekszik a helyén tartani a tartalmat, ha a látható
+     rész FÖLÖTT megváltozik az elrendezés: ilyenkor magától odébb tolja a
+     görgetést, hogy a képen ugyanaz maradjon. Ez az oldal viszont görgetés
+     közben, KÉPKOCKÁNKÉNT ír valódi elrendezési tulajdonságokat — a videós
+     keret left/top/width/height-jét és az idővonal-jelölő pozícióját. A
+     böngésző ezt tartalom-elmozdulásnak érti, és "kompenzál", vagyis
+     megrántja a görgetést. Innen jött a telefonon tapasztalt ugrálás,
+     főleg FELFELÉ görgetve, amikor a változás a képernyő fölött történik.
+     A none az elemre ÉS a leszármazottaira is érvényes, tehát ez az egy sor
+     az egész oldalt lefedi. Nincs mellékhatása: az oldalon nincs utólag
+     beszúrt tartalom, a képeknek megvan az előre lefoglalt helyük. */
+  overflow-anchor:none; }
+/* Biztos, ami biztos: azokra a konténerekre külön is rátesszük, amelyeknek a
+   belsejét görgetés közben MÉRETEZZÜK. A body-szintű szabály a leszármazottakra
+   is vonatkozik, de a számított érték ezt nem tükrözi, motoronként pedig eltérhet
+   az értelmezés — ez a sor egyértelművé teszi. */
+.stage, .zoo, .zoo__pin, .zoo__media, .tl, .tl__track{ overflow-anchor:none; }
 /* NINCS overflow-x a body-n: iOS Safari-n ha BÁRMELYIK ősnek (a body is az!)
    nem "visible" az overflow-ja, a position:sticky teljesen leáll — ez okozta,
    hogy a hero/zoo pin-szekciók iPhone-on nem ragadtak be, és üresen görgött
