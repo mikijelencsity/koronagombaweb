@@ -1121,7 +1121,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    5b. RÓLUNK → ÉLETKÉPEK GALÉRIA
    ============================================================ */
 .abt{ position:relative; background:var(--cream); color:var(--ink); overflow:hidden;
-  padding:clamp(70px,9vw,120px) 0 clamp(190px,22vw,300px); }
+  /* a felső padding nagyobb lett a blob magasságánál (.abt__wave), különben
+     a hullám belelógott volna az "Életképek" címbe */
+  padding:clamp(150px,17vw,250px) 0 clamp(190px,22vw,300px); }
 
 .gal__head{ position:relative; z-index:2; text-align:center; margin-bottom:clamp(30px,4vw,46px); }
 .gal__eyebrow{ display:inline-block; font-family:var(--font-display); font-weight:400; text-transform:uppercase;
@@ -1160,6 +1162,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 .abt__wave--bot{ bottom:-1px; }
 .abt__wave--bot #wave-abt{ fill:var(--red); }
+
+/* átvezetés a sötét videós szekcióból az életképekbe. Ugyanaz az elv, mint a
+   .tl__wave-nél a partnereknél: a blob az ALSÓ szekció tetején ül, de a FELSŐ
+   szekció színével van kitöltve (--ink) — ettől folytonos a határ.
+   Saját --top módosító, mert az .abt__wave bázist a lenti (piros) hullám is
+   használja: ha a bázisra tennénk a top:-1px-et, azt is felrántaná a szekció
+   tetejére. */
+.abt__wave--top{ top:-1px; z-index:3; }
+.abt__wave--top svg{ height:clamp(100px,11vw,180px); }
+.abt__wave--top path{ fill:var(--ink); }
 
 .tl__wave{ position:absolute; left:0; right:0; top:-1px; z-index:2; pointer-events:none; line-height:0; }
 .tl__wave svg{ display:block; width:100%; height:clamp(86px,8vw,128px); }
@@ -2290,6 +2302,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 <!-- ================== 5b. ÉLETKÉPEK GALÉRIA ================== -->
 <section class="abt" id="rolunk">
+
+  <!-- átvezető blob a sötét videós szekcióból: ugyanaz a formanyelv, mint a
+       partnerek alatti .tl__wave, csak vízszintesen tükrözve, hogy ne
+       ugyanaz a hullám ismétlődjön kétszer az oldalon -->
+  <div class="abt__wave abt__wave--top" aria-hidden="true">
+    <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
+      <path d="M1200,0 H0 V42 C162,38 246,32 388,58 C550,88 652,96 816,66 C972,38 1072,86 1200,54 Z"/>
+    </svg>
+  </div>
 
   <div class="gal__head">
     <h2 class="gal__eyebrow">Életképek</h2>
