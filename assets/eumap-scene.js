@@ -828,6 +828,10 @@ async function init() {
      nem biztos, és a beállítás csendben elveszne. */
   ScrollTrigger.config({ ignoreMobileResize: true });
 
+  /* ?off=eumap — a diagnosztikai kapcsolótábla (lásd index.html). A 3D jelenet
+     megmarad, csak a pin + scrub nem jön létre, tehát a szekció normálisan
+     görög át. Így elkülöníthető, hogy a ScrollTrigger okozza-e az ugrálást. */
+  if (!(window.__OFF && window.__OFF('eumap'))) {
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
@@ -847,6 +851,7 @@ async function init() {
     scrub: 1.1,
     onUpdate: (self) => applyScroll(self.progress),
   });
+  }
 
   const clock = new THREE.Clock();
   let raf = null, running = false;

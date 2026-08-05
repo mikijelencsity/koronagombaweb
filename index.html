@@ -2742,6 +2742,41 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ============ DIAGNOSZTIKAI KAPCSOLÓTÁBLA (?off=...) ============
+     Az ugrálás forrását telefonon kell bemérni, mert asztali böngészőben a
+     címsáv mozgása nem reprodukálható. Ezzel a scroll-vezérelt effektek
+     egyesével kikapcsolhatók az URL-ből, kódmódosítás nélkül:
+
+        ?off=hero      — a hero görgetés-haladása (--p, --reveal, --stack)
+        ?off=zoo       — a videó kinövése (KOR(O)NA GOMBA)
+        ?off=mtl       — a mobil idővonal rajzolódó útvonala
+        ?off=tl        — az asztali idővonal (mobilon amúgy sem fut)
+        ?off=blob      — a folyamatosan hullámzó SVG-sávok (nonstop rAF)
+        ?off=eumap     — a 3D térkép ScrollTrigger pinje
+        ?off=all       — mind
+
+     Vesszővel többet is: ?off=zoo,blob
+     A bal felső sarokban egy kis címke mutatja, mi van kikapcsolva — ha nem
+     látod, akkor a régi, gyorsítótárazott fájl fut, és hiába tesztelsz. */
+  var OFFLIST = (function(){
+    var m = /[?&]off=([^&]*)/.exec(location.search);
+    return m ? decodeURIComponent(m[1]).toLowerCase().split(',') : [];
+  })();
+  function OFF(name){
+    return OFFLIST.indexOf('all') >= 0 || OFFLIST.indexOf(name) >= 0;
+  }
+  window.__OFF = OFF;   /* az eumap ES-modul is ezt olvassa */
+  if (OFFLIST.length){
+    document.addEventListener('DOMContentLoaded', function(){
+      var b = document.createElement('div');
+      b.textContent = 'OFF: ' + OFFLIST.join(',');
+      b.style.cssText = 'position:fixed;left:8px;top:8px;z-index:99999;background:#c00;'
+        + 'color:#fff;font:700 12px/1.4 monospace;padding:5px 9px;border-radius:6px;'
+        + 'pointer-events:none';
+      document.body.appendChild(b);
+    });
+  }
+
   /* Csak akkor hívjuk vissza, ha a SZÉLESSÉG változott.
      Telefonon a címsáv mozgása magasság-változást szül (és FELFELÉ görgetve
      újra meg újra visszaúszik), ami az elrendezést nem érinti — a
@@ -3136,7 +3171,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     /* A menü akkor jöjjön elő, ha a hero már gyakorlatilag le van takarva. */
     if (nav) nav.classList.toggle('is-shown', hSt >= 0.9);
   }
-  SCROLL.add(heroRead, heroWrite);
+  if (!OFF('hero')) SCROLL.add(heroRead, heroWrite);
 
   /* ============ 2. NEON bekapcsolás ============ */
   var neon = document.getElementById('neon');
@@ -3431,6 +3466,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       if(eum) eum.setAttribute('d', toPath(sample(t*0.62 + 1.6, -1)));
     }
     paint(0);
+    /* kikapcsolva: a kezdőkép megmarad, csak a nonstop rAF nem indul el */
+    if (OFF('blob')) return;
 
     function frame(now){
       requestAnimationFrame(frame);
@@ -3523,7 +3560,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       pin.style.setProperty('--dark', zBp.toFixed(4));
       pin.style.setProperty('--exit', zExit.toFixed(4));
     }
-    SCROLL.add(zooRead, zooWrite);
+    if (!OFF('zoo')) SCROLL.add(zooRead, zooWrite);
   })();
 
   /* ============ 5c. IDŐVONAL ============ */
@@ -3572,7 +3609,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       marker.style.setProperty('--mk', tMk);
       marker.style.transform = 'rotate(' + tRot.toFixed(1) + 'deg)';   /* enyhe pörgés az út mentén */
     }
-    SCROLL.add(tlRead, tlWrite);
+    if (!OFF('tl')) SCROLL.add(tlRead, tlWrite);
 
     /* az állomások — és a szórt fotó-matricák — egyenként úsznak be */
     var items = track.querySelectorAll('.tl__item, .tl__pola');
@@ -3667,7 +3704,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       mMarker.style.setProperty('--mk', mMk);
       mMarker.style.transform = 'rotate(' + mRot.toFixed(1) + 'deg)';
     }
-    SCROLL.add(mRead, mWrite);
+    if (!OFF('mtl')) SCROLL.add(mRead, mWrite);
 
     /* Csak szélességre: a build() újragenerálja az SVG-útvonalat és újra
        mintavételez 240 pontot — ezt nem szabad minden címsáv-mozgásra lefuttatni. */
