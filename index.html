@@ -634,7 +634,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      (lásd .slide), így a kép nagy maradhat és középen is van. */
   --media-x:0px;
   --ring-x:calc(50% + var(--media-x));
-  --ring-y:58%;
+  /* MÉRVE: 58%-nál a korong középpontja 423px-en ült, a termékkép középpontja
+     viszont 368px-en — a kör 55px-szel a termék ALATT volt, ezért látszott
+     fent több helynek, mint lent (143px vs 26px), és ezért vágta el az alsó
+     hullám-divider a kör alját. A külső gyűrű is aszimmetrikusan lógott ki
+     (fent 72px, lent 189px).
+     50%-on a korong a karusszel függőleges közepére kerül, egybeesik a
+     termékkép középpontjával, a kivágás pedig fent-lent szimmetrikus lesz. */
+  --ring-y:50%;
   transition:background-color var(--swap) var(--swap-ease);
   padding-top:clamp(20px,3vw,45px); }
 
@@ -1597,21 +1604,31 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     transform:none; position:relative; }
   .slide__media img{ width:min(85%,422px); }
 
-  /* A .carousel__ring fix koordinátákkal ül a karusszelen — az a GÉPES
-     elrendezés kép-pozíciójához van igazítva, mobilon nem talál rá.
-     Helyette a korongot magához a képhez kötjük (::before), így bármilyen
-     magasságnál biztosan mögötte van és vele együtt mozog. */
-  .carousel__ring{ display:none; }
-  .slide__media::before{ content:''; position:absolute; left:50%; top:50%;
-    translate:-50% -50%; width:min(86vw,470px); aspect-ratio:1; border-radius:50%;
-    background:rgba(255,255,255,.24); z-index:-1; }
-  /* a napsugár középpontja a kép magasságához igazítva */
-  .carousel__rays{ --ring-y:40%; }
+  /* EGY darab álló fehér kör az egész karusszelre.
+     Korábban a kör a .slide__media::before-ból jött, vagyis MINDEN dia hozta
+     a sajátját — ezért úsztak be a szomszéd diák körei oldalról, és ezért
+     látszott több kör egyszerre. A .carousel__ring viszont a karusszelhez van
+     kötve, nem a diához: állva marad, és csak a termék halad át rajta.
+     A külső díszgyűrűk mobilon kikapcsolva — ott egyetlen tiszta kör kell. */
+  .carousel__ring{ display:grid; }
+  .carousel__ring .ring--1,
+  .carousel__ring .ring--2,
+  .carousel__ring .ring--3{ display:none; }
+  .carousel__ring .disc{ width:min(86vw,470px); }
+  .slide__media::before{ content:none; }
+  /* Mobilon a kép FELÜL van (order:1), a szöveg alatta, ezért a termékkép
+     középpontja NEM a karusszel felénél van — 50%-on a kör a termék alatt ült.
+     Egy helyen állítjuk, a napsugár is ezt örökli, így a kör, a sugarak és a
+     termék egy középpontra néznek.
+     Két érték kell, mert az arány a szélességgel változik: tableten a kép
+     nagyobb, tehát lejjebb ül a középpontja, mint telefonon.
+     MÉRVE 768px-en: kép közepe 45.5% — itt 45% a jó. */
+  .carousel{ --ring-y:45%; }
 }
 @media (max-width:640px){
-  /* Telefonon a termékkép feljebb ül, mint a dekor körgyűrű (a gyűrű a
-     carousel 52%-ánál van, a kép viszont az egy-oszlopos elrendezés tetején).
-     A gyűrűt a kép mögé húzzuk, hogy a termék a gyűrűben üljön, mint gépen. */
+  /* MÉRVE 360 / 390 / 414px-en: a kép közepe 37.5 / 38.0 / 38.5% —
+     38.5%-kal az eltérés 5 / 2 / 0px. */
+  .carousel{ --ring-y:38.5%; }
 }
 /* ===== HERO — 100% zoomon a 80%-os arány visszaállítása (CSAK desktop) =====
    Az oldalt 80% böngésző-zoomon terveztük; 100%-on a hero PX-alapú elemei
