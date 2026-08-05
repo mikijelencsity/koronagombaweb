@@ -1862,6 +1862,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .slide{ flex:0 0 min(800px,66vw); }
 }
 @media (max-width:900px){
+  /* ===== A HERO-STACKELŐDÉS MOBILON KI VAN KAPCSOLVA =====
+     Az átfedés CSS-ben -100lvh (NAGY nézetmagasság), a hozzá tartozó --stack
+     haladást viszont a JS a window.innerHeight-ból számolja. Telefonon ez a
+     kettő pontosan a böngésző címsávjának magasságával tér el, és a címsáv
+     görgetés közben el is tűnik/visszajön — vagyis a matematika mobilon eleve
+     elcsúszik, menet közben ráadásul változik is.
+     Egy teljes nézetmagasságnyi NEGATÍV MARGÓ a legrosszabb hely erre a
+     bizonytalanságra: ha a két érték nem egyezik, a hero és a rákövetkező
+     szekció viszonya csúszik el. Mobilon ezért marad az egyszerű, egymás
+     utáni gördülés — ott a stackelődés amúgy is alig látszó, 7%-os hatás. */
+  .neon{ margin-top:0; }
+  .hero{ scale:1; border-radius:0; }
+  .hero__stack{ display:none; }
+
   .zoo{ height:280vh; }
   /* "KORONA" / "GOMBA" 2 sorba törve (lásd .zoo__break) — mivel soronként
      kevesebb szélesség kell, jóval nagyobbra vehető, mint 1 sorban lenne.
@@ -2741,17 +2755,35 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      alapmagassággal számoltatta újra, ez okozta a mobilon ugráló/
      akadó görgetést. Csak akkor frissítünk, ha ténylegesen a szélesség
      (vagyis az elrendezés) változott — a címsáv súlykodása attól független. */
-  var stableVH = window.innerHeight;
+  /* A CSS az elrendezést lvh-ban (NAGY nézetmagasság) méretezi — a .hero, a
+     .zoo__pin és a görgetési konténerek is. A JS viszont window.innerHeight-ot
+     használt, ami telefonon a címsáv állásától függően KISEBB. A kettő így
+     pontosan a címsáv magasságával tért el: a görgetési haladás számítása
+     elcsúszott a tényleges elrendezéstől, ráadásul a címsáv mozgásakor
+     változott is. Egy próbaelemmel megmérjük a VALÓDI lvh-t, és azzal
+     számolunk; ahol a böngésző nem ismeri az lvh-t, marad az innerHeight. */
+  var vhProbe = null;
+  function measureLVH(){
+    if(!vhProbe && document.body){
+      vhProbe = document.createElement('div');
+      vhProbe.setAttribute('aria-hidden','true');
+      vhProbe.style.cssText = 'position:absolute;left:-9999px;top:0;width:1px;'
+        + 'height:100lvh;visibility:hidden;pointer-events:none';
+      document.body.appendChild(vhProbe);
+    }
+    return (vhProbe && vhProbe.offsetHeight) || window.innerHeight;
+  }
+  var stableVH = measureLVH();
   var stableVW = window.innerWidth;
   function pageVH(){
     if(window.innerWidth !== stableVW){
       stableVW = window.innerWidth;
-      stableVH = window.innerHeight;
+      stableVH = measureLVH();
     }
     return stableVH;
   }
   window.addEventListener('orientationchange', function(){
-    setTimeout(function(){ stableVW = window.innerWidth; stableVH = window.innerHeight; }, 200);
+    setTimeout(function(){ stableVW = window.innerWidth; stableVH = measureLVH(); }, 200);
   });
 
   /* A saját, wheel-alapú "sima görgetés" KIVÉVE.
