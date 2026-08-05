@@ -509,7 +509,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   line-height:.94; letter-spacing:-.03em; font-size:clamp(2.8rem,9.2vw,8.2rem);
   color:var(--red); -webkit-text-stroke:clamp(2px,.4vw,5px) var(--cream); paint-order:stroke fill; }
 .neon__head .r{ display:block; }
-.neon__word{ display:inline-block; overflow:hidden; vertical-align:top; }
+/* Minden szó saját sorba: MAGYAR / KONYHÁK / GOMBÁJA. A .r sorok megmaradtak,
+   mert a szavankénti animáció-késleltetés a .r-en belüli sorrendre van kötve. */
+.neon__word{ display:block; overflow:hidden; }
 .neon__word span{ display:inline-block; transform:translateY(115%); transition:transform .7s var(--expo); }
 .neon.lit .neon__word span{ transform:translateY(0); }
 /* szavankénti késleltetés — bal->jobb, sor->sor, mint egy gépíró */
@@ -546,15 +548,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .neon__cta:hover{ box-shadow:var(--sh-btn-press) var(--ink); translate:2px 2px; }
 
 @media (max-width:640px){
-  /* A "MAGYAR KONYHÁK" egy sorban 465px széles a mobil betűméret-padlónál
-     (a clamp alsó határa 2.8rem = 44.8px), miközben csak 340–370px a hely —
-     a .neon overflow:hidden-je szó nélkül levágná a sor végét. Mobilon ezért
-     minden szó saját sorba kerül: MAGYAR / KONYHÁK / GOMBÁJA. A legszélesebb
-     így 245px, marad ~95px levegő. A szavankénti animáció-késleltetés
-     változatlanul jó, mert az a .r-en belüli sorrendre van kötve, nem a
-     megjelenítési módra. */
-  .neon__head .neon__word{ display:block; }
-
   /* egy nagy alapkép (p2), a másik kettő matricaként rárakva a sarkokba —
      így a fotók jóval nagyobbak, mint a korábbi három egyforma, apró kép.
      Több levegő fent/lent a szöveg és a CTA felé, a matricák pedig csak
