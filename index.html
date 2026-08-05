@@ -1014,8 +1014,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      teljesen kinyílva komoly, mozis tömbként ül a sötét háttéren.
      A --zp-t (0 = zárt betű-kör, 1 = teljes 16:9) a JS írja a .zoo__pin-re;
      az alábbi rétegek MIND ezt olvassák, ezért nem kellett új JS. */
+  /* A FEKETE árnyék is --exit-tel fogy el, nem csak a zöld. Mérve: 154px-re
+     nyúlik le a kerettől, miközben a keret aljától a szekció aljáig csak 22px
+     van — vagyis a teljes alsó sávot --ink ALÁ sötétítette, a lenti blob
+     viszont tiszta --ink. Pontosan ez a lépcső látszott csíkként. */
   box-shadow:0 calc(18px + 46px * var(--zp,0)) calc(40px + 90px * var(--zp,0))
-             calc(-20px - 20px * var(--zp,0)) rgba(0,0,0,calc(.35 + .3 * var(--zp,0))),
+             calc(-20px - 20px * var(--zp,0))
+             rgba(0,0,0,calc((.35 + .3 * var(--zp,0)) * (1 - var(--exit,0)))),
              /* FÉNYKISZŰRŐDÉS: a sötét fázisban a képernyő besugározza maga
                 körül a teret, mint egy monitor egy sötét szobában. --dark-hoz
                 kötve, tehát világos háttéren nincs is jelen. */
