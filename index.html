@@ -2759,10 +2759,17 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      újratördelés (layout thrashing). Innentől EGY figyelő és EGY rAF hívja
      sorban a modulokat, tehát képkockánként egyetlen mérési kör van. */
   var SCROLL = (function(){
-    var fns = [], queued = false;
+    var mods = [], queued = false;
+    /* KÉT FÁZIS. Előbb MINDEN modul mér, csak utána ír MINDEGYIK.
+       Enélkül a sorrend olvas -> ír -> olvas -> ír, és minden írás utáni
+       olvasás KÉNYSZERŰ ÚJRATÖRDELÉST vált ki a böngészőben (layout
+       thrashing). Négy modullal ez képkockánként több teljes újratördelés
+       volt — telefonon ez a görgetés akadásának fő oka.
+       Szétválasztva képkockánként EGYETLEN újratördelés van. */
     function run(){
       queued = false;
-      for(var i=0;i<fns.length;i++){ try{ fns[i](); }catch(e){} }
+      for(var i=0;i<mods.length;i++){ try{ mods[i].read(); }catch(e){} }
+      for(var i=0;i<mods.length;i++){ try{ mods[i].write(); }catch(e){} }
     }
     function tick(){ if(!queued){ queued = true; requestAnimationFrame(run); } }
     window.addEventListener('scroll', tick, { passive:true });
@@ -2771,7 +2778,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
        szélesség-változáskor frissül — a címsáv magasság-ingadozása tehát a
        matematikájukat nem érinti, fölösleges rájuk futni. */
     onWidthResize(tick);
-    return { add:function(fn){ fns.push(fn); fn(); }, tick:tick };
+    return {
+      /* add(mer, ir) — a mérő NEM írhat, az író NEM olvashat elrendezést */
+      add:function(read, write){
+        mods.push({ read:read, write:write });
+        read(); write();
+      },
+      tick:tick
+    };
   })();
 
   /* Az SVG getPointAtLength() minden hívásnál újraszámolja az útvonal
@@ -3081,34 +3095,36 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* a stackelődéshez a RÁÚSZÓ szekció kell — külön néven, mert a lentebbi
      `var neon` csak később kap értéket, itt még undefined lenne */
   var stackTo = document.getElementById('neon');
-  var ticking = false;
-  function update(){
+  var hE = 0, hR = 0, hSt = 0;
+
+  /* MÉRÉS — csak olvas, semmit nem ír. */
+  function heroRead(){
     var vh = pageVH();
     var total = stage.offsetHeight - vh;
     var p = total > 0 ? -stage.getBoundingClientRect().top / total : 0;
     p = Math.min(1, Math.max(0, p));
-    var e = 1 - Math.pow(1 - p, 1.6);
+    hE = 1 - Math.pow(1 - p, 1.6);
     var r = Math.min(1, Math.max(0, (p - 0.46) / 0.30));
-    r = r * r * (3 - 2 * r);
-    hero.style.setProperty('--p', e.toFixed(4));
-    hero.style.setProperty('--reveal', r.toFixed(4));
+    hR = r * r * (3 - 2 * r);
     /* stackelődés: 0 = a .neon épp belép alulról, 1 = teljesen befedte a herót.
        smoothstep, hogy a hátramaradás ne lineárisan, hanem lágyan induljon
        és álljon meg — ettől lesz "pakli", nem csúszka. */
-    var st = 0;
+    hSt = 0;
     if (stackTo){
-      st = 1 - Math.min(1, Math.max(0, stackTo.getBoundingClientRect().top / vh));
-      st = st * st * (3 - 2 * st);
-      hero.style.setProperty('--stack', st.toFixed(4));
+      var st = 1 - Math.min(1, Math.max(0, stackTo.getBoundingClientRect().top / vh));
+      hSt = st * st * (3 - 2 * st);
     }
-    /* A menü akkor jöjjön elő, ha a hero már gyakorlatilag le van takarva.
-       Korábban ez a stage aljához volt kötve — a negatív margóval viszont a
-       takarás 100vh-val KORÁBBRA került, tehát a stage-hez kötve a menü
-       kínosan későn úszott volna be. Most a takarás mértékét nézzük. */
-    if (nav) nav.classList.toggle('is-shown', st >= 0.9);
-    ticking = false;
   }
-  SCROLL.add(update);
+
+  /* ÍRÁS — csak stílust állít, elrendezést nem olvas. */
+  function heroWrite(){
+    hero.style.setProperty('--p', hE.toFixed(4));
+    hero.style.setProperty('--reveal', hR.toFixed(4));
+    if (stackTo) hero.style.setProperty('--stack', hSt.toFixed(4));
+    /* A menü akkor jöjjön elő, ha a hero már gyakorlatilag le van takarva. */
+    if (nav) nav.classList.toggle('is-shown', hSt >= 0.9);
+  }
+  SCROLL.add(heroRead, heroWrite);
 
   /* ============ 2. NEON bekapcsolás ============ */
   var neon = document.getElementById('neon');
@@ -3439,15 +3455,18 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
     function smooth(t){ return t*t*(3-2*t); }
 
-    function layout(){
-      raf = false;
+    var zW=0, zH=0, zL=0, zT=0, zZp=0, zBp=0, zExit=0, zBg='';
+
+    /* MÉRÉS — kizárólag olvas.
+       FONTOS: a betűhely (slot) mérése KORÁBBAN a --zp beírása UTÁN történt.
+       A --zp viszont épp a feliratot mozgatja, tehát az utána következő
+       mérés teljes újratördelést kényszerített ki minden képkockában. */
+    function zooRead(){
       var vh = pageVH();
       var pr = pin.getBoundingClientRect();
       var total = sec.offsetHeight - vh;
       var p  = clamp(-sec.getBoundingClientRect().top / total, 0, 1);
-      var zp = smooth(clamp(p / 0.78, 0, 1));   /* a görgetés 78%-áig tart a kinövés */
-
-      pin.style.setProperty('--zp', zp.toFixed(4));
+      zZp = smooth(clamp(p / 0.78, 0, 1));   /* a görgetés 78%-áig tart a kinövés */
 
       /* kiinduló állapot: a betű helye, kör alakban */
       var sr = slot.getBoundingClientRect();
@@ -3455,46 +3474,42 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       var cx0 = sr.left - pr.left + sr.width/2;
       var cy0 = sr.top  - pr.top  + sr.height/2;
 
-      /* végállapot: teljes szélesség (100vw), 16:9-ben —
-         de ha ez magasabb lenne, mint a viewport, zsugorítjuk,
-         hogy sose vágódjon le az alja (ott van a videó logója) */
+      /* végállapot: teljes szélesség, 16:9-ben — de ha ez magasabb lenne,
+         mint a viewport, zsugorítjuk, hogy sose vágódjon le az alja */
       var w1 = pr.width * 0.94;
       var h1 = w1 / RATIO;
       if(h1 > vh * 0.94){ var shrink = (vh*0.94) / h1; w1 *= shrink; h1 = vh*0.94; }
       var cx1 = pr.width/2, cy1 = vh/2;
 
-      var w = s0 + (w1 - s0) * zp;
-      var h = s0 + (h1 - s0) * zp;
-      var cx = cx0 + (cx1 - cx0) * zp;
-      var cy = cy0 + (cy1 - cy0) * zp;
-
-      media.style.width  = w.toFixed(1) + 'px';
-      media.style.height = h.toFixed(1) + 'px';
-      media.style.left   = (cx - w/2).toFixed(1) + 'px';
-      media.style.top    = (cy - h/2).toFixed(1) + 'px';
-      /* kör → enyhén lekerekített téglalap */
-      media.style.borderRadius = (50 - 46*zp).toFixed(2) + '%';
+      zW = s0 + (w1 - s0) * zZp;
+      zH = s0 + (h1 - s0) * zZp;
+      zL = (cx0 + (cx1 - cx0) * zZp) - zW/2;
+      zT = (cy0 + (cy1 - cy0) * zZp) - zH/2;
 
       /* a háttér a zoom második felében sötétre vált, hogy a videó
          elválasztó nélkül folyjon bele az alatta lévő sötét szekcióba */
-      var bp = clamp((zp - 0.45) / 0.55, 0, 1);
+      zBp = clamp((zZp - 0.45) / 0.55, 0, 1);
       var c0 = [240,233,218], c1 = [22,17,13];          /* --certs-bg → --ink */
-      var mix = c0.map(function(v,i){ return Math.round(v + (c1[i]-v)*bp); });
-      pin.style.backgroundColor = 'rgb(' + mix.join(',') + ')';
-      /* ugyanez a sötétedés CSS-ből is elérhető: a hangulatfény és a keret
-         körüli fénycsóvák CSAK a sötét fázisban látszanak, világos háttéren
-         semmi értelmük nem lenne */
-      pin.style.setProperty('--dark', bp.toFixed(4));
+      zBg = 'rgb(' + c0.map(function(v,i){ return Math.round(v + (c1[i]-v)*zBp); }).join(',') + ')';
 
-      /* A szekció UTOLSÓ ötödében a hangulatfény és a keret zöld
-         kisugárzása kifut nullára. Enélkül a szekció alja zöldesre színeződik,
-         az utána következő blob viszont tiszta --ink-kel van kitöltve — a
-         kettő nem tudna egybeolvadni, látszana a határ.
-         A kinövés a görgetés 78%-ánál már kész (lásd zp), tehát ez a fázis
-         nem vesz el semmit a hatásból. */
-      pin.style.setProperty('--exit', clamp((p - 0.80) / 0.20, 0, 1).toFixed(4));
+      /* A szekció UTOLSÓ ötödében a hangulatfény és a keret zöld kisugárzása
+         kifut nullára, hogy a határon tiszta --ink találkozzon a lenti blobbal. */
+      zExit = clamp((p - 0.80) / 0.20, 0, 1);
     }
-    SCROLL.add(layout);
+
+    /* ÍRÁS — csak stílus, elrendezést nem olvas. */
+    function zooWrite(){
+      pin.style.setProperty('--zp', zZp.toFixed(4));
+      media.style.width  = zW.toFixed(1) + 'px';
+      media.style.height = zH.toFixed(1) + 'px';
+      media.style.left   = zL.toFixed(1) + 'px';
+      media.style.top    = zT.toFixed(1) + 'px';
+      media.style.borderRadius = (50 - 46*zZp).toFixed(2) + '%';   /* kör → lekerekített téglalap */
+      pin.style.backgroundColor = zBg;
+      pin.style.setProperty('--dark', zBp.toFixed(4));
+      pin.style.setProperty('--exit', zExit.toFixed(4));
+    }
+    SCROLL.add(zooRead, zooWrite);
   })();
 
   /* ============ 5c. IDŐVONAL ============ */
@@ -3514,35 +3529,36 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     line.style.strokeDasharray  = len + ' ' + len;
     line.style.strokeDashoffset = len;
 
-    function paint(){
-      raf = false;
-      if(window.innerWidth < 900) return;
+    var tOff=0, tX=0, tY=0, tMk=0, tRot=0, tAktiv=false;
+
+    /* MÉRÉS — csak olvas. */
+    function tlRead(){
+      tAktiv = window.innerWidth >= 900;
+      if(!tAktiv) return;
       var r  = track.getBoundingClientRect();
-      /* pageVH() és NEM window.innerHeight: iPhone-on felfelé görgetve
-         visszajön az alsó eszköztár, amitől az innerHeight egy pillanat alatt
-         ~60-90px-et esik. Élő értékkel a lenti haladás (p) ugyanennyit
-         ugrana egyetlen képkocka alatt — ez volt a rándulás. A pageVH()
-         rögzített, csak szélesség-változáskor frissül. */
+      /* pageVH() és NEM window.innerHeight: iPhone-on az alsó eszköztár
+         ki-be úszása egy képkocka alatt megugrasztaná a haladást. */
       var vh = pageVH();
-
       /* 0 → 1: amíg a sáv teteje a képernyő közepéhez ér, és az alja is átfut */
-      var p = (vh * 0.62 - r.top) / (r.height);
-      p = Math.min(1, Math.max(0, p));
-
-      line.style.strokeDashoffset = (len * (1 - p)).toFixed(1);
-
-      /* a jelölő az útvonal aktuális pontjára ül */
+      var p = Math.min(1, Math.max(0, (vh * 0.62 - r.top) / r.height));
+      tOff = len * (1 - p);
       var pt = pointOn(pts, p);
-      var sx = r.width  / VB_W;
-      var sy = r.height / VB_H;
-      marker.style.left = (pt.x * sx).toFixed(1) + 'px';
-      marker.style.top  = (pt.y * sy).toFixed(1) + 'px';
-      marker.style.setProperty('--mk', (p > 0.004 && p < 0.999) ? 1 : 0);
-
-      /* enyhe pörgés az út mentén */
-      marker.style.transform = 'rotate(' + (p * 300).toFixed(1) + 'deg)';
+      tX  = pt.x * (r.width  / VB_W);
+      tY  = pt.y * (r.height / VB_H);
+      tMk = (p > 0.004 && p < 0.999) ? 1 : 0;
+      tRot = p * 300;
     }
-    SCROLL.add(paint);
+
+    /* ÍRÁS — csak stílus. */
+    function tlWrite(){
+      if(!tAktiv) return;
+      line.style.strokeDashoffset = tOff.toFixed(1);
+      marker.style.left = tX.toFixed(1) + 'px';
+      marker.style.top  = tY.toFixed(1) + 'px';
+      marker.style.setProperty('--mk', tMk);
+      marker.style.transform = 'rotate(' + tRot.toFixed(1) + 'deg)';   /* enyhe pörgés az út mentén */
+    }
+    SCROLL.add(tlRead, tlWrite);
 
     /* az állomások — és a szórt fotó-matricák — egyenként úsznak be */
     var items = track.querySelectorAll('.tl__item, .tl__pola');
@@ -3609,28 +3625,35 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       mLine.style.strokeDashoffset = mLen;
       mPts = samplePath(mLine, 240);
       mBuilt = true;
-      mPaint();
+      mRead(); mWrite();   /* az újraépítés után azonnal a helyes állapot */
     }
 
-    function mPaint(){
-      mRaf = false;
-      if(!mBuilt || window.innerWidth >= 900) return;
+    var mOff=0, mX=0, mY=0, mMk=0, mRot=0, mAktiv=false;
+
+    /* MÉRÉS — csak olvas. */
+    function mRead(){
+      mAktiv = mBuilt && window.innerWidth < 900 && !!mPts;
+      if(!mAktiv) return;
       var r  = mTrack.getBoundingClientRect();
-      /* lásd fent: rögzített magasság, hogy az eszköztár ki-be úszása ne
-         ugrassa meg a haladást. Ez a MOBIL ág, tehát itt a legfontosabb. */
-      var vh = pageVH();
-      var p = (vh * 0.7 - r.top) / r.height;
-      p = Math.min(1, Math.max(0, p));
-
-      mLine.style.strokeDashoffset = (mLen * (1 - p)).toFixed(1);
-
+      var vh = pageVH();   /* rögzített: az eszköztár ne ugrassa meg a haladást */
+      var p = Math.min(1, Math.max(0, (vh * 0.7 - r.top) / r.height));
+      mOff = mLen * (1 - p);
       var pt = pointOn(mPts, p);
-      mMarker.style.left = pt.x.toFixed(1) + 'px';
-      mMarker.style.top  = pt.y.toFixed(1) + 'px';
-      mMarker.style.setProperty('--mk', (p > 0.01 && p < 0.995) ? 1 : 0);
-      mMarker.style.transform = 'rotate(' + (p * 300).toFixed(1) + 'deg)';
+      mX = pt.x; mY = pt.y;
+      mMk = (p > 0.01 && p < 0.995) ? 1 : 0;
+      mRot = p * 300;
     }
-    SCROLL.add(mPaint);
+
+    /* ÍRÁS — csak stílus. */
+    function mWrite(){
+      if(!mAktiv) return;
+      mLine.style.strokeDashoffset = mOff.toFixed(1);
+      mMarker.style.left = mX.toFixed(1) + 'px';
+      mMarker.style.top  = mY.toFixed(1) + 'px';
+      mMarker.style.setProperty('--mk', mMk);
+      mMarker.style.transform = 'rotate(' + mRot.toFixed(1) + 'deg)';
+    }
+    SCROLL.add(mRead, mWrite);
 
     /* Csak szélességre: a build() újragenerálja az SVG-útvonalat és újra
        mintavételez 240 pontot — ezt nem szabad minden címsáv-mozgásra lefuttatni. */
@@ -3774,6 +3797,83 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   }
 }
 </script>
+<!-- ============================================================
+     TELJESÍTMÉNY-MÉRŐ — CSAK ?debug=1 esetén fut le.
+     Normál látogatónál egyetlen sor sem hajtódik végre belőle.
+     Azért kellett, mert a fejlesztői környezetben a fül rejtett állapotban
+     fut, ott a requestAnimationFrame el sem indul — futásidejű
+     teljesítményt ott elvileg sem lehet mérni. Ez a mérő a VALÓDI
+     készüléken gyűjt adatot: hol esnek a képkockák, és mikor mozdul a
+     böngésző eszköztára.
+     ============================================================ -->
+<script>
+(function(){
+  if(!/[?&]debug=1/.test(location.search)) return;
+
+  var doboz = document.createElement('div');
+  doboz.style.cssText = 'position:fixed;left:6px;top:6px;z-index:99999;'
+    + 'font:11px/1.4 ui-monospace,Menlo,Consolas,monospace;'
+    + 'background:rgba(0,0,0,.85);color:#7CFF9B;padding:7px 9px;'
+    + 'border-radius:7px;white-space:pre;pointer-events:none;max-width:94vw';
+  document.body.appendChild(doboz);
+
+  var szekciok = [].slice.call(document.querySelectorAll('section[id], header[id]'));
+  function holVagyunk(){
+    var kozep = window.innerHeight / 2;
+    for(var i=0;i<szekciok.length;i++){
+      var r = szekciok[i].getBoundingClientRect();
+      if(r.top <= kozep && r.bottom >= kozep) return szekciok[i].id;
+    }
+    return '?';
+  }
+
+  var esettPerSzekcio = {};      /* szekció -> hány képkocka csúszott meg ott */
+  var esettOsszes = 0, kepkocka = 0, fps = 0;
+  var utolsoKiiras = performance.now(), elozo = performance.now();
+  var magassag = window.innerHeight, magassagValtozas = 0;
+
+  function tick(t){
+    var dt = t - elozo; elozo = t;
+    kepkocka++;
+    /* 32ms fölött már két képkockányi csúszás — ezt látja a szem akadásnak */
+    if(dt > 32 && dt < 2000){
+      esettOsszes++;
+      var hol = holVagyunk();
+      esettPerSzekcio[hol] = (esettPerSzekcio[hol] || 0) + 1;
+    }
+    if(t - utolsoKiiras >= 500){
+      fps = Math.round(kepkocka * 1000 / (t - utolsoKiiras));
+      kepkocka = 0; utolsoKiiras = t;
+      kiir();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* sortörés String.fromCharCode-dal, hogy a forrásban ne kelljen escape-elni */
+  var NL = String.fromCharCode(10);
+
+  function kiir(){
+    var lista = Object.keys(esettPerSzekcio)
+      .sort(function(a,b){ return esettPerSzekcio[b] - esettPerSzekcio[a]; })
+      .slice(0,5)
+      .map(function(k){ return '  ' + k + ': ' + esettPerSzekcio[k]; })
+      .join(NL);
+    doboz.textContent =
+      'FPS: ' + fps + '   esett kepkocka: ' + esettOsszes + NL
+      + 'magassag: ' + window.innerHeight + '  (valtozott ' + magassagValtozas + 'x)' + NL
+      + 'itt vagy: ' + holVagyunk() + NL
+      + (lista ? 'legtobb akadas:' + NL + lista : 'nincs akadas');
+  }
+
+  window.addEventListener('resize', function(){
+    if(window.innerHeight !== magassag){ magassag = window.innerHeight; magassagValtozas++; }
+  });
+
+  requestAnimationFrame(tick);
+  kiir();
+})();
+</script>
+
 <script src="assets/eumap-bg.js"></script>
 <script type="module" src="assets/eumap-scene.js"></script>
 </body>
