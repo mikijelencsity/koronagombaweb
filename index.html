@@ -2738,6 +2738,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* Csak akkor hívjuk vissza, ha a SZÉLESSÉG változott.
+     Telefonon a címsáv mozgása magasság-változást szül (és FELFELÉ görgetve
+     újra meg újra visszaúszik), ami az elrendezést nem érinti — a
+     szélességhez kötött újraszámolásokat viszont fölöslegesen elindítaná,
+     pont a legrosszabb pillanatban. */
+  function onWidthResize(fn, delay){
+    var w = window.innerWidth, t;
+    window.addEventListener('resize', function(){
+      if(window.innerWidth === w) return;
+      w = window.innerWidth;
+      if(delay){ clearTimeout(t); t = setTimeout(fn, delay); } else { fn(); }
+    });
+  }
+
   /* ============ KÖZÖS GÖRGETÉS-ÜTEMEZŐ ============
      Korábban öt külön scroll-figyelő futott, mindegyik SAJÁT rAF-fal. Egy
      képkockán belül így akár négy-öt callback is lefutott, és mindegyik
@@ -2752,7 +2766,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     }
     function tick(){ if(!queued){ queued = true; requestAnimationFrame(run); } }
     window.addEventListener('scroll', tick, { passive:true });
-    window.addEventListener('resize', tick);
+
+    /* A modulok a pageVH()-val számolnak, ami szándékosan csak
+       szélesség-változáskor frissül — a címsáv magasság-ingadozása tehát a
+       matematikájukat nem érinti, fölösleges rájuk futni. */
+    onWidthResize(tick);
     return { add:function(fn){ fns.push(fn); fn(); }, tick:tick };
   })();
 
@@ -3293,7 +3311,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     if(e.key === 'ArrowRight') move(1, 1);
     if(e.key === 'ArrowLeft')  move(-1, 1);
   });
-  window.addEventListener('resize', function(){ centerOn(track.children[1], false); });
+  /* Csak szélességre: enélkül telefonon minden címsáv-mozgás VISSZAUGRASZTOTTA
+     a karusszelt az első termékre — nem csak lassított, látható hiba is volt. */
+  onWidthResize(function(){ centerOn(track.children[1], false); });
 
   centerOn(track.children[1], false);
   paint();
@@ -3605,11 +3625,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     }
     SCROLL.add(mPaint);
 
-    var resizeTimer;
-    window.addEventListener('resize', function(){
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(build, 150);
-    });
+    /* Csak szélességre: a build() újragenerálja az SVG-útvonalat és újra
+       mintavételez 240 pontot — ezt nem szabad minden címsáv-mozgásra lefuttatni. */
+    onWidthResize(build, 150);
     window.addEventListener('load', build);
     build();
   })();
@@ -3650,7 +3668,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     prev.addEventListener('click', function(){ index -= 1; render(); });
     next.addEventListener('click', function(){ index += 1; render(); });
-    window.addEventListener('resize', render);
+    onWidthResize(render);
     render();
   })();
 
