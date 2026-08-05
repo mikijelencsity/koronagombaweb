@@ -943,8 +943,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    5. KOR(O)NA GOMBA — görgetésre kinövő videó a betű helyén
    ============================================================ */
 .zoo{ position:relative; height:330vh; background:var(--ink); }
-.zoo__pin{ position:sticky; top:0; height:100vh; height:100lvh; overflow:visible; background:var(--certs-bg);
-  display:grid; place-items:center; }
+.zoo__pin{ position:sticky; top:0; height:100vh; height:100lvh; background:var(--certs-bg);
+  display:grid; place-items:center;
+  /* Csak VÍZSZINTESEN vágunk (függőlegesen marad látható, hogy a kinyíló
+     videó és a kéz ne csorbuljon). A pin teljes szélességű, tehát pontosan
+     a képernyő szélén vág — ott, ahol a böngésző amúgy is: a látvány
+     változatlan, viszont a mondat szétlökött darabjai nem tudják
+     vízszintesen kitolni az oldalt (a body-n szándékosan nincs overflow-x).
+     A sticky-t ez nem töri: csak a SZÜLŐK nem-visible overflow-ja állítaná
+     le, magán a sticky elemen a clip rendben van. */
+  overflow-x:clip; overflow-y:visible; }
 
 .zoo__sent{ position:relative; z-index:3; display:flex; align-items:center; justify-content:center;
   gap:.05em; flex-wrap:nowrap; padding:0 3vw;
@@ -955,6 +963,23 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   text-shadow:0 .06em 0 var(--ink-a16);
   opacity:calc(1 - var(--zp,0) * 1.6); }
 .zoo__slot{ position:relative; display:inline-block; width:.78em; height:.78em; vertical-align:middle; }
+
+/* SZÉTLÖKÉS — a videó nem légüres térben nő: ahogy tágul, ellöki a mondatot.
+   A "KOR" balra, a "NA" és a "GOMBA" jobbra csúszik ki a képből, mintha a
+   kinyíló kép fizikailag tolná őket félre. Enélkül egy doboz nőtt a képernyő
+   közepén, miközben a jelenet többi eleme tétlenül nézte — így viszont a
+   növekedésnek oka és iránya lesz.
+
+   A .zoo__slot (a 2. gyerek) SZÁNDÉKOSAN nem mozdul: a JS layout() ebből
+   olvassa ki, hova pozicionálja a videót. Ha eltolnánk, elmászna a nyitás
+   kiindulópontja — a videó nem a betű helyéről indulna.
+
+   A tempó 1.6x, mert a mondat opacitása is ezzel a szorzóval fogy el
+   (lásd .zoo__sent lentebb) — így a TELJES szétlökés még látható, mielőtt a
+   szöveg eltűnik. min()-nel megállítjuk 1-en, hogy utána ne csússzon tovább. */
+.zoo__sent > span:nth-child(1){ translate:calc(min(var(--zp,0) * 1.6, 1) * -.85em) 0; }
+.zoo__sent > span:nth-child(3),
+.zoo__sent > span:nth-child(5){ translate:calc(min(var(--zp,0) * 1.6, 1) * .85em) 0; }
 /* mobilon a "KORONA" / "GOMBA" 2 sorba törik, hogy ne csússzon ki —
    ez a kényszerített törőpont közöttük (deskopon rejtve, egysoros marad) */
 .zoo__break{ display:none; }
@@ -1677,13 +1702,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .zoo__sent{ flex-wrap:wrap; font-size:clamp(2.6rem,16vw,6rem); row-gap:.02em;
     margin-top:8vh; }
   .zoo__break{ display:block; flex-basis:100%; height:0; }
+  /* itt a "GOMBA" már a MÁSODIK sorban áll, egyedül középen — nincs mit
+     ellökni tőle, oldalra tolva csak félrecsúszna. Csak a felső sor
+     ("KOR" / "NA") reagál a videóra. */
+  .zoo__sent > span:nth-child(5){ translate:none; }
   /* a kéz+fazék nagyobb (a hely jó marad) — a szöveg margin-top-ja
      (feljebb) ad hozzá elég teret, hogy ne érjenek egymásba */
   .zoo__hand{ top:-4%; width:clamp(300px,38vw,480px); left:clamp(-165px,-11vw,-60px); }
-  /* a mondat egy sorban maradt volna és keskeny kijelzőn pár px-el túlért —
-     ez adta az egész oldal vízszintes „kicsúszását". Csak vízszintesen
-     vágjuk (a függőleges zoom-média/kéz marad); a sticky-t ez nem töri. */
-  .zoo__pin{ overflow-x:clip; }
+  /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
+     szélességen kell, a szétlökött mondat miatt) */
   .stage{ height:210vh; }
 
   .s3,.s4,.r3,.r4{ display:none; }
