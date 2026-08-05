@@ -1921,8 +1921,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      ("KOR" / "NA") reagál a videóra. */
   .zoo__sent > span:nth-child(5){ translate:none; }
   /* a kéz+fazék nagyobb (a hely jó marad) — a szöveg margin-top-ja
-     (feljebb) ad hozzá elég teret, hogy ne érjenek egymásba */
-  .zoo__hand{ top:-4%; width:clamp(300px,38vw,480px); left:clamp(-165px,-11vw,-60px); }
+     (feljebb) ad hozzá elég teret, hogy ne érjenek egymásba.
+     A telefonos belógás viszont itt már túlzott: a kéz a felirat alá/ki a
+     képernyőből nyomul, ezért itt "kötjük be" a kéz szélét a viewporthez,
+     hogy a kompozíció ne lógjon ki a telefon képernyőjéről. */
+  .zoo__hand{ top:-2%; width:clamp(260px,34vw,420px); left:clamp(-40px,-3vw,0px);
+    translate:0 0; }
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
   .stage{ height:210vh; }
@@ -2826,6 +2830,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      elcsúszott a tényleges elrendezéstől, ráadásul a címsáv mozgásakor
      változott is. Egy próbaelemmel megmérjük a VALÓDI lvh-t, és azzal
      számolunk; ahol a böngésző nem ismeri az lvh-t, marad az innerHeight. */
+  /* FIGYELEM: itt korábban a visualViewport.height állt legelöl. Az NEM az
+     lvh, hanem a PILLANATNYI (kis) nézetmagasság — iPhone-on minden egyes
+     görgetéskor változik, ahogy a címsáv és az alsó eszköztár be-/kiúszik.
+     Vagyis a "stabil" magasság valójában képkockánként ugrált, és vele
+     ugrált a videó mérete/pozíciója is. Csak a próbaelem 100lvh-ját mérjük. */
   var vhProbe = null;
   function measureLVH(){
     if(!vhProbe && document.body){
@@ -2839,16 +2848,19 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   }
   var stableVH = measureLVH();
   var stableVW = window.innerWidth;
-  function pageVH(){
-    if(window.innerWidth !== stableVW){
-      stableVW = window.innerWidth;
-      stableVH = measureLVH();
-    }
-    return stableVH;
+  /* Görgetés közben SOHA nem mérünk újra: a pageVH() egy gyorsítótárazott
+     szám. A heightChanged-ág (bármi >8px eltérés újramérést hozott) épp a
+     címsáv mozgására sült el, tehát pont azt engedte át, ami ellen készült. */
+  function pageVH(){ return stableVH; }
+  function refreshVH(){
+    if(window.innerWidth === stableVW) return;   /* csak valódi elrendezés-váltás */
+    stableVW = window.innerWidth;
+    stableVH = measureLVH();
   }
   window.addEventListener('orientationchange', function(){
-    setTimeout(function(){ stableVW = window.innerWidth; stableVH = measureLVH(); }, 200);
+    setTimeout(function(){ stableVW = window.innerWidth; stableVH = measureLVH(); SCROLL.tick(); }, 200);
   });
+  window.addEventListener('resize', refreshVH, { passive:true });
 
   /* ============ SIMA GÖRGETÉS — VISSZAÁLLÍTVA ============
      Egy körben kivettem, mert gyanús volt az ugrálásra. TÉVEDÉS volt: ez a
@@ -3464,7 +3476,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     function zooRead(){
       var vh = pageVH();
       var pr = pin.getBoundingClientRect();
-      var total = sec.offsetHeight - vh;
+      var total = Math.max(1, sec.offsetHeight - vh);
       var p  = clamp(-sec.getBoundingClientRect().top / total, 0, 1);
       zZp = smooth(clamp(p / 0.78, 0, 1));   /* a görgetés 78%-áig tart a kinövés */
 
@@ -3475,11 +3487,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       var cy0 = sr.top  - pr.top  + sr.height/2;
 
       /* végállapot: teljes szélesség, 16:9-ben — de ha ez magasabb lenne,
-         mint a viewport, zsugorítjuk, hogy sose vágódjon le az alja */
-      var w1 = pr.width * 0.94;
+         mint a viewport, zsugorítjuk, hogy sose vágódjon le az alja.
+         A vh itt a rögzített 100lvh — görgetés közben nem változik, tehát a
+         videó doboza sem méreteződik újra a címsáv mozgására. */
+      var w1 = pr.width * (window.innerWidth <= 900 ? 0.86 : 0.94);
       var h1 = w1 / RATIO;
       if(h1 > vh * 0.94){ var shrink = (vh*0.94) / h1; w1 *= shrink; h1 = vh*0.94; }
-      var cx1 = pr.width/2, cy1 = vh/2;
+      var cx1 = pr.width/2, cy1 = vh * 0.5;
 
       zW = s0 + (w1 - s0) * zZp;
       zH = s0 + (h1 - s0) * zZp;

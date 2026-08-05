@@ -807,12 +807,43 @@ async function init() {
     v: 1, duration: 2.4, ease: 'power2.out', paused: true, onUpdate: applyReveal,
   });
 
+  /* ===== iOS: A CÍMSÁV/ESZKÖZTÁR NE INDÍTSON REFRESH-T =====
+     Ez volt a telefonon tapasztalt ugrálás valódi oka. Lentebb egy
+     ScrollTrigger fut `pin: true`-val. A pin úgy működik, hogy a plugin egy
+     "pin-spacer" elemet szúr a DOM-ba, és a szekciót fixed/relative közt
+     váltogatja — vagyis VALÓDI elrendezés-módosítás.
+     A ScrollTrigger minden `resize` eseményre teljes refresh()-t futtat:
+     kiszedi és visszateszi a pineket, és újraszámolja a start/end értékeket.
+     Az `end: '+=185%'` a nézetmagasság százaléka, tehát refreshkor MÁS lesz
+     → változik a pin-spacer magassága → változik a teljes dokumentumhossz →
+     az oldal láthatóan megrándul.
+     iPhone-on pont FELFELÉ görgetve úszik be a címsáv és az alsó eszköztár,
+     ilyenkor a Safari resize-t lő — ezért jelentkezett a hiba főleg felfelé.
+     Az ignoreMobileResize pontosan erre való: érintőeszközön a CSAK MAGASSÁG
+     változásából eredő resize-t figyelmen kívül hagyja. Elfordításnál
+     (orientationchange) és valódi szélesség-váltásnál továbbra is frissül.
+     SZÁNDÉKOSAN ITT ÁLL, nem a fájl tetején: a GSAP ezt a kapcsolót csak
+     akkor veszi figyelembe, ha a ScrollTrigger.isTouch már meg van
+     állapítva — a modul tetején, közvetlenül a registerPlugin után az még
+     nem biztos, és a beállítás csendben elveszne. */
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
     /* hosszabb sáv: a mozgás 62%-nál véget ér, a maradék a tartás */
     end: '+=185%',
     pin: true,
+    /* iOS: a pin alapból `position: fixed`-del dolgozik. A fixed elemeket a
+       Safari a LÁTHATÓ nézetablakhoz igazítja, és a címsáv be-/kiúszásának
+       animációja alatt ezt késve, a compositoron kívül teszi meg — a pinelt
+       szekció ilyenkor láthatóan megrándul. A 'transform' változat nem
+       fixed-et használ, hanem eltolja az elemet: végig a fő elrendezésben
+       marad, így a címsáv mozgása nem tudja megugrasztani. */
+    pinType: ScrollTrigger.isTouch === 1 ? 'transform' : 'fixed',
+    /* érintőeszközön a görgetés aszinkron (a fő szál késve értesül róla),
+       ezért a pin becsatolása egy hajszállal korábban induljon */
+    anticipatePin: ScrollTrigger.isTouch === 1 ? 1 : 0,
     scrub: 1.1,
     onUpdate: (self) => applyScroll(self.progress),
   });

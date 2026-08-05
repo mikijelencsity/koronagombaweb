@@ -117,7 +117,16 @@
   }
 
   var t = null;
-  function schedule() { clearTimeout(t); t = setTimeout(draw, 140); }
+  /* Csak SZÉLESSÉG-változásra rajzolunk újra. A draw() ~50 ms a fő szálon;
+     iPhone-on a címsáv be-/kiúszása is resize-t lő, és a host magassága ilyenkor
+     változhat — enélkül felfelé görgetve ismételten újrarajzolt volna, ami
+     ott akasztja meg a görgetést, ahol a legjobban látszik. */
+  var lastResizeW = window.innerWidth;
+  function schedule() {
+    if (window.innerWidth === lastResizeW) return;
+    lastResizeW = window.innerWidth;
+    clearTimeout(t); t = setTimeout(draw, 140);
+  }
 
   /* a rajzolás ~50 ms a fő szálon, a szekció pedig jóval a hajtás alatt van —
      ezért tétlen időben (vagy késleltetve) fut, hogy ne akassza a betöltést */
