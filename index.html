@@ -968,6 +968,23 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   opacity:calc(1 - var(--zp,0) * 1.6); }
 .zoo__slot{ position:relative; display:inline-block; width:.78em; height:.78em; vertical-align:middle; }
 
+/* HANGULATFÉNY — a háttér a görgetés 45%-ától vált sötétre (lásd JS: bp),
+   és onnantól eddig egy teljesen üres fekete mező vette körbe a videót.
+   Ez a réteg tölti meg: a képernyő fénye kiszűrődik a sötét térbe, plusz
+   két halvány, lassan sodródó színfolt ad neki mélységet.
+   Az opacitás a JS-től kapott --dark, tehát pontosan a sötétedéssel együtt
+   úszik be — világos háttéren nem is látszik. */
+.zoo__glow{ position:absolute; inset:0; z-index:1; pointer-events:none;
+  opacity:var(--dark,0);
+  background:
+    radial-gradient(64% 52% at 50% 50%, rgba(61,163,93,.46) 0%, rgba(61,163,93,0) 74%),
+    radial-gradient(40% 36% at 14% 78%, rgba(217,226,78,.26) 0%, transparent 72%),
+    radial-gradient(36% 32% at 88% 20%, rgba(240,185,60,.24) 0%, transparent 72%);
+  animation: glow-drift 15s ease-in-out infinite; }
+@keyframes glow-drift{
+  0%,100%{ background-position:0 0, 0 0, 0 0; }
+  50%    { background-position:0 0, 3% -4%, -3% 4%; } }
+
 /* SZÉTLÖKÉS — a videó nem légüres térben nő: ahogy tágul, ellöki a mondatot.
    A "KOR" balra, a "NA" és a "GOMBA" jobbra csúszik ki a képből, mintha a
    kinyíló kép fizikailag tolná őket félre. Enélkül egy doboz nőtt a képernyő
@@ -996,7 +1013,11 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      A --zp-t (0 = zárt betű-kör, 1 = teljes 16:9) a JS írja a .zoo__pin-re;
      az alábbi rétegek MIND ezt olvassák, ezért nem kellett új JS. */
   box-shadow:0 calc(18px + 46px * var(--zp,0)) calc(40px + 90px * var(--zp,0))
-             calc(-20px - 20px * var(--zp,0)) rgba(0,0,0,calc(.35 + .3 * var(--zp,0)));
+             calc(-20px - 20px * var(--zp,0)) rgba(0,0,0,calc(.35 + .3 * var(--zp,0))),
+             /* FÉNYKISZŰRŐDÉS: a sötét fázisban a képernyő besugározza maga
+                körül a teret, mint egy monitor egy sötét szobában. --dark-hoz
+                kötve, tehát világos háttéren nincs is jelen. */
+             0 0 calc(70px + 130px * var(--dark,0)) rgba(104,214,146,calc(.30 * var(--dark,0)));
   /* A KERET A NÉZŐRE FORDUL: megdöntve, perspektívában indul, és ahogy
      nyílik, kiegyenesedik — mintha egy lap fordulna szembe a nézővel.
      Az oldalon semmi más nem használ térbeli mélységet, ezért ez ad neki
@@ -1013,6 +1034,30 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .zoo__media video{ width:100%; height:100%; object-fit:cover; display:block;
   transform:scale(calc(1.22 - .22 * var(--zp,0))); transform-origin:50% 50%;
   filter:saturate(calc(.72 + .28 * var(--zp,0))) contrast(calc(1.14 - .14 * var(--zp,0))); }
+
+/* KÉT FÉNYCSÓVA A KERETEN — egy meleg és egy zöldes fénypont fut körbe a
+   keret peremén, egymással szemben (180 fokra).
+   A @property nélkül a kúpgradiens szöge nem animálható: regisztrálás nélkül
+   a böngésző szöveges értéknek veszi a --beam-et, és nem interpolál. Ahol
+   nincs @property támogatás, a gyűrű állva marad — a látvány szegényebb, de
+   nem törik el semmi.
+   A gyűrűt a kétrétegű maszk vágja ki: az egyik a teljes dobozt fedi, a
+   másik csak a belsejét, a kivonás pedig a 2.5px-es peremet hagyja meg.
+   A border-radius:inherit miatt követi a JS-től kapott lekerekítést, tehát
+   a körből téglalappá alakulás közben is pontosan a peremen fut. */
+@property --beam{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
+.zoo__media::before{ content:''; position:absolute; inset:0; z-index:3;
+  pointer-events:none; box-sizing:border-box; border-radius:inherit; padding:2.5px;
+  background:conic-gradient(from var(--beam),
+    rgba(255,255,255,0) 0deg, rgba(255,244,220,.95) 13deg, rgba(255,255,255,0) 32deg,
+    rgba(255,255,255,0) 180deg, rgba(150,238,182,.9) 193deg, rgba(255,255,255,0) 212deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite:exclude;
+  animation:beam-run 5s linear infinite;
+  opacity:var(--dark,0); }
+@keyframes beam-run{ to{ --beam:360deg; } }
 
 /* VIGNETTA — nyitás elején erős, a végére alig: a szélek felé sötétít,
    így a kép közepe emelkedik ki. */
@@ -1885,6 +1930,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     transform:none !important; opacity:calc(1 - var(--zp,0) * 2.6) !important; }
   /* a térbeli dőlés és a kamera-sodródás mozgás-alapú — síkban marad */
   .zoo__media{ transform:none !important; }
+  /* a körbefutó fénycsóvák és a sodródó hangulatfény is mozgás */
+  .zoo__media::before{ animation:none !important; }
+  .zoo__glow{ animation:none !important; }
   .zoo__hand, .zoo-shroom, .deco-sticker, .zoo-logo{
     translate:none !important; scale:none !important;
     /* mivel a kitolás itt ki van kapcsolva, a dekornak halványodással kell
@@ -2202,6 +2250,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 <!-- ============ 5. KOR(O)NA GOMBA — kinövő videó ============ -->
 <section class="zoo" id="video" data-zoo>
   <div class="zoo__pin">
+
+    <!-- hangulatfény a sötét fázisra: a videó „kisugárzása" a sötét térbe -->
+    <div class="zoo__glow" aria-hidden="true"></div>
 
     <div class="zoo__sent" aria-label="Korona Gomba">
       <span aria-hidden="true">KOR</span>
@@ -3217,6 +3268,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       var c0 = [240,233,218], c1 = [22,17,13];          /* --certs-bg → --ink */
       var mix = c0.map(function(v,i){ return Math.round(v + (c1[i]-v)*bp); });
       pin.style.backgroundColor = 'rgb(' + mix.join(',') + ')';
+      /* ugyanez a sötétedés CSS-ből is elérhető: a hangulatfény és a keret
+         körüli fénycsóvák CSAK a sötét fázisban látszanak, világos háttéren
+         semmi értelmük nem lenne */
+      pin.style.setProperty('--dark', bp.toFixed(4));
     }
     function onS(){ if(!raf){ raf = true; requestAnimationFrame(layout); } }
     window.addEventListener('scroll', onS, { passive:true });
