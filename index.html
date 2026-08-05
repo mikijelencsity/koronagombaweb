@@ -1123,7 +1123,17 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* ============================================================
    5b. RÓLUNK → ÉLETKÉPEK GALÉRIA
    ============================================================ */
-.abt{ position:relative; background:var(--cream); color:var(--ink); overflow:hidden;
+.abt{ position:relative; color:var(--ink); overflow:hidden;
+  /* HAJSZÁLCSÍK ELLEN: a szekcióhatár nem egész pixelen ül (mérve .125px), és
+     az overflow:hidden levágja a blob 1px-es rálógását — a részpixeles
+     élsimítás így átengedte alóla a krémet, ami vékony világos csíkként
+     látszott. 80%-os böngésző-nagyításon (amire az oldal készült) a törtpixel
+     még gyakoribb. Ezért a szekció legfelső 8px-e tömör --ink: ha bármi
+     átszűrődik a blob éle alatt, az is fekete, nem krém. A blob 169px magas,
+     tehát ez a sáv sosem látszik önmagában. */
+  background-color:var(--cream);
+  background-image:linear-gradient(var(--ink), var(--ink));
+  background-repeat:no-repeat; background-size:100% 8px; background-position:0 0;
   /* a felső padding nagyobb lett a blob magasságánál (.abt__wave), különben
      a hullám belelógott volna az "Életképek" címbe */
   padding:clamp(150px,17vw,250px) 0 clamp(190px,22vw,300px); }
