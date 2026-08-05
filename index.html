@@ -1003,7 +1003,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     radial-gradient(64% 52% at 50% 50%, rgba(61,163,93,.46) 0%, rgba(61,163,93,0) 74%),
     radial-gradient(40% 36% at 14% 78%, rgba(217,226,78,.26) 0%, transparent 72%),
     radial-gradient(36% 32% at 88% 20%, rgba(240,185,60,.24) 0%, transparent 72%);
-  animation: glow-drift 15s ease-in-out infinite; }
+  animation: glow-drift 15s ease-in-out infinite paused; }
+.zoo__pin.is-in .zoo__glow{ animation-play-state:running; }
 @keyframes glow-drift{
   0%,100%{ background-position:0 0, 0 0, 0 0; }
   50%    { background-position:0 0, 3% -4%, -3% 4%; } }
@@ -1030,7 +1031,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
 /* a média a pinhez képest abszolút — így a mondat nem tördelődik újra */
 .zoo__media{ position:absolute; z-index:4; overflow:hidden; background:var(--ink);
-  will-change:left,top,width,height;
+  /* NINCS will-change: a left/top/width/height LAYOUT tulajdonságok, azokra a
+     will-change nem gyorsít semmit — viszont feleslegesen fenntart egy külön
+     GPU-réteget egy majdnem teljes képernyős elemre. (A menü fekete
+     négyzet-hibája is pont ebből a mintából jött annak idején.) */
   /* A keret súlya a nyílással együtt nő: záráskor még alig vet árnyékot,
      teljesen kinyílva komoly, mozis tömbként ül a sötét háttéren.
      A --zp-t (0 = zárt betű-kör, 1 = teljes 16:9) a JS írja a .zoo__pin-re;
@@ -1083,9 +1087,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   -webkit-mask-composite:xor;
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask-composite:exclude;
-  animation:beam-run 5s linear infinite;
+  /* Az animáció CSAK akkor fut, ha a szekció látható (.is-in). A forgó
+     kúpgradiens egy majdnem teljes képernyős elemet rajzol újra minden
+     képkockában — ezt nem érdemes a háttérben pörgetni. */
+  animation:beam-run 5s linear infinite paused;
   /* a csóvák is kifutnak a szekció végére, hogy a határon semmi ne világítson */
   opacity:calc(var(--dark,0) * (1 - var(--exit,0))); }
+.zoo__pin.is-in .zoo__media::before{ animation-play-state:running; }
 @keyframes beam-run{ to{ --beam:360deg; } }
 
 /* VIGNETTA — nyitás elején erős, a végére alig: a szélek felé sötétít,
@@ -2684,6 +2692,40 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ============ KÖZÖS GÖRGETÉS-ÜTEMEZŐ ============
+     Korábban öt külön scroll-figyelő futott, mindegyik SAJÁT rAF-fal. Egy
+     képkockán belül így akár négy-öt callback is lefutott, és mindegyik
+     getBoundingClientRect()-tel kezdett — vagyis képkockánként több kényszerű
+     újratördelés (layout thrashing). Innentől EGY figyelő és EGY rAF hívja
+     sorban a modulokat, tehát képkockánként egyetlen mérési kör van. */
+  var SCROLL = (function(){
+    var fns = [], queued = false;
+    function run(){
+      queued = false;
+      for(var i=0;i<fns.length;i++){ try{ fns[i](); }catch(e){} }
+    }
+    function tick(){ if(!queued){ queued = true; requestAnimationFrame(run); } }
+    window.addEventListener('scroll', tick, { passive:true });
+    window.addEventListener('resize', tick);
+    return { add:function(fn){ fns.push(fn); fn(); }, tick:tick };
+  })();
+
+  /* Az SVG getPointAtLength() minden hívásnál újraszámolja az útvonal
+     geometriáját. Képkockánként meghívva (két idővonal-jelölő) ez volt az
+     egyik legdrágább művelet az oldalon. Egyszer mintavételezzük az utat,
+     onnantól tömbből olvasunk és két szomszédos pont közt interpolálunk —
+     240 mintánál a hiba szabad szemmel nem látható. */
+  function samplePath(el, n){
+    var len = el.getTotalLength(), out = new Array(n+1);
+    for(var i=0;i<=n;i++){ var pt = el.getPointAtLength(len*i/n); out[i] = [pt.x, pt.y]; }
+    return out;
+  }
+  function pointOn(tab, t){
+    var n = tab.length - 1, f = Math.min(1, Math.max(0, t)) * n;
+    var i = f | 0, a = tab[i], b = tab[i+1] || a, k = f - i;
+    return { x: a[0] + (b[0]-a[0])*k, y: a[1] + (b[1]-a[1])*k };
+  }
+
   /* ============ KÖZÉPSŐ EGÉRGOMB (görgő-kattintás) AUTO-GÖRGETÉS TILTÁSA ============
      Ez a natív böngésző-funkció a "wheel" eseményt megkerülve, saját
      tempójában görgeti az oldalt — ez nem venné figyelembe a fenti egyedi
@@ -2712,60 +2754,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     setTimeout(function(){ stableVW = window.innerWidth; stableVH = window.innerHeight; }, 200);
   });
 
-  /* ============ SIMA GÖRGETÉS (az egész oldalra) ============
-     Nem transform-alapú, hanem a valódi görgetést lazítja — így a sticky
-     hero, a videó-zoom és az idővonal is pontosan működik tovább. */
-  (function(){
-    var fine = window.matchMedia('(pointer: fine)').matches;
-    if(reduce || !fine) return;                       /* mobilon marad a natív */
-
-    var target  = window.scrollY;
-    var current = window.scrollY;
-    var running = false;
-    var EASE    = 0.062;     /* mennyire „úszik” — kisebb = hosszabb utánfutás */
-    var STEP    = 1.15;      /* egérgörgő érzékenysége */
-
-    /* a görgetési egység böngészőnként más: pixel, sor vagy oldal */
-    function pixels(e){
-      if(e.deltaMode === 1) return e.deltaY * 40;              /* sor */
-      if(e.deltaMode === 2) return e.deltaY * window.innerHeight; /* oldal */
-      return e.deltaY;                                         /* pixel */
-    }
-
-    function maxScroll(){
-      return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    }
-    function loop(){
-      var d = target - current;
-      if(Math.abs(d) < 0.12){
-        current = target;
-        window.scrollTo(0, current);
-        running = false;
-        return;
-      }
-      current += d * EASE;
-      window.scrollTo(0, current);
-      requestAnimationFrame(loop);
-    }
-    function kick(){ if(!running){ running = true; requestAnimationFrame(loop); } }
-
-    window.addEventListener('wheel', function(e){
-      if(document.body.classList.contains('menu-open')) return;   /* nyitott menüben ne */
-      if(document.documentElement.classList.contains('is-locked')) return;
-      if(e.ctrlKey) return;                                       /* nagyítás maradjon natív */
-      e.preventDefault();
-      target = Math.min(maxScroll(), Math.max(0, target + pixels(e) * STEP));
-      kick();
-    }, { passive:false });
-
-    /* ha bárki más görget (billentyű, ugrólink, görgetősáv), szinkronizálunk.
-       Futás közben csak akkor, ha a tényleges pozíció elszaladt tőlünk. */
-    window.addEventListener('scroll', function(){
-      if(!running){ target = current = window.scrollY; }
-      else if(Math.abs(window.scrollY - current) > 90){ target = current = window.scrollY; }
-    }, { passive:true });
-    window.addEventListener('resize', function(){ target = current = window.scrollY; });
-  })();
+  /* A saját, wheel-alapú "sima görgetés" KIVÉVE.
+     Minden képkockában window.scrollTo()-t hívott, ami újabb scroll-eseményt
+     szült, az pedig meghajtotta a többi görgetés-figyelőt — vagyis a JS
+     görgetés kaszkádot indított. Ráadásul volt benne egy szinkron-ág, ami
+     90px eltérésnél ODARÁNTOTTA a pozíciót: ez volt a látható "ugrálás".
+     A natív görgetés simább és pontosabb, a preventDefault miatt ráadásul a
+     touchpad tehetetlensége is sérült. */
 
   /* ============ 0. PRELOADER ============ */
   (function(){
@@ -2828,7 +2823,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         window.scrollTo(0,0);
         html.classList.remove('is-locked');      /* görgetés felszabadítva, a sáv helye végig foglalt volt */
         window.scrollTo(0,0);
-        onScroll();                              /* a hero és a nav állapota frissüljön azonnal */
+        SCROLL.tick();                           /* a hero és a nav állapota frissüljön azonnal */
       }, 1150);
 
       setTimeout(function(){ pre.classList.add('is-gone'); }, 1700);
@@ -2979,10 +2974,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     if (nav) nav.classList.toggle('is-shown', st >= 0.9);
     ticking = false;
   }
-  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
-  window.addEventListener('scroll', onScroll, { passive:true });
-  window.addEventListener('resize', onScroll);
-  update();
+  SCROLL.add(update);
 
   /* ============ 2. NEON bekapcsolás ============ */
   var neon = document.getElementById('neon');
@@ -3366,10 +3358,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
          nem vesz el semmit a hatásból. */
       pin.style.setProperty('--exit', clamp((p - 0.80) / 0.20, 0, 1).toFixed(4));
     }
-    function onS(){ if(!raf){ raf = true; requestAnimationFrame(layout); } }
-    window.addEventListener('scroll', onS, { passive:true });
-    window.addEventListener('resize', onS);
-    layout();
+    SCROLL.add(layout);
   })();
 
   /* ============ 5c. IDŐVONAL ============ */
@@ -3382,6 +3371,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
     var VB_W = 1600, VB_H = 1200;
     var len  = line.getTotalLength();
+    var pts  = samplePath(line, 240);
     var raf  = false;
 
     /* az útvonal alapból üres, görgetésre rajzolódik ki */
@@ -3401,7 +3391,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       line.style.strokeDashoffset = (len * (1 - p)).toFixed(1);
 
       /* a jelölő az útvonal aktuális pontjára ül */
-      var pt = line.getPointAtLength(len * p);
+      var pt = pointOn(pts, p);
       var sx = r.width  / VB_W;
       var sy = r.height / VB_H;
       marker.style.left = (pt.x * sx).toFixed(1) + 'px';
@@ -3411,10 +3401,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       /* enyhe pörgés az út mentén */
       marker.style.transform = 'rotate(' + (p * 300).toFixed(1) + 'deg)';
     }
-    function onS(){ if(!raf){ raf = true; requestAnimationFrame(paint); } }
-    window.addEventListener('scroll', onS, { passive:true });
-    window.addEventListener('resize', onS);
-    paint();
+    SCROLL.add(paint);
 
     /* az állomások — és a szórt fotó-matricák — egyenként úsznak be */
     var items = track.querySelectorAll('.tl__item, .tl__pola');
@@ -3442,7 +3429,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     var mMarker = document.getElementById('tlMarkerM');
     if(!mTrack || !mList || !mSvg || !mLineBg || !mLine || !mMarker) return;
 
-    var mLen = 0, mRaf = false, mBuilt = false;
+    var mLen = 0, mRaf = false, mBuilt = false, mPts = null;
 
     function build(){
       if(window.innerWidth >= 900){ mBuilt = false; return; }
@@ -3479,6 +3466,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
       mLen = mLine.getTotalLength();
       mLine.style.strokeDasharray  = mLen + ' ' + mLen;
       mLine.style.strokeDashoffset = mLen;
+      mPts = samplePath(mLine, 240);
       mBuilt = true;
       mPaint();
     }
@@ -3493,14 +3481,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
       mLine.style.strokeDashoffset = (mLen * (1 - p)).toFixed(1);
 
-      var pt = mLine.getPointAtLength(mLen * p);
+      var pt = pointOn(mPts, p);
       mMarker.style.left = pt.x.toFixed(1) + 'px';
       mMarker.style.top  = pt.y.toFixed(1) + 'px';
       mMarker.style.setProperty('--mk', (p > 0.01 && p < 0.995) ? 1 : 0);
       mMarker.style.transform = 'rotate(' + (p * 300).toFixed(1) + 'deg)';
     }
-    function onMS(){ if(!mRaf){ mRaf = true; requestAnimationFrame(mPaint); } }
-    window.addEventListener('scroll', onMS, { passive:true });
+    SCROLL.add(mPaint);
 
     var resizeTimer;
     window.addEventListener('resize', function(){
