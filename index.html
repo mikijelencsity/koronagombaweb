@@ -915,7 +915,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    üres jobb oldalon, kivágott, átlátszó hátterű nyárs-gomba kép
    ============================================================ */
 .deco-sticker{ position:absolute; z-index:6; right:0; top:-14%; pointer-events:none;
-  opacity:calc(1 - var(--zp,0) * 2.6); }
+  opacity:1; }   /* nem halványodik: a --camera tolja ki oldalra */
 .deco-sticker img{ display:block; width:clamp(180px,16vw,300px); height:auto; transform-origin:50% 50%;
   filter:drop-shadow(0 20px 26px var(--ink-a30));
   animation: bob-deco 7.5s ease-in-out .2s infinite; }
@@ -927,13 +927,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    elhalványul, mint a többi zoo-dekor. Deskopon és mobilon is él,
    külön hangolt pozícióval/mérettel a két elrendezéshez. */
 .zoo-logo{ position:absolute; z-index:6; right:-6%; bottom:2%; pointer-events:none;
-  opacity:calc(1 - var(--zp,0) * 2.6); }
+  opacity:1; }   /* nem halványodik: a --camera tolja ki oldalra */
 .zoo-logo img{ display:block; width:clamp(220px,24vw,400px); height:auto;
   filter:drop-shadow(0 12px 20px var(--ink-a30));
   animation: bob-logo 8s ease-in-out .4s infinite; }
 @keyframes bob-logo{ 0%,100%{ transform:rotate(-9deg) translateY(0); } 50%{ transform:rotate(-3deg) translateY(-14px); } }
 .zoo-shroom{ position:absolute; z-index:6; left:-6%; bottom:1%; pointer-events:none;
-  opacity:calc(1 - var(--zp,0) * 2.6); }
+  opacity:1; }   /* nem halványodik: a --camera tolja ki oldalra */
 .zoo-shroom img{ display:block; width:clamp(220px,24vw,400px); height:auto;
   filter:drop-shadow(0 14px 22px var(--ink-a30));
   animation: bob-shroom 6.6s ease-in-out .1s infinite; }
@@ -953,11 +953,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      A sticky-t ez nem töri: csak a SZÜLŐK nem-visible overflow-ja állítaná
      le, magán a sticky elemen a clip rendben van. */
   overflow-x:clip; overflow-y:visible;
-  /* A kamera-behatolás haladása. Azért 2.6x, mert a dekor opacitása is
-     ezzel a szorzóval fogy el (opacity:calc(1 - var(--zp)*2.6)) — így a
-     teljes elsodródás még LÁTHATÓ, mielőtt a dekor eltűnik. A min() 1-en
-     megállítja, hogy utána ne sodródjon tovább a semmibe. */
-  --camera:min(var(--zp,0) * 2.6, 1); }
+  /* A kamera-behatolás haladása. 1.8x: a dekor a nyílás első ~55%-ában
+     kicsúszik a képből, tehát mire a videó nagyra nő, már kint van.
+     A min() 1-en megállítja, hogy utána ne csússzon tovább a semmibe. */
+  --camera:min(var(--zp,0) * 1.8, 1); }
 
 .zoo__sent{ position:relative; z-index:3; display:flex; align-items:center; justify-content:center;
   gap:.05em; flex-wrap:nowrap; padding:0 3vw;
@@ -1028,7 +1027,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .zoo__hand{ position:absolute; z-index:5; left:clamp(-150px,-9vw,-40px); top:8%;
   width:clamp(400px,40vw,720px); pointer-events:none;
   filter:drop-shadow(0 20px 40px var(--ink-a30));
-  opacity:calc(1 - var(--zp,0) * 2.6); }
+  opacity:1; }   /* nem halványodik: a --camera tolja ki oldalra */
 .zoo__hand img{ width:100%; height:auto; display:block;
   animation: bob-hand 7s ease-in-out .3s infinite; }
 @keyframes bob-hand{ 0%,100%{ transform:rotate(11deg) translateY(0); } 50%{ transform:rotate(17deg) translateY(-14px); } }
@@ -1058,12 +1057,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    becsúszás és a képeken futó bob-ringatás már használja. Ezek külön CSS
    tulajdonságok, tehát egymás mellett élnek, nem írják felül egymást.
 
-   vw-ben mérünk, hogy a sodródás a kijelzővel arányos maradjon — fix px-ben
-   telefonon aránytalanul nagy lenne. */
-.zoo__hand   { translate:calc(var(--camera) * -6vw)   calc(var(--camera) * -3vw);   scale:calc(1 + var(--camera) * .12); }
-.zoo-shroom  { translate:calc(var(--camera) * -5vw)   calc(var(--camera) * 2.6vw);  scale:calc(1 + var(--camera) * .10); }
-.deco-sticker{ translate:calc(var(--camera) * 6vw)    calc(var(--camera) * -3vw);   scale:calc(1 + var(--camera) * .12); }
-.zoo-logo    { translate:calc(var(--camera) * 5vw)    calc(var(--camera) * 2.6vw);  scale:calc(1 + var(--camera) * .10); }
+   A dekor NEM halványodik el: a nyíló kép fizikailag KITOLJA őket oldalra —
+   a bal oldali párost balra, a jobb oldalit jobbra, arra, amerről beúsztak.
+   A .zoo__pin overflow-x:clip-je vágja le őket a képernyő szélén.
+
+   SZÁZALÉKBAN mérünk, nem vw-ben: a % az elem SAJÁT szélességéhez mér, így
+   mindegyik biztosan kiér a képből. vw-vel ez telefonon elbukna, mert a
+   képek szélessége ott px-re van korlátozva (pl. a kéz clamp minimuma
+   400px), tehát egy vw-arányos tolás nem vinné ki őket.
+   140% (nem 125%), mert a scale 1.12-re nagyítja őket — a % viszont a
+   nagyítás ELŐTTI dobozzal számol, kell a ráhagyás. */
+.zoo__hand   { translate:calc(var(--camera) * -140%) calc(var(--camera) * -10%); scale:calc(1 + var(--camera) * .12); }
+.zoo-shroom  { translate:calc(var(--camera) * -140%) calc(var(--camera) * 8%);   scale:calc(1 + var(--camera) * .10); }
+.deco-sticker{ translate:calc(var(--camera) * 140%)  calc(var(--camera) * -10%); scale:calc(1 + var(--camera) * .12); }
+.zoo-logo    { translate:calc(var(--camera) * 140%)  calc(var(--camera) * 8%);   scale:calc(1 + var(--camera) * .10); }
 
 /* ============================================================
    5b. RÓLUNK → ÉLETKÉPEK GALÉRIA
@@ -1879,7 +1886,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* a térbeli dőlés és a kamera-sodródás mozgás-alapú — síkban marad */
   .zoo__media{ transform:none !important; }
   .zoo__hand, .zoo-shroom, .deco-sticker, .zoo-logo{
-    translate:none !important; scale:none !important; }
+    translate:none !important; scale:none !important;
+    /* mivel a kitolás itt ki van kapcsolva, a dekornak halványodással kell
+       eltűnnie — különben rajta ragadna a teljesen kinyílt videón */
+    opacity:calc(1 - var(--zp,0) * 2.6) !important; }
 }
 </style>
 </head>
