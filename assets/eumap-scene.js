@@ -836,33 +836,42 @@ async function init() {
   /* ?off=eumap — a diagnosztikai kapcsolótábla (lásd index.html). A 3D jelenet
      megmarad, csak a pin + scrub nem jön létre, tehát a szekció normálisan
      görög át. Így elkülöníthető, hogy a ScrollTrigger okozza-e az ugrálást. */
+  /* ============ ÉRINTŐESZKÖZÖN NINCS PIN ============
+     Sorban kipróbáltam a pin finomhangolásait — ignoreMobileResize, pinType:
+     'transform', anticipatePin ki, scrub: true —, és a telefonon EGYIK SEM
+     szüntette meg a rángatást. Ez nem véletlen, hanem a pin természete.
+
+     A pin azt jelenti, hogy egy elemet a helyén TARTUNK, miközben az oldal
+     alatta görög. Ezt a ScrollTrigger a fő szálról, JavaScriptből teszi:
+     minden görgetési értesüléskor visszaigazítja az elemet. Csakhogy iOS-en a
+     görgetés a fő száltól FÜGGETLENÜL, külön szálon fut és külön is rajzolódik
+     ki — a JavaScript mindig egy-két képkockával utána kullog. A pinelt elem
+     tehát nem áll, hanem apró lépésekben kapkod a helyére vissza. Pontosan ez
+     a rángatás, és fogalmilag nem tüntethető el finomhangolással: amíg
+     JS tart valamit a helyén egy tőle független görgetéssel szemben, addig
+     látszani fog.
+
+     Ezért érintőeszközön nincs pin. A szekció egyszerűen átgördül, a jelenet
+     pedig a szekció áthaladásának arányában animálódik (0 = épp belép alulról,
+     1 = épp kilép felül). Nincs mit a helyén tartani, tehát nincs mit
+     elrontani — a görgetés végig a böngésző natív, sima útján marad.
+
+     CSERE: a mozgás gyorsabban fut le, mert nincs a végén a kitartott,
+     "megállított" szakasz. Gépen minden marad a régiben. */
+  const eumapTouch = ScrollTrigger.isTouch === 1;
+
   if (!(window.__OFF && window.__OFF('eumap'))) {
   ScrollTrigger.create({
     trigger: section,
-    start: 'top top',
-    /* hosszabb sáv: a mozgás 62%-nál véget ér, a maradék a tartás */
-    end: '+=185%',
-    pin: true,
-    /* iOS: a pin alapból `position: fixed`-del dolgozik. A fixed elemeket a
-       Safari a LÁTHATÓ nézetablakhoz igazítja, és a címsáv be-/kiúszásának
-       animációja alatt ezt késve, a compositoron kívül teszi meg — a pinelt
-       szekció ilyenkor láthatóan megrándul. A 'transform' változat nem
-       fixed-et használ, hanem eltolja az elemet: végig a fő elrendezésben
-       marad, így a címsáv mozgása nem tudja megugrasztani. */
-    pinType: ScrollTrigger.isTouch === 1 ? 'transform' : 'fixed',
+    start: eumapTouch ? 'top bottom' : 'top top',
+    /* asztali: hosszabb sáv, a mozgás 62%-nál véget ér, a maradék a tartás */
+    end:   eumapTouch ? 'bottom top'  : '+=185%',
+    pin:   !eumapTouch,
     /* A scrub SZÁMÉRTÉKKEL (1.1) azt jelenti: a jelenet nem a görgetés
        pillanatnyi állását veszi át, hanem ~1,1 másodperc alatt UTÁNAHÚZ.
-       Egéren ez lágy. Érintőeszközön viszont a görgetés aszinkron: a fő szál
-       csak kapkodva, csomókban értesül róla. Ilyenkor a jelenet folyamatosan
-       egy mozgó célpontot kerget, és a két ütem interferenciája pontosan az a
-       rángatás, ami a telefonon látszik.
-       A `true` az 1:1 leképezés — nincs utánahúzás, nincs mit kergetni: a
-       jelenet mindig ott áll, ahol az ujjad. Érintőn ez a simább.
-
-       Az anticipatePin innen KIKERÜLT. Egy korábbi körben találgatásból tettem
-       bele; nem volt rá bizonyíték, viszont épp az a dolga, hogy a pin
-       becsatolását előrehozza — ami egy látható ugrást tud okozni. */
-    scrub: ScrollTrigger.isTouch === 1 ? true : 1.1,
+       Egéren ez lágy. Érintőn viszont a jelenet így egy mozgó célpontot
+       kergetne, ezért ott az 1:1 leképezés (`true`) a helyes. */
+    scrub: eumapTouch ? true : 1.1,
     onUpdate: (self) => applyScroll(self.progress),
   });
   }

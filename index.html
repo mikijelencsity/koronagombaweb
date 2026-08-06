@@ -1949,8 +1949,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      A telefonos belógás viszont itt már túlzott: a kéz a felirat alá/ki a
      képernyőből nyomul, ezért itt "kötjük be" a kéz szélét a viewporthez,
      hogy a kompozíció ne lógjon ki a telefon képernyőjéről. */
-  .zoo__hand{ top:-2%; width:clamp(260px,34vw,420px); left:clamp(-40px,-3vw,0px);
-    translate:0 0; }
+  /* A `translate:0 0` INNEN KIKERÜLT. A kéz kicsúszását a --camera intézi
+     (lásd a .zoo__hand alapszabályát), és ez a sor pont azt írta felül —
+     ezért ragadt a kéz+fazék a képernyőn mobilon, miközben a videó kinőtt
+     alatta. A `left` és a `width` hangolása marad, az a belógás mértékéről
+     szól, nem a kicsúszásról. */
+  .zoo__hand{ top:-2%; width:clamp(260px,34vw,420px); left:clamp(-40px,-3vw,0px); }
   /* ===== "KULCSLYUK": A VIDEÓ ÁLL, AZ ABLAK NŐ KI RÁ =====
      Eddig a videó eleme maga is átméreteződött minden képkockán
      (width/height:100% a növekvő kereten belül), RÁADÁSUL kapott egy
@@ -4216,7 +4220,7 @@ html.dbg-nonav .nav{ display:none !important; }
      fájl futott, és a mérés emiatt mást mutatott, mint amit a kód csinál.
      Ez a sor egyértelműen megmondja, melyik változat van a készüléken.
      ÚJ VÁLTOZATNÁL LÉPTESD. */
-  var BUILD = 'b12 — kulcslyuk + beam/glow ki + play() + eumap v2';
+  var BUILD = 'b13 — kéz kicsúszik + térkép pin nélkül érintőn';
 
   function tick(){
     var sorok = [BUILD, 'koppints = nullaz', 'ertek  min..max  szoras'];
@@ -4245,7 +4249,7 @@ html.dbg-nonav .nav{ display:none !important; }
      Ha ezekben a fájlokban módosítasz, LÉPTESD a lenti számot — ettől lesz más
      az URL, és tölti újra a böngésző.
      ============================================================ -->
-<script src="assets/eumap-bg.js?v=2"></script>
-<script type="module" src="assets/eumap-scene.js?v=2"></script>
+<script src="assets/eumap-bg.js?v=3"></script>
+<script type="module" src="assets/eumap-scene.js?v=3"></script>
 </body>
 </html>
