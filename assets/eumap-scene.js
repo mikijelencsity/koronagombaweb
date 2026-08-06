@@ -943,7 +943,12 @@ function hasWebGL() {
   } catch (e) { return false; }
 }
 
-if (!hasWebGL()) {
+/* ?off=three — a teljes WebGL-jelenet kimarad, nem csak a ScrollTrigger pinje.
+   A folyamatosan futó render és a Three.js fő szálas munkája önmagában is
+   akaszthatja a görgetést; ezzel elkülöníthető a pin hatásától. */
+if (window.__OFF && window.__OFF('three')) {
+  eumapFallback('?off=three');
+} else if (!hasWebGL()) {
   eumapFallback('nincs WebGL-kontextus');
 } else {
   init().catch((e) => { eumapFallback(e && e.message ? e.message : e); });

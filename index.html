@@ -2073,6 +2073,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
        eltűnnie — különben rajta ragadna a teljesen kinyílt videón */
     opacity:calc(1 - var(--zp,0) * 2.6) !important; }
 }
+
+/* ============================================================
+   DIAGNOSZTIKAI KAPCSOLÓK (?off=... — lásd a szkriptben)
+   Csak akkor lépnek életbe, ha az URL-ben kérted. Élesben halott kód.
+   ============================================================ */
+/* ?off=sticky — a két kitűzött (sticky) szekció normál folyamba kerül.
+   A .neon negatív margóját is nullázni kell, különben ráúszna a heróra.
+   A látvány szétesik — csak azt vizsgáljuk, ugrál-e még. */
+html.dbg-nosticky .hero,
+html.dbg-nosticky .zoo__pin{ position:static !important; }
+html.dbg-nosticky .neon{ margin-top:0 !important; }
+/* ?off=nav — a képernyőhöz rögzített menüsáv. iOS-en a fixed elemeket a
+   Safari az eszköztár animációja alatt külön, késve pozicionálja. */
+html.dbg-nonav .nav{ display:none !important; }
 </style>
 </head>
 <body>
@@ -2753,7 +2767,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
         ?off=tl        — az asztali idővonal (mobilon amúgy sem fut)
         ?off=blob      — a folyamatosan hullámzó SVG-sávok (nonstop rAF)
         ?off=eumap     — a 3D térkép ScrollTrigger pinje
-        ?off=all       — mind
+     A JS-effektek kizárása után is maradt az ugrálás, ezért CSS/elrendezés
+     szintű kapcsolók is kellenek:
+        ?off=sticky    — a kitűzött (sticky) hero és videó-pin normál folyamba
+        ?off=vhpx      — a 260vh/280vh szekciómagasságok px-be rögzítve
+        ?off=three     — a teljes WebGL-jelenet (nem csak a pinje)
+        ?off=nav       — a képernyőhöz rögzített menüsáv
+        ?off=all       — mind a fenti
 
      Vesszővel többet is: ?off=zoo,blob
      A bal felső sarokban egy kis címke mutatja, mi van kikapcsolva — ha nem
@@ -2766,6 +2786,26 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     return OFFLIST.indexOf('all') >= 0 || OFFLIST.indexOf(name) >= 0;
   }
   window.__OFF = OFF;   /* az eumap ES-modul is ezt olvassa */
+
+  /* --- CSS-szintű kapcsolók: az osztály AZONNAL kell, még a festés előtt --- */
+  if (OFF('sticky')) document.documentElement.classList.add('dbg-nosticky');
+  if (OFF('nav'))    document.documentElement.classList.add('dbg-nonav');
+
+  /* ?off=vhpx — a MÉRT gyanú tesztje. A .stage 260vh, a .zoo 280vh magas:
+     a nézetmagasság MINDEN változását 2,6-, illetve 2,8-szorosára szorozzák
+     fel, és a tartalom kiugrik a görgetés alól (80px viewport-változás 208px
+     tartalom-elmozdulást adott a mérésben). Itt egyszer, betöltéskor px-be
+     rögzítjük a magasságukat — utána semmilyen viewport-változás nem tudja
+     átméretezni őket. Ha ettől megnyugszik, megvan az ok. */
+  if (OFF('vhpx')){
+    window.addEventListener('load', function(){
+      ['stage','video'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.style.height = el.offsetHeight + 'px';
+      });
+    });
+  }
+
   if (OFFLIST.length){
     document.addEventListener('DOMContentLoaded', function(){
       var b = document.createElement('div');
