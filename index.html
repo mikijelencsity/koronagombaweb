@@ -2790,7 +2790,9 @@ html.dbg-nonav .nav{ display:none !important; }
      A JS-effektek kizárása után is maradt az ugrálás, ezért CSS/elrendezés
      szintű kapcsolók is kellenek:
         ?off=sticky    — a kitűzött (sticky) hero és videó-pin normál folyamba
-        ?off=vhpx      — a 260vh/280vh szekciómagasságok px-be rögzítve
+        ?off=lockh     — a szekciómagasságok px-be rögzítése (ALAPBÓL BE VAN
+                         kapcsolva, ez a javítás — ezzel lehet visszakapcsolni
+                         a hibás állapotot A/B-hez)
         ?off=three     — a teljes WebGL-jelenet (nem csak a pinje)
         ?off=nav       — a képernyőhöz rögzített menüsáv
         ?off=all       — mind a fenti
@@ -2811,18 +2813,46 @@ html.dbg-nonav .nav{ display:none !important; }
   if (OFF('sticky')) document.documentElement.classList.add('dbg-nosticky');
   if (OFF('nav'))    document.documentElement.classList.add('dbg-nonav');
 
-  /* ?off=vhpx — a MÉRT gyanú tesztje. A .stage 260vh, a .zoo 280vh magas:
-     a nézetmagasság MINDEN változását 2,6-, illetve 2,8-szorosára szorozzák
-     fel, és a tartalom kiugrik a görgetés alól (80px viewport-változás 208px
-     tartalom-elmozdulást adott a mérésben). Itt egyszer, betöltéskor px-be
-     rögzítjük a magasságukat — utána semmilyen viewport-változás nem tudja
-     átméretezni őket. Ha ettől megnyugszik, megvan az ok. */
-  if (OFF('vhpx')){
-    window.addEventListener('load', function(){
-      ['stage','video'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (el) el.style.height = el.offsetHeight + 'px';
-      });
+  /* ============ SZEKCIÓMAGASSÁGOK PX-BE RÖGZÍTVE ============
+     A .stage (260vh) és a .zoo (330vh, mobilon 280vh) SZORZÓK a
+     nézetmagasságra: ha az megmozdul, a magasságuk 2,6-3,3-szor akkorát
+     változik, és mivel a görgetési pozíció közben helyben marad, az alattuk
+     lévő teljes tartalom kirántódik a görgetés alól.
+     Mérés 400px széles nézeten, 80px magasság-csökkenéssel: a .stage
+     2211 -> 2003 px (-208), és vele a .neon dokumentum-pozíciója is -208 px,
+     változatlan scrollY mellett.
+
+     MIÉRT PX ÉS NEM lvh: az lvh elméletben pont erre való (a behúzható
+     böngésző-felülettől független, nagy nézetmagasság), és át is lett írva rá
+     — a VALÓDI iPhone-on viszont NEM oldotta meg. A px-be rögzítés viszont
+     igen, A/B teszttel visszaigazolva. Az lvh a CSS-ben maradt, mert a
+     kiinduló érték attól helyes; a rögzítés erre ül rá.
+     Elmélet helyett a mérés dönt.
+
+     Kikapcsolható az A/B-hez: ?off=lockh */
+  /* Minden elem, aminek a magassága a nézetmagasságból SZÁRMAZIK:
+       stage      .stage      260vh / 210vh / 260vh  (2,6x szorzó)
+       video      .zoo        330vh / 280vh          (3,3x szorzó)
+       eumapStage .eumap__stage 100vh — ezt pinneli a ScrollTrigger, és az
+                  end:'+=185%' is ehhez mér, tehát rajta keresztül a
+                  pin-spacer és a teljes dokumentumhossz is elmozdulna
+       tlTrack    .tl__track  clamp(1440px, 150vh, 1980px) */
+  function lockSectionHeights(){
+    ['stage','video','eumapStage','tlTrack'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.style.height = '';                        /* vissza a CSS-értékre... */
+      el.style.height = el.offsetHeight + 'px';    /* ...majd befagyasztva */
+    });
+  }
+  if (!OFF('lockh')){
+    lockSectionHeights();
+    /* A szélesség változása VALÓDI elrendezés-váltás (elfordítás, ablakméret):
+       ilyenkor újra kell mérni, különben a régi px-magasság ragadna be. A
+       címsáv mozgása nem szélesség-változás, azt tehát nem érinti. */
+    onWidthResize(function(){ lockSectionHeights(); SCROLL.tick(); });
+    window.addEventListener('orientationchange', function(){
+      setTimeout(function(){ lockSectionHeights(); SCROLL.tick(); }, 250);
     });
   }
 
