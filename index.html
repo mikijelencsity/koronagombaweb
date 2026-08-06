@@ -3210,15 +3210,24 @@ html.dbg-nonav .nav{ display:none !important; }
        HA A LOGÓFÁJL CSERÉLŐDIK, ezeket az arányokat újra ki kell mérni. */
     var SEAL_FILL_H = 0.7813, SEAL_FILL_W = 0.7719, SEAL_BIAS_Y = 0.0453;
     var CAP_RATIO = 0.69, CAP_OFFSET = 0.0137;
+    /* A pecsét oszlopának szélessége 1 px-es betűmérethez — a fentiekből
+       következik, tehát nem külön mérés, csak kiszámolva egyszer. */
+    var SEAL_ADV = (CAP_RATIO / SEAL_FILL_H) * SEAL_FILL_W * 1.12;
 
     var px = 0, cellH = 0, digitW = 0, TOP_A = 0, TOP_B = 0;
     function layout(){
       var W = window.innerWidth, H = window.innerHeight;
-      /* Két korlát közül a szűkebb dönt. Álló telefonon MINDIG a szélesség
-         (W*0.135) a szűk keresztmetszet, ezért a magassági szorzó emelése
-         ott nem változtat semmit — csak a széles képernyőkön nő a szó, ahol
-         eddig indokolatlanul sok üres hely maradt körülötte. */
-      px = Math.min(H * 0.215, W * 0.135);
+      /* A betűméretet nem találgatjuk, hanem KISZÁMOLJUK: megmérjük, hogy a
+         teljes szó hány képpont széles 1 px-es betűmérethez, és abból adjuk
+         meg azt a méretet, amivel a szó pontosan a képernyő 84%-át tölti ki.
+         Így minden szélességen ugyanaz az arány — a korábbi fix szorzó
+         telefonon indokolatlanul kicsi szót adott. A magassági korlát csak a
+         széles, alacsony képernyőkön szól bele. */
+      var per = 0;
+      cols.forEach(function(c){
+        per += (c.ch === 'SEAL') ? SEAL_ADV : widthOf(c.ch, 100) / 100;
+      });
+      px = Math.min(H * 0.215, (W * 0.84) / per);
       cellH = px * 0.80;                          /* SZOROS vágás — ettől félbevágott a váltó jegy */
       digitW = widthOf('0', px);
       wordEl.style.height = cellH + 'px';
@@ -3231,7 +3240,7 @@ html.dbg-nonav .nav{ display:none !important; }
         c.el.style.height = cellH + 'px';
         /* A pecsét oszlopa a jel LÁTHATÓ szélességéhez igazodik, nem a képéhez
            és nem a betűmérethez — plusz egy kis levegő oldalt. */
-        c.letterW = (c.ch === 'SEAL') ? imgH * SEAL_FILL_W * 1.12 : widthOf(c.ch, px);
+        c.letterW = (c.ch === 'SEAL') ? px * SEAL_ADV : widthOf(c.ch, px);
         for(var n = 0; n < c.strip.children.length; n++){
           c.strip.children[n].style.height = cellH + 'px';
           c.strip.children[n].style.fontSize = px + 'px';
@@ -3246,10 +3255,24 @@ html.dbg-nonav .nav{ display:none !important; }
       seal.style.transform = 'translateY(' + (imgH * SEAL_BIAS_Y + cellH * CAP_OFFSET) + 'px)';
       TOP_A = H * 0.46; TOP_B = H * 0.50;
       if(!exited) wordEl.style.top = TOP_A + 'px';
-      /* Az alcím a SZÓHOZ méretezve, nem a képernyőhöz: így a kettő aránya
-         mindenhol azonos marad. Az alsó korlát azért kell, mert telefonon a
-         szó eleve kicsi, és a puszta arány olvashatatlanul apró feliratot adna. */
-      subEl.style.fontSize = Math.max(11, px * 0.125) + 'px';
+      /* Az alcím alapból a SZÓHOZ méretezve (így a kettő aránya mindenhol
+         azonos), de közben be is kell férnie egy sorba. Ezért kimérjük a
+         tényleges szélességét — a .3em betűközzel együtt, mert az egy 31
+         karakteres feliratnál már a szélesség harmada —, és ha nem fér el,
+         a beférő méretet vesszük. Így telefonon a lehető legnagyobb, de
+         sosem lóg ki és sosem törik két sorba. */
+      var subTxt = subEl.textContent.toUpperCase();
+      /* Keskeny kijelzőn szűkebb betűköz: a .3em tracking egy 31 karakteres
+         feliratnál a szélesség harmadát viszi el, és épp ez fogja vissza a
+         betűméretet. Kicsit szűkebbre véve a felirat nagyobb lehet, és még
+         mindig ritkított kiskapitálisnak olvasódik. */
+      var subTrack = W < 560 ? 0.22 : 0.30;
+      subEl.style.letterSpacing = subTrack + 'em';
+      meas.font = '700 100px Archivo, system-ui, sans-serif';
+      var subPer = meas.measureText(subTxt).width / 100 + subTxt.length * subTrack;
+      /* A szóhoz mért arány gépre jó, telefonon viszont lefelé húzna; ezért
+         van alsó kívánság (14 px), amit a beférés vág vissza, ha kell. */
+      subEl.style.fontSize = Math.max(9, Math.min((W * 0.88) / subPer, Math.max(px * 0.125, 14))) + 'px';
       subEl.style.top = (TOP_B + cellH * 0.62 * 0.5 + Math.max(16, px * 0.30)) + 'px';
     }
 
