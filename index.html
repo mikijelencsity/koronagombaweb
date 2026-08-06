@@ -1914,19 +1914,23 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .slide{ flex:0 0 min(800px,66vw); }
 }
 @media (max-width:900px){
-  /* ===== A HERO-STACKELŐDÉS MOBILON KI VAN KAPCSOLVA =====
-     Az átfedés CSS-ben -100lvh (NAGY nézetmagasság), a hozzá tartozó --stack
-     haladást viszont a JS a window.innerHeight-ból számolja. Telefonon ez a
-     kettő pontosan a böngésző címsávjának magasságával tér el, és a címsáv
-     görgetés közben el is tűnik/visszajön — vagyis a matematika mobilon eleve
-     elcsúszik, menet közben ráadásul változik is.
-     Egy teljes nézetmagasságnyi NEGATÍV MARGÓ a legrosszabb hely erre a
-     bizonytalanságra: ha a két érték nem egyezik, a hero és a rákövetkező
-     szekció viszonya csúszik el. Mobilon ezért marad az egyszerű, egymás
-     utáni gördülés — ott a stackelődés amúgy is alig látszó, 7%-os hatás. */
-  .neon{ margin-top:0; }
-  .hero{ scale:1; border-radius:0; }
-  .hero__stack{ display:none; }
+  /* ===== A HERO-STACKELŐDÉS MOBILON ÚJRA BE VAN KAPCSOLVA =====
+     Korábban ki volt kapcsolva, és az indoklás ez volt: az átfedés CSS-ben
+     -100lvh, a hozzá tartozó --stack haladást viszont a JS a
+     window.innerHeight-ból számolta, ami telefonon pont a címsáv magasságával
+     tér el — és görgetés közben változik is. Egy teljes nézetmagasságnyi
+     negatív margó pedig a legrosszabb hely erre a bizonytalanságra.
+     EZ AZ OK MEGSZŰNT: a --stack már a rögzített pageVH()-val számol, a
+     szekciómagasságok px-be vannak fagyasztva, és a negatív margót is a JS
+     állítja be pontosan a hero MÉRT magasságára (lásd lockSectionHeights).
+     Nincs tehát mihez képest elcsúsznia.
+
+     A hero 7%-os ZSUGORODÁSA viszont mobilon marad kikapcsolva — nem a
+     matematika miatt, hanem teljesítményből: a scale egy képernyő méretű,
+     sok gyerekes réteget kényszerít újrarasztereznie a böngészőnek MINDEN
+     képkockán. A látvány lényege (a ráúszó lap lekerekített éle, árnyéka és
+     a hero tompulása) enélkül is megvan. */
+  .hero{ scale:1; }
 
   .zoo{ height:280vh; height:280lvh; }   /* lvh — lásd a .stage-nél az okot */
   /* "KORONA" / "GOMBA" 2 sorba törve (lásd .zoo__break) — mivel soronként
@@ -2062,6 +2066,29 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     top:auto !important; bottom:9% !important; }
   /* a „12 ország export" beljebb, a közép felé (a jobb széltől elhúzva) */
   .hsticker--green{ right:22% !important; }
+
+  /* ===== ELMOSOTT ÁRNYÉKOK LE AZ ANIMÁLT ELEMEKRŐL =====
+     Ez a legdrágább dolog az oldalon telefonon. A drop-shadow egy ELMOSÁS:
+     a böngészőnek minden képkockán újra kell rasztereznie az elem teljes
+     képét ahhoz, hogy a homályos árnyékot kiszámolja. Ha az elem közben
+     mozog is, ez képkockánként ismétlődik.
+     Márpedig pont a mozgó elemekre volt rátéve:
+       - a heróban ~22 gomba (10 alap + 12 .mextra), mindegyik egyszerre
+         lebeg (bob animáció) ÉS görgetésre is tolódik (--p),
+       - a videós szekcióban a kéz, a logó, a gomba és a matrica, amiket a
+         --camera minden képkockán told és nagyít.
+     Nagy sugarú (20-30px) elmosás ennyi elemen egy telefon GPU-jának
+     képkockánként több ezredmásodperc — ez okozta a heró és a videós rész
+     szaggatását/lefagyását.
+     Gépen minden marad a régiben; itt csak a homály tűnik el, a formák,
+     méretek és mozgások változatlanok. */
+  .shroom img,
+  .zoo__hand img,
+  .zoo-logo img,
+  .zoo-shroom img,
+  .deco-sticker img,
+  .olog img,
+  .ogomb img{ filter:none !important; }
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -2844,6 +2871,18 @@ html.dbg-nonav .nav{ display:none !important; }
       el.style.height = '';                        /* vissza a CSS-értékre... */
       el.style.height = el.offsetHeight + 'px';    /* ...majd befagyasztva */
     });
+    /* A hero magassága és a ráúszó szekció negatív margója EGY SZÁM kell hogy
+       legyen, különben a stackelődés elcsúszik. A CSS-ben ez 100lvh és
+       -100lvh, csakhogy az lvh-ban a valódi készüléken nem lehet megbízni
+       (mérve). Ezért a herót is px-be rögzítjük, a margót pedig pontosan a
+       MÉRT hero-magasságra állítjuk — így a kettő definíció szerint egyezik. */
+    var heroEl = document.getElementById('hero');
+    var neonEl = document.getElementById('neon');
+    if (heroEl){
+      heroEl.style.height = '';
+      heroEl.style.height = heroEl.offsetHeight + 'px';
+      if (neonEl) neonEl.style.marginTop = (-heroEl.offsetHeight) + 'px';
+    }
   }
   if (!OFF('lockh')){
     lockSectionHeights();
@@ -3559,8 +3598,18 @@ html.dbg-nonav .nav{ display:none !important; }
     /* kikapcsolva: a kezdőkép megmarad, csak a nonstop rAF nem indul el */
     if (OFF('blob')) return;
 
+    /* Telefonon 20 képkocka/mp elég ehhez a lassú hullámzáshoz — szabad
+       szemmel nem különböztethető meg a 60-tól, viszont harmadannyi
+       munka. Egy setAttribute('d', ...) ugyanis nem olcsó: a böngészőnek
+       újra kell értelmeznie a teljes útvonal-geometriát, és újra kell
+       festenie a sávot. Négy ilyen fut, képkockánként. */
+    var blobMinDt = window.innerWidth <= 900 ? 50 : 0;
+    var blobLast = -1e9;
+
     function frame(now){
       requestAnimationFrame(frame);
+      if (now - blobLast < blobMinDt) return;
+      blobLast = now;
       var t = (now - t0)/1000;
       if(vis.products){
         if(top) top.setAttribute('d', toPath(sample(t, 1)));

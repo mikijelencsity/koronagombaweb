@@ -646,7 +646,12 @@ async function init() {
     powerPreference: 'high-performance',
     failIfMajorPerformanceCaveat: true,
   });
-  const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 1.5);
+  /* A pixelarány NÉGYZETESEN hat a kirajzolandó képpontok számára: 1,5-ről
+     1,0-ra véve a telefon 2,25-ször kevesebb képpontot számol képkockánként.
+     Ez az egyetlen olyan csavar a jeleneten, ami ekkorát fog egy lépésben,
+     és lapos, nagy felületű grafikán (országlapok, vastag útvonalak) a
+     különbség alig látszik. Gépen marad az 1,5. */
+  const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5);
   renderer.setPixelRatio(dpr);
 
   renderer.setClearColor(0x000000, 0);
