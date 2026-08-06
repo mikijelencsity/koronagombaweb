@@ -1,0 +1,56 @@
+# ============================================================
+#  GITHUB PAGES — MI MENJEN KI A TELEPÍTÉSBE
+# ============================================================
+#
+#  MIÉRT VAN EZ A FÁJL
+#  A telepítés (nem a build!) ismételten beragadt a GitHub sorában, és a
+#  deploy-pages lépés 10 perc után visszavonta. A build maga másodpercek
+#  alatt lefutott — az artifact elkészült —, csak a kirakás nem történt meg.
+#
+#  Ennek egyik oka a csomag mérete volt. Mérve:
+#      ténylegesen hivatkozott képek/videók:      6,1 MB
+#      sehol nem hivatkozott:                   168,9 MB  (180 fájl)
+#  Vagyis minden egyes telepítéskor 177 MB ment ki egy ~6 MB-os oldalért.
+#  Egy bedugult sorban pont ez viszi át az időkorláton.
+#
+#  A repóban ugyanis KÉT PÉLDÁNY van mindenből: az oldal az `images/…` alatti
+#  kicsi .webp változatokat használja, miközben ott vannak mellette az
+#  eredeti, több megabájtos JPG/PNG-k is. Az alábbi lista ez utóbbiakat
+#  hagyja ki a TELEPÍTÉSBŐL — a fájlok a repóban maradnak, semmi nem vész el.
+#
+#  ELLENŐRIZVE: minden hivatkozás pontos útvonalon lett visszakeresve (nem
+#  fájlnévre, mert ugyanaz a név létezik mindkét ágon). Az alábbi listából
+#  egyetlen hivatkozott fájl sem esik ki. Eredmény: 177 MB -> 14,9 MB.
+#
+#  HA ÚJ KÉPET TESZEL BE: az `images/…` ág alá tedd, vagy vedd ki a nevét
+#  ebből a listából, különben nem kerül fel az élő oldalra.
+# ============================================================
+
+exclude:
+  # --- eredeti, nagy felbontású forrásképek (az images/… ág a használt) ---
+  - telephely/            # 41,5 MB
+  - koronakepek/          # 38,0 MB
+  - rolunk/
+  - elet/
+  - partners/
+  - partners-mono/
+
+  # --- ugyanezek az assets/ ágon; az assets/*.js FENT MARAD, az kell! ---
+  - assets/telephely/     # 37,7 MB
+  - assets/elet/          # 30,1 MB
+  - assets/products/      # a használt: images/assets/products/
+  - assets/certs/         # a használt: images/assets/certs/
+  - assets/logo.png       # a használt: images/assets/logo-320.webp
+  - assets/rolunk-1400.webp
+  - assets/rolunk-1800.jpg
+  - assets/rolunk-2400.webp
+
+  # --- az images/ ágon belüli, sehol nem hivatkozott maradékok ---
+  - images/telephely/
+  - images/assets/telephely/
+  - images/prod/
+
+  # --- fejlesztői holmi, ennek semmi keresnivalója az élő oldalon ---
+  - .vscode/
+  - README.md
+  - korona-hero-v5.pre-mobile-20260730-1942.bak
