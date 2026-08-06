@@ -126,6 +126,15 @@
   --r-card-top:29px 17px 0 0;       /* a kártya felső 2 sarka (kifutó kép) */
   --r-card-top-r:17px 29px 0 0;     /* ugyanaz tükrözve */
 
+  /* ===== RÖGZÍTETT VH-EGYSÉG =====
+     Egy "vh"-nyi hossz, amit a böngésző eszköztárának mozgása NEM változtat.
+     A JS a hero MÉRT magasságának a századát írja ide (lockSectionHeights).
+     Ez az alapérték csak addig él, amíg a JS le nem fut — onnantól px.
+     Mindenhol ezt kell használni, ahol egy FÜGGŐLEGES pozíció vagy elmozdulás
+     a nézetmagassághoz igazodik; a sima vh telefonon együtt mozog a
+     címsávval, és attól úszkál a tartalom görgetés közben. */
+  --vhu:1vh;
+
   /* ===== ÁTLÁTSZÓSÁG-SKÁLA ==============================================
      Az --ink és a --cream 12, illetve 16 különböző alfával volt kézzel
      újraírva a CSS-ben (rgba(22,17,13,.30) / .32 / .34 / .35 — ezek
@@ -542,8 +551,19 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
             translateY(calc((1 - var(--reveal)) * 26px)); }
 .hsticker--green{ background:var(--green-deep); color:var(--cream); }
 
-.shroom{ position:absolute; z-index:40; left:var(--x); top:var(--y); width:var(--w); pointer-events:none; will-change:transform;
-  transform: translate3d(calc(var(--p)*var(--kx)*1vw + var(--mx,0px)), calc(var(--p)*var(--ky)*1vh + var(--my,0px)), 0) rotate(calc(var(--p)*var(--kr)*1deg)); }
+/* ===== A FÜGGŐLEGES ÉRTÉKEK NEM vh-BAN, HANEM --vhu-BAN =====
+   A gombák helye (--yn) és a görgetésre kapott függőleges elmozdulásuk (--ky)
+   korábban vh-ban volt. A vh viszont telefonon együtt mozog a böngésző
+   eszköztárával: ahogy görgetés közben be- és kiúszik, MINDEN vh-ban megadott
+   pozíció feljebb-lejjebb csúszik. Ettől mozgott a gomba-koszorú és az
+   EST. 1990 tábla fel-le, miközben csak görgetni akartál.
+   A --vhu egy RÖGZÍTETT "egy vh"-nyi hossz: a JS a hero MÉRT magasságának a
+   századát írja bele (lásd lockSectionHeights), és csak valódi
+   elrendezés-váltáskor frissíti. Alapértéke 1vh, hogy a JS lefutása előtt is
+   a megszokott módon viselkedjen.
+   A --x és a --w VÍZSZINTES, azok maradnak vw-ben: a szélesség nem mozog. */
+.shroom{ position:absolute; z-index:40; left:var(--x); top:calc(var(--yn,0) * var(--vhu)); width:var(--w); pointer-events:none; will-change:transform;
+  transform: translate3d(calc(var(--p)*var(--kx)*1vw + var(--mx,0px)), calc(var(--p)*var(--ky)*var(--vhu) + var(--my,0px)), 0) rotate(calc(var(--p)*var(--kr)*1deg)); }
 .shroom--r{ left:auto; right:var(--x); }
 /* extra gombák CSAK telefonra — gépen rejtve, hogy a laptopos nézet ne változzon */
 .mextra{ display:none; }
@@ -1899,7 +1919,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      "KORONA GOMBA" feliratba (a kép mérete/szélessége nagy desktopon,
      ezért egy kicsit kisebbre is vesszük, hogy elférjen a szöveg fölött
      anélkül, hogy a teteje a viewport fölé lógna és levágódna) ===== */
-  .zoo__hand{ top:-4vh; width:clamp(300px,26vw,460px); left:clamp(-125px,-6vw,-15px); }
+  .zoo__hand{ top:calc(-4 * var(--vhu)); width:clamp(300px,26vw,460px); left:clamp(-125px,-6vw,-15px); }
 
   /* ===== TERMÉKEK — a szomszédos diák visszakapják a 80%-on látott
      "belógást" =====
@@ -1938,7 +1958,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      A margin-top kicsit lejjebb told a szöveget, hogy a kéz+fazék kép
      alatta férjen el ütközés nélkül. */
   .zoo__sent{ flex-wrap:wrap; font-size:clamp(2.6rem,16vw,6rem); row-gap:.02em;
-    margin-top:8vh; }
+    margin-top:calc(8 * var(--vhu)); }
   .zoo__break{ display:block; flex-basis:100%; height:0; }
   /* itt a "GOMBA" már a MÁSODIK sorban áll, egyedül középen — nincs mit
      ellökni tőle, oldalra tolva csak félrecsúszna. Csak a felső sor
@@ -2073,7 +2093,8 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   /* az EST. 1990 tábla feljebb, a hero tetejéhez közel — a gombák (z:40)
      MÖGÖTT maradjon, hogy betöltéskor eltakarják */
-  .est{ z-index:35; top:13vh !important; }
+  /* --vhu: rögzített vh-egység, hogy az eszköztár ne mozgassa a táblát */
+  .est{ z-index:35; top:calc(13 * var(--vhu)) !important; }
 
   /* --- CÍM: nagyobb, de a vastag kontúr is beleférjen a szélek elé --- */
   .big{ padding:0 4vw; }
@@ -2092,18 +2113,18 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      takarják is a címet egy kicsit — mint gépen. */
 
   /* --- BAL OSZLOP, fentről le (nagyobb gombák) --- */
-  .s1{ --x:-24vw !important; --y:-4vh !important; --w:52vw !important; --kx:-34 !important; --ky:-12 !important; }  /* óriás portobello, bal-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
-  .s5{ --x:-4vw  !important; --y:27vh !important; --w:32vw !important; --kx:-11 !important; }  /* benyúlik a cím bal szélére — görgetve kevésbé megy ki, jobban bent marad */
-  .s3{ --x:-3vw  !important; --y:47vh !important; --w:27vw !important; --kx:-10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
-  .s2{ --x:-12vw !important; --y:76vh !important; --w:46vw !important; }  /* bal-alsó sarok, óriás */
-  .s4{ --x:20vw  !important; --y:90vh !important; --w:26vw !important; }  /* alsó rés */
+  .s1{ --x:-24vw !important; --yn:-4 !important; --w:52vw !important; --kx:-34 !important; --ky:-12 !important; }  /* óriás portobello, bal-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
+  .s5{ --x:-4vw  !important; --yn:27 !important; --w:32vw !important; --kx:-11 !important; }  /* benyúlik a cím bal szélére — görgetve kevésbé megy ki, jobban bent marad */
+  .s3{ --x:-3vw  !important; --yn:47 !important; --w:27vw !important; --kx:-10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
+  .s2{ --x:-12vw !important; --yn:76 !important; --w:46vw !important; }  /* bal-alsó sarok, óriás */
+  .s4{ --x:20vw  !important; --yn:90 !important; --w:26vw !important; }  /* alsó rés */
 
   /* --- JOBB OSZLOP, fentről le (nagyobb gombák) --- */
-  .r1{ --x:-22vw !important; --y:-5vh !important; --w:50vw !important; --kx:34 !important; --ky:-12 !important; }  /* óriás gombacsokor, jobb-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
-  .r5{ --x:-4vw  !important; --y:30vh !important; --w:31vw !important; --kx:11 !important; }  /* benyúlik a cím jobb szélére — görgetve kevésbé megy ki, jobban bent marad */
-  .r3{ --x:-3vw  !important; --y:50vh !important; --w:26vw !important; --kx:10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
-  .r2{ --x:-12vw !important; --y:74vh !important; --w:48vw !important; }  /* jobb-alsó sarok, óriás */
-  .r4{ --x:22vw  !important; --y:88vh !important; --w:25vw !important; }  /* alsó rés */
+  .r1{ --x:-22vw !important; --yn:-5 !important; --w:50vw !important; --kx:34 !important; --ky:-12 !important; }  /* óriás gombacsokor, jobb-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
+  .r5{ --x:-4vw  !important; --yn:30 !important; --w:31vw !important; --kx:11 !important; }  /* benyúlik a cím jobb szélére — görgetve kevésbé megy ki, jobban bent marad */
+  .r3{ --x:-3vw  !important; --yn:50 !important; --w:26vw !important; --kx:10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
+  .r2{ --x:-12vw !important; --yn:74 !important; --w:48vw !important; }  /* jobb-alsó sarok, óriás */
+  .r4{ --x:22vw  !important; --yn:88 !important; --w:25vw !important; }  /* alsó rés */
 
   /* --- MATRICÁK: a „Saját komposzt" a CTA gombok ALÁ kerül, de feljebb
      marad, mint a „12 ország export" (ami a legalsó sarokban marad) --- */
@@ -2279,34 +2300,34 @@ html.dbg-nonav .nav{ display:none !important; }
   <div class="hsticker"            style="--deg:-11; left:13%; bottom:47%;">Saját<br>komposzt</div>
   <div class="hsticker hsticker--green" style="--deg:11; right:15%; bottom:28%;">12 ország<br>export</div>
 
-  <div class="shroom s1" data-depth="14" style="--x:-9vw; --y:4vh;  --w:33vw; --kx:-13; --ky:-2; --kr:-9;  --rot:-6deg; --dur:7.4s; --del:.05s"><img src="images/mushrooms/mushroom-0.webp" alt=""></div>
-  <div class="shroom s2" data-depth="18" style="--x:1vw;  --y:46vh; --w:27vw; --kx:-15; --ky:3;  --kr:7;   --rot:9deg;  --dur:6.4s; --del:.18s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
-  <div class="shroom s3" data-depth="24" style="--x:13vw; --y:-6vh; --w:21vw; --kx:-21; --ky:-4; --kr:-15; --rot:-12deg;--dur:8.2s; --del:.30s"><img src="images/mushrooms/mushroom-5.webp" alt=""></div>
-  <div class="shroom s4" data-depth="20" style="--x:9vw;  --y:66vh; --w:23vw; --kx:-19; --ky:5;  --kr:12;  --rot:5deg;  --dur:7s;   --del:.42s"><img src="images/mushrooms/mushroom-6.webp" alt=""></div>
-  <div class="shroom s5" data-depth="30" style="--x:23vw; --y:24vh; --w:15vw; --kx:-26; --ky:-6; --kr:-18; --rot:14deg; --dur:6.1s; --del:.54s"><img src="images/mushrooms/mushroom-8.webp" alt=""></div>
+  <div class="shroom s1" data-depth="14" style="--x:-9vw; --yn:4;  --w:33vw; --kx:-13; --ky:-2; --kr:-9;  --rot:-6deg; --dur:7.4s; --del:.05s"><img src="images/mushrooms/mushroom-0.webp" alt=""></div>
+  <div class="shroom s2" data-depth="18" style="--x:1vw;  --yn:46; --w:27vw; --kx:-15; --ky:3;  --kr:7;   --rot:9deg;  --dur:6.4s; --del:.18s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
+  <div class="shroom s3" data-depth="24" style="--x:13vw; --yn:-6; --w:21vw; --kx:-21; --ky:-4; --kr:-15; --rot:-12deg;--dur:8.2s; --del:.30s"><img src="images/mushrooms/mushroom-5.webp" alt=""></div>
+  <div class="shroom s4" data-depth="20" style="--x:9vw;  --yn:66; --w:23vw; --kx:-19; --ky:5;  --kr:12;  --rot:5deg;  --dur:7s;   --del:.42s"><img src="images/mushrooms/mushroom-6.webp" alt=""></div>
+  <div class="shroom s5" data-depth="30" style="--x:23vw; --yn:24; --w:15vw; --kx:-26; --ky:-6; --kr:-18; --rot:14deg; --dur:6.1s; --del:.54s"><img src="images/mushrooms/mushroom-8.webp" alt=""></div>
 
-  <div class="shroom shroom--r r1" data-depth="14" style="--x:-8vw; --y:2vh;  --w:32vw; --kx:13; --ky:-2; --kr:10;  --rot:8deg;  --dur:7.8s; --del:.10s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
-  <div class="shroom shroom--r r2" data-depth="18" style="--x:0vw;  --y:48vh; --w:28vw; --kx:16; --ky:3;  --kr:-8;  --rot:-7deg; --dur:6.7s; --del:.24s"><img src="images/mushrooms/mushroom-7.webp" alt=""></div>
-  <div class="shroom shroom--r r3" data-depth="24" style="--x:12vw; --y:-4vh; --w:20vw; --kx:22; --ky:-5; --kr:16;  --rot:11deg; --dur:8.5s; --del:.36s"><img src="images/mushrooms/mushroom-2.webp" alt=""></div>
-  <div class="shroom shroom--r r4" data-depth="20" style="--x:8vw;  --y:68vh; --w:22vw; --kx:19; --ky:6;  --kr:-13; --rot:-9deg; --dur:7.2s; --del:.48s"><img src="images/mushrooms/mushroom-4.webp" alt=""></div>
-  <div class="shroom shroom--r r5" data-depth="30" style="--x:24vw; --y:26vh; --w:14vw; --kx:28; --ky:-6; --kr:20;  --rot:-15deg;--dur:6.3s; --del:.60s"><img src="images/mushrooms/mushroom-9.webp" alt=""></div>
+  <div class="shroom shroom--r r1" data-depth="14" style="--x:-8vw; --yn:2;  --w:32vw; --kx:13; --ky:-2; --kr:10;  --rot:8deg;  --dur:7.8s; --del:.10s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
+  <div class="shroom shroom--r r2" data-depth="18" style="--x:0vw;  --yn:48; --w:28vw; --kx:16; --ky:3;  --kr:-8;  --rot:-7deg; --dur:6.7s; --del:.24s"><img src="images/mushrooms/mushroom-7.webp" alt=""></div>
+  <div class="shroom shroom--r r3" data-depth="24" style="--x:12vw; --yn:-4; --w:20vw; --kx:22; --ky:-5; --kr:16;  --rot:11deg; --dur:8.5s; --del:.36s"><img src="images/mushrooms/mushroom-2.webp" alt=""></div>
+  <div class="shroom shroom--r r4" data-depth="20" style="--x:8vw;  --yn:68; --w:22vw; --kx:19; --ky:6;  --kr:-13; --rot:-9deg; --dur:7.2s; --del:.48s"><img src="images/mushrooms/mushroom-4.webp" alt=""></div>
+  <div class="shroom shroom--r r5" data-depth="30" style="--x:24vw; --yn:26; --w:14vw; --kx:28; --ky:-6; --kr:20;  --rot:-15deg;--dur:6.3s; --del:.60s"><img src="images/mushrooms/mushroom-9.webp" alt=""></div>
 
   <!-- EXTRA gombák — csak telefonon jelennek meg (.mextra), a sokkal telibb
        oldalakhoz és hogy az EST. tábla mögé is kerüljön belőlük -->
-  <div class="shroom mextra"          style="--x:16vw; --y:-2vh; --w:27vw; --kx:-9; --ky:-2; --kr:-6; --rot:-6deg; --dur:7.1s; --del:.12s"><img src="images/mushrooms/mushroom-2.webp" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:18vw; --y:-1vh; --w:26vw; --kx:9;  --ky:-2; --kr:7;  --rot:8deg;  --dur:6.6s; --del:.20s"><img src="images/mushrooms/mushroom-4.webp" alt=""></div>
-  <div class="shroom mextra"          style="--x:-4vw; --y:11vh; --w:24vw; --kx:-12;--ky:-3; --kr:-9; --rot:10deg; --dur:7.6s; --del:.28s"><img src="images/mushrooms/mushroom-8.webp" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-4vw; --y:13vh; --w:23vw; --kx:12; --ky:-3; --kr:8;  --rot:-11deg;--dur:6.9s; --del:.34s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
-  <div class="shroom mextra"          style="--x:-11vw;--y:60vh; --w:24vw; --kx:-16;--ky:4;  --kr:-12;--rot:7deg;  --dur:7.3s; --del:.42s"><img src="images/mushrooms/mushroom-5.webp" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-11vw;--y:63vh; --w:23vw; --kx:16; --ky:4;  --kr:11; --rot:-8deg; --dur:6.4s; --del:.50s"><img src="images/mushrooms/mushroom-7.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:16vw; --yn:-2; --w:27vw; --kx:-9; --ky:-2; --kr:-6; --rot:-6deg; --dur:7.1s; --del:.12s"><img src="images/mushrooms/mushroom-2.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:18vw; --yn:-1; --w:26vw; --kx:9;  --ky:-2; --kr:7;  --rot:8deg;  --dur:6.6s; --del:.20s"><img src="images/mushrooms/mushroom-4.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:-4vw; --yn:11; --w:24vw; --kx:-12;--ky:-3; --kr:-9; --rot:10deg; --dur:7.6s; --del:.28s"><img src="images/mushrooms/mushroom-8.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-4vw; --yn:13; --w:23vw; --kx:12; --ky:-3; --kr:8;  --rot:-11deg;--dur:6.9s; --del:.34s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:-11vw;--yn:60; --w:24vw; --kx:-16;--ky:4;  --kr:-12;--rot:7deg;  --dur:7.3s; --del:.42s"><img src="images/mushrooms/mushroom-5.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-11vw;--yn:63; --w:23vw; --kx:16; --ky:4;  --kr:11; --rot:-8deg; --dur:6.4s; --del:.50s"><img src="images/mushrooms/mushroom-7.webp" alt=""></div>
 
   <!-- MÉG több nagy gomba (2. kör) — még telibb oldalak -->
-  <div class="shroom mextra"          style="--x:-9vw; --y:40vh; --w:28vw; --kx:-14;--ky:2;  --kr:-10;--rot:-9deg; --dur:7.8s; --del:.16s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-9vw; --y:43vh; --w:27vw; --kx:14; --ky:2;  --kr:10; --rot:9deg;  --dur:6.8s; --del:.24s"><img src="images/mushrooms/mushroom-6.webp" alt=""></div>
-  <div class="shroom mextra"          style="--x:5vw;  --y:6vh;  --w:24vw; --kx:-10;--ky:-4; --kr:-7; --rot:12deg; --dur:7.2s; --del:.32s"><img src="images/mushrooms/mushroom-0.webp" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:4vw;  --y:8vh;  --w:23vw; --kx:10; --ky:-4; --kr:7;  --rot:-12deg;--dur:6.5s; --del:.40s"><img src="images/mushrooms/mushroom-9.webp" alt=""></div>
-  <div class="shroom mextra"          style="--x:-13vw;--y:86vh; --w:30vw; --kx:-18;--ky:5;  --kr:-14;--rot:6deg;  --dur:7.5s; --del:.46s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
-  <div class="shroom shroom--r mextra" style="--x:-13vw;--y:84vh; --w:29vw; --kx:18; --ky:5;  --kr:14; --rot:-6deg; --dur:6.7s; --del:.54s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:-9vw; --yn:40; --w:28vw; --kx:-14;--ky:2;  --kr:-10;--rot:-9deg; --dur:7.8s; --del:.16s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-9vw; --yn:43; --w:27vw; --kx:14; --ky:2;  --kr:10; --rot:9deg;  --dur:6.8s; --del:.24s"><img src="images/mushrooms/mushroom-6.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:5vw;  --yn:6;  --w:24vw; --kx:-10;--ky:-4; --kr:-7; --rot:12deg; --dur:7.2s; --del:.32s"><img src="images/mushrooms/mushroom-0.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:4vw;  --yn:8;  --w:23vw; --kx:10; --ky:-4; --kr:7;  --rot:-12deg;--dur:6.5s; --del:.40s"><img src="images/mushrooms/mushroom-9.webp" alt=""></div>
+  <div class="shroom mextra"          style="--x:-13vw;--yn:86; --w:30vw; --kx:-18;--ky:5;  --kr:-14;--rot:6deg;  --dur:7.5s; --del:.46s"><img src="images/mushrooms/mushroom-1.webp" alt=""></div>
+  <div class="shroom shroom--r mextra" style="--x:-13vw;--yn:84; --w:29vw; --kx:18; --ky:5;  --kr:14; --rot:-6deg; --dur:6.7s; --del:.54s"><img src="images/mushrooms/mushroom-3.webp" alt=""></div>
 
 
 </header>
@@ -2933,6 +2954,10 @@ html.dbg-nonav .nav{ display:none !important; }
       heroEl.style.height = '';
       heroEl.style.height = heroEl.offsetHeight + 'px';
       if (neonEl) neonEl.style.marginTop = (-heroEl.offsetHeight) + 'px';
+      /* A rögzített vh-egység: a hero magasságának a százada. Innentől minden
+         --vhu-ban megadott függőleges pozíció (gombák, EST. 1990 tábla, a
+         videós felirat margója) érzéketlen a címsáv mozgására. */
+      document.documentElement.style.setProperty('--vhu', (heroEl.offsetHeight / 100) + 'px');
     }
   }
   if (!OFF('lockh')){
@@ -4220,7 +4245,7 @@ html.dbg-nonav .nav{ display:none !important; }
      fájl futott, és a mérés emiatt mást mutatott, mint amit a kód csinál.
      Ez a sor egyértelműen megmondja, melyik változat van a készüléken.
      ÚJ VÁLTOZATNÁL LÉPTESD. */
-  var BUILD = 'b13 — kéz kicsúszik + térkép pin nélkül érintőn';
+  var BUILD = 'b14 — rögzített vh-egység (gombák, EST. 1990 nem úszik)';
 
   function tick(){
     var sorok = [BUILD, 'koppints = nullaz', 'ertek  min..max  szoras'];
