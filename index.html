@@ -3985,6 +3985,84 @@ html.dbg-nonav .nav{ display:none !important; }
 })();
 </script>
 
+<!-- ============================================================
+     NÉZETABLAK-MŰSZER — CSAK ?diag=1 esetén fut le.
+     Az ugrálás okát nem sikerült elméletből eltalálni (a vh -> lvh csere sem
+     oldotta meg), ezért a VALÓDI készüléken kell megnézni, MELYIK érték
+     mozdul egyáltalán. Minden lényeges nézetablak-mennyiséget mér
+     képkockánként, és megjegyzi a legkisebb/legnagyobb látott értéket.
+     Amelyik sor mögött nem 0 a szórás, az mozog — az a bűnös.
+     A dobozra koppintva a min/max nullázódik.
+     ============================================================ -->
+<script>
+(function(){
+  if(!/[?&]diag=1/.test(location.search)) return;
+
+  /* Próbaelemek: a CSS-egységeket csak úgy lehet megmérni, ha tényleg
+     kirakjuk őket az oldalra. Egy pixel szélesek, a képen kívül. */
+  function proba(magassag){
+    var d = document.createElement('div');
+    d.setAttribute('aria-hidden','true');
+    d.style.cssText = 'position:absolute;left:-9999px;top:0;width:1px;visibility:hidden;'
+      + 'pointer-events:none;height:' + magassag;
+    document.body.appendChild(d);
+    return d;
+  }
+  var pVh = proba('100vh'), pLvh = proba('100lvh'),
+      pSvh = proba('100svh'), pDvh = proba('100dvh');
+
+  var doboz = document.createElement('div');
+  doboz.style.cssText = 'position:fixed;right:6px;top:6px;z-index:99999;'
+    + 'font:11px/1.35 ui-monospace,Menlo,Consolas,monospace;'
+    + 'background:rgba(0,0,0,.88);color:#8FF;padding:7px 9px;'
+    + 'border-radius:7px;white-space:pre;max-width:70vw';
+  document.body.appendChild(doboz);
+
+  var stage = document.getElementById('stage');
+  var zoo   = document.getElementById('video');
+  var neon  = document.getElementById('neon');
+
+  /* Minden mérendő mennyiség: név -> mérőfüggvény. A "neon teteje" a
+     legfontosabb: az a dokumentumbeli pozíció, ami ténylegesen elugrik a
+     görgetés alól, amikor a hero alatt felfelé görgetsz. */
+  var mertek = [
+    ['innerH',  function(){ return window.innerHeight; }],
+    ['visual',  function(){ return window.visualViewport ? Math.round(window.visualViewport.height) : -1; }],
+    ['vh',      function(){ return pVh.offsetHeight; }],
+    ['lvh',     function(){ return pLvh.offsetHeight; }],
+    ['svh',     function(){ return pSvh.offsetHeight; }],
+    ['dvh',     function(){ return pDvh.offsetHeight; }],
+    ['stageH',  function(){ return stage ? stage.offsetHeight : -1; }],
+    ['zooH',    function(){ return zoo ? zoo.offsetHeight : -1; }],
+    ['neonTop', function(){ return neon ? Math.round(neon.getBoundingClientRect().top + window.scrollY) : -1; }],
+    ['docH',    function(){ return document.documentElement.scrollHeight; }]
+  ];
+
+  var min = [], max = [];
+  function nullaz(){ min = []; max = []; }
+  doboz.addEventListener('click', nullaz);
+  doboz.addEventListener('touchstart', nullaz, { passive:true });
+
+  var NL = String.fromCharCode(10);
+
+  function tick(){
+    var sorok = ['koppints = nullaz', 'ertek  min..max  szoras'];
+    for(var i=0;i<mertek.length;i++){
+      var v = mertek[i][1]();
+      if(min[i] === undefined || v < min[i]) min[i] = v;
+      if(max[i] === undefined || v > max[i]) max[i] = v;
+      var szoras = max[i] - min[i];
+      /* a nyíl azonnal kiemeli, ami egyáltalán mozgott */
+      sorok.push((szoras > 1 ? '>> ' : '   ') + mertek[i][0] + ': ' + v
+        + '  ' + min[i] + '..' + max[i] + '  ' + szoras);
+    }
+    doboz.textContent = sorok.join(NL);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+
 <script src="assets/eumap-bg.js"></script>
 <script type="module" src="assets/eumap-scene.js"></script>
 </body>
