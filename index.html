@@ -1951,6 +1951,26 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      hogy a kompozíció ne lógjon ki a telefon képernyőjéről. */
   .zoo__hand{ top:-2%; width:clamp(260px,34vw,420px); left:clamp(-40px,-3vw,0px);
     translate:0 0; }
+  /* ===== "KULCSLYUK": A VIDEÓ ÁLL, AZ ABLAK NŐ KI RÁ =====
+     Eddig a videó eleme maga is átméreteződött minden képkockán
+     (width/height:100% a növekvő kereten belül), RÁADÁSUL kapott egy
+     képkockánként változó scale-t és egy saturate/contrast szűrőt is.
+     Mindhárom ugyanazt csinálja: a böngészőnek újra kell skáláznia,
+     illetve újra kell szűrnie a videó teljes textúráját, 60-szor
+     másodpercenként. Ez volt a szaggatva növekvés oka — nem a szöveg.
+
+     Innentől a videó FIX méretű (a végállapot mérete, px-ben a JS-től) és a
+     keret közepére van igazítva. A keret ugyanúgy nő ki a betűből és ugyanúgy
+     alakul körből téglalappá — csak most ABLAKKÉNT tárul fel az álló videóra.
+     A videó textúrája így egyetlen képkockán sem méreteződik át.
+     Gépen minden marad a régiben. */
+  .zoo__media video{
+    position:absolute; left:50%; top:50%; translate:-50% -50%;
+    width:auto; height:auto; max-width:none;   /* a méretet a JS adja px-ben */
+    transform:none;                             /* nincs képkockánkénti skálázás */
+    filter:none;                                /* nincs képkockánkénti szűrő */
+  }
+
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
   .stage{ height:210vh; height:210lvh; }   /* lvh — lásd a .stage-nél az okot */
@@ -3645,6 +3665,13 @@ html.dbg-nonav .nav{ display:none !important; }
 
     var zW=0, zH=0, zL=0, zT=0, zZp=0, zBp=0, zExit=0, zBg='';
 
+    /* "Kulcslyuk" mobilon: a videó FIX méretű, a végállapot méretére állítva,
+       és a keret közepére igazítva (a pozicionálást a CSS adja). Csak akkor
+       írjuk felül, ha a végméret ténylegesen változott — vagyis gyakorlatilag
+       egyszer, betöltéskor, illetve elfordításkor. Képkockánként semmi. */
+    var vid = media.querySelector('video');
+    var zFinW = 0, zFinH = 0, zAppliedW = -1;
+
     /* MÉRÉS — kizárólag olvas.
        FONTOS: a betűhely (slot) mérése KORÁBBAN a --zp beírása UTÁN történt.
        A --zp viszont épp a feliratot mozgatja, tehát az utána következő
@@ -3670,6 +3697,7 @@ html.dbg-nonav .nav{ display:none !important; }
       var h1 = w1 / RATIO;
       if(h1 > vh * 0.94){ var shrink = (vh*0.94) / h1; w1 *= shrink; h1 = vh*0.94; }
       var cx1 = pr.width/2, cy1 = vh * 0.5;
+      zFinW = w1; zFinH = h1;      /* a "kulcslyuk" mögött álló videó mérete */
 
       zW = s0 + (w1 - s0) * zZp;
       zH = s0 + (h1 - s0) * zZp;
@@ -3689,6 +3717,13 @@ html.dbg-nonav .nav{ display:none !important; }
 
     /* ÍRÁS — csak stílus, elrendezést nem olvas. */
     function zooWrite(){
+      /* A videó fix mérete — csak valódi változáskor írjuk (elfordítás,
+         ablakméret), tehát a görgetés alatt ez a sor sosem fut le. */
+      if (vid && window.innerWidth <= 900 && Math.abs(zFinW - zAppliedW) > 0.5){
+        zAppliedW = zFinW;
+        vid.style.width  = zFinW.toFixed(1) + 'px';
+        vid.style.height = zFinH.toFixed(1) + 'px';
+      }
       pin.style.setProperty('--zp', zZp.toFixed(4));
       media.style.width  = zW.toFixed(1) + 'px';
       media.style.height = zH.toFixed(1) + 'px';

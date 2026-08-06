@@ -850,10 +850,19 @@ async function init() {
        fixed-et használ, hanem eltolja az elemet: végig a fő elrendezésben
        marad, így a címsáv mozgása nem tudja megugrasztani. */
     pinType: ScrollTrigger.isTouch === 1 ? 'transform' : 'fixed',
-    /* érintőeszközön a görgetés aszinkron (a fő szál késve értesül róla),
-       ezért a pin becsatolása egy hajszállal korábban induljon */
-    anticipatePin: ScrollTrigger.isTouch === 1 ? 1 : 0,
-    scrub: 1.1,
+    /* A scrub SZÁMÉRTÉKKEL (1.1) azt jelenti: a jelenet nem a görgetés
+       pillanatnyi állását veszi át, hanem ~1,1 másodperc alatt UTÁNAHÚZ.
+       Egéren ez lágy. Érintőeszközön viszont a görgetés aszinkron: a fő szál
+       csak kapkodva, csomókban értesül róla. Ilyenkor a jelenet folyamatosan
+       egy mozgó célpontot kerget, és a két ütem interferenciája pontosan az a
+       rángatás, ami a telefonon látszik.
+       A `true` az 1:1 leképezés — nincs utánahúzás, nincs mit kergetni: a
+       jelenet mindig ott áll, ahol az ujjad. Érintőn ez a simább.
+
+       Az anticipatePin innen KIKERÜLT. Egy korábbi körben találgatásból tettem
+       bele; nem volt rá bizonyíték, viszont épp az a dolga, hogy a pin
+       becsatolását előrehozza — ami egy látható ugrást tud okozni. */
+    scrub: ScrollTrigger.isTouch === 1 ? true : 1.1,
     onUpdate: (self) => applyScroll(self.progress),
   });
   }
