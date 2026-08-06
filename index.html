@@ -247,45 +247,47 @@ html.no-js.is-intro .ogomb,
 html.no-js.is-intro .after,
 html.no-js.is-intro .est{ animation-play-state:running; }
 
-.pre{ position:fixed; inset:0; z-index:200; background:var(--cream); overflow:hidden;
-  /* saját maga is takar, ha a lapok közt hajszálnyi rés maradna */ }
+/* ===================== PRELOADER =====================
+   Az ÉVSZÁM a betöltés mértéke: 1990-től a mai évig gördül, jegyenként éles
+   digitális számlálóként. Amikor kész, a szám elszabadul, majd a jegyek
+   UGYANAZZAL a gördüléssel a KORONA betűibe fordulnak át — a második O
+   helyén a pecséttel. A szó TÖMÖR zöld lapon áll meg és ott is marad egy
+   ütemig; a hero csak azután tárul fel, hogy az egész réteg egyetlen ferde
+   éllel elhúzódott. Ezért nincs pillanat, amikor a szó a fotón "lebegne". */
+.pre{ position:fixed; inset:0; z-index:200; background:var(--green-deep); overflow:hidden;
+  /* A ferde felső él nyugalomban a képernyő FÖLÖTT van, tehát a lap hézagmentesen
+     takar. A söprést egy sima transform végzi, nem clip-path animáció — így a
+     mozgás végig a kompozitoron marad, és telefonon sem szaggat. */
+  clip-path:polygon(0% -20%, 100% -4%, 100% 100%, 0% 100%);
+  will-change:transform; transition:transform 1.05s var(--expo); }
+.pre.is-sweep{ transform:translateY(121%); }
 .pre.is-exit{ pointer-events:none; }
 .pre.is-gone{ display:none; }
 
-.pre__lid{ position:absolute; left:-2%; right:-2%; z-index:2; background:var(--cream);
-  will-change:transform; transition:transform 1.15s var(--expo) .28s; }
-.pre__lid--t{ top:-2%; height:54%; border-radius:0 0 50% 50% / 0 0 22% 22%; }
-.pre__lid--b{ bottom:-2%; height:54%; border-radius:50% 50% 0 0 / 22% 22% 0 0; }
-.pre.is-exit .pre__lid--t{ transform:translateY(-104%); }
-.pre.is-exit .pre__lid--b{ transform:translateY(104%); }
-/* a lapok mögül a kész oldal látszik, ne a fekete alap */
-.pre.is-exit{ background:transparent; }
+/* a szó: hat oszlop, mindegyik egy SZOROSAN vágott, gördülő szalag.
+   A szoros vágás adja a jegyváltáskor látszó félbevágott alakot. */
+/* A szó addig REJTVE marad, amíg az Archivo Black tényleg be nem töltött.
+   Az oszlopszélességeket ugyanis canvas measureText-tel mérjük; ha a betű még
+   nincs meg, a böngésző a tartalék betűvel mér, az pedig keskenyebb — ettől
+   csúsztak egymásra a jegyek kemény újratöltés (Ctrl+F5) után. */
+.pre__word{ position:absolute; left:50%; z-index:4; display:flex; align-items:center;
+  color:#fff; transform:translate(-50%,-50%); transform-origin:50% 50%; opacity:0;
+  transition:opacity .28s var(--ease), transform .72s var(--ease), top .72s var(--ease); }
+.pre.is-ready .pre__word{ opacity:1; }
+.pre__col{ position:relative; overflow:hidden; flex:none; }
+.pre__strip{ position:absolute; left:0; top:0; width:100%; will-change:transform; }
+.pre__cell{ display:flex; align-items:center; justify-content:center; width:100%;
+  font-family:var(--font-display); font-weight:400; line-height:1; }
+.pre__logo{ display:block; }
 
-.pre__ring{ position:absolute; left:50%; top:50%; translate:-50% -50%; border-radius:50%; z-index:3;
-  transition:opacity .34s var(--ease);
-  animation-name:preSpin; animation-timing-function:linear; animation-iteration-count:infinite; }
-.pre__ring--1{ width:min(74vw,420px); aspect-ratio:1; border:1.6px dashed var(--green); opacity:.55; animation-duration:15s; }
-.pre__ring--2{ width:min(60vw,336px); aspect-ratio:1; border:1.6px dotted var(--red); opacity:.6; animation-duration:11s; animation-direction:reverse; }
-.pre__ring--3{ width:min(88vw,500px); aspect-ratio:1; border:1.6px solid rgba(248,35,22,.28); animation-duration:22s; }
-.pre__ring--1::after, .pre__ring--2::after{ content:""; position:absolute; top:-6px; left:50%; width:11px; height:11px;
-  margin-left:-5.5px; border-radius:50%; background:var(--n-lime); }
-.pre__ring--2::after{ background:var(--red); top:auto; bottom:-6px; }
-@keyframes preSpin{ to{ transform:rotate(360deg); } }
-.pre.is-exit .pre__ring{ opacity:0; }
+.pre__sub{ position:absolute; left:50%; z-index:4; transform:translateX(-50%); opacity:0;
+  color:var(--n-lime); font-weight:700; letter-spacing:.3em; text-transform:uppercase;
+  white-space:nowrap; transition:opacity .55s var(--ease); }
+.pre.is-settle .pre__sub{ opacity:1; }
 
-.pre__core{ position:absolute; inset:0; z-index:4; display:grid; place-items:center; align-content:center; gap:14px;
-  transition:opacity .34s var(--ease), transform .45s var(--ease); }
-.pre.is-exit .pre__core{ opacity:0; transform:scale(.95); }
-.pre__logo{ width:clamp(84px,11vw,132px); height:auto; display:block;
-  animation:preBob 5.6s ease-in-out infinite; }
-@keyframes preBob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
-.pre__num{ font-family:var(--font-display); font-weight:400; font-size:clamp(2.6rem,10vw,6.4rem); line-height:.82;
-  letter-spacing:-.06em; color:var(--ink); }
-.pre__num i{ font-style:normal; font-size:.32em; vertical-align:super; color:var(--green-deep); margin-left:.08em; }
-.pre__word{ display:flex; gap:.06em; font-family:var(--font-display); font-weight:400;
-  font-size:clamp(.8rem,2vw,1.15rem); letter-spacing:.34em; text-transform:uppercase; color:var(--ink-soft); }
-.pre__word span{ opacity:0; transform:translateY(14px); animation:preLetter .6s var(--ease) forwards; }
-@keyframes preLetter{ to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){
+  .pre, .pre__word, .pre__sub{ transition-duration:.01ms; }
+}
 
 /* ===================== NAV — logó bal, matrica-gomb jobb ===================== */
 .nav{ position:fixed; top:clamp(12px,1.6vw,20px); left:clamp(12px,2.4vw,28px); right:clamp(12px,2.4vw,28px); z-index:120;
@@ -947,7 +949,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .certs.is-in .certs__spark{ animation:twinkle 3.6s ease-in-out var(--del,0s) infinite; }
 
 .certs__head{ position:relative; z-index:2; text-align:center; max-width:1300px; margin:0 auto clamp(46px,5vw,80px); }
-.certs__eyebrow{ display:flex; align-items:center; justify-content:center; gap:13px; font-size:11px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:22px; }
+.certs__eyebrow{ display:flex; align-items:center; justify-content:center; gap:13px; font-size:11px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:34px; }
 .certs__eyebrow i{ display:block; width:34px; height:1.5px; background:var(--red); font-style:normal; }
 .certs__title{ font-family:var(--font-display); font-weight:400; font-size:var(--fs-h2); line-height:.88; letter-spacing:-.03em; text-transform:uppercase; }
 .certs__title em{ display:block; font-family:var(--font-display); font-style:normal; font-weight:400; text-transform:uppercase;
@@ -1308,9 +1310,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .tl__eyebrow{ display:flex; align-items:center; justify-content:center; gap:12px; font-size:11px; font-weight:700;
   letter-spacing:.26em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:18px; }
 .tl__eyebrow i{ display:block; width:34px; height:1.5px; background:var(--red); }
-.tl__title{ font-family:var(--font-display); font-weight:400; font-size:var(--fs-h2); line-height:.9;
+.tl__title{ font-family:var(--font-display); font-weight:400; font-size:var(--fs-h2); line-height:1.1;
   letter-spacing:-.036em; text-transform:uppercase; }
-.tl__title em{ display:block; font-style:normal; margin-top:.08em;
+.tl__title em{ display:block; font-style:normal; margin-top:0;
   color:var(--green-deep); }
 .tl__lead{ max-width:58ch; margin:26px auto 0; font-family:var(--font-lead); font-weight:500; letter-spacing:-.015em;
   font-size:var(--fs-lead); line-height:1.64; color:var(--ink); }
@@ -2207,18 +2209,14 @@ html.dbg-nonav .nav{ display:none !important; }
 
 <!-- ===================== PRELOADER ===================== -->
 <div class="pre" id="preloader">
-  <div class="pre__lid pre__lid--t"></div>
-  <div class="pre__lid pre__lid--b"></div>
-
-  <div class="pre__ring pre__ring--3"></div>
-  <div class="pre__ring pre__ring--1"></div>
-  <div class="pre__ring pre__ring--2"></div>
-
-  <div class="pre__core">
-    <img class="pre__logo" src="images/assets/logo-320.webp" alt="">
-    <div class="pre__num"><span id="preNum">0</span><i>%</i></div>
-    <div class="pre__word" id="preWord" data-letters="Gombaipari Egyesülés"></div>
+  <div class="pre__word" id="preWord">
+    <!-- A pecsét MÁR A HTML-BEN itt van, nem a JS hozza létre: így a böngésző
+         a lap elemzésekor azonnal elindítja a letöltését, és ez az elem az,
+         amit a betöltésfigyelő is vár (.pre__logo). A JS csak áthelyezi a
+         negyedik oszlop szalagjának utolsó cellájába. -->
+    <img class="pre__logo" id="preSeal" src="images/assets/logo-320.webp" alt="">
   </div>
+  <div class="pre__sub">Gombaipari Egyesülés · 1990 óta</div>
 </div>
 
 <!-- goo szűrő a menühöz -->
@@ -3165,22 +3163,149 @@ html.dbg-nonav .nav{ display:none !important; }
   /* ============ 0. PRELOADER ============ */
   (function(){
     var pre  = document.getElementById('preloader');
-    var num  = document.getElementById('preNum');
-    var word = document.getElementById('preWord');
     if(!pre) return;
+    var wordEl = document.getElementById('preWord');
+    var seal   = document.getElementById('preSeal');
+    var subEl  = pre.querySelector('.pre__sub');
 
-    /* felirat betűnként */
-    word.dataset.letters.split('').forEach(function(ch,i){
-      var s = document.createElement('span');
-      s.textContent = ch === ' ' ? ' ' : ch;
-      s.style.animationDelay = (0.45 + i*0.04) + 's';
-      word.appendChild(s);
+    /* ---- A SZÓ FELÉPÍTÉSE ----
+       Hat oszlop: K O R [pecsét] N A. Mindegyik oszlop egy szalag, amiben
+       0..9, még egy 0 (a körbefordulás miatt), végül a célbetű áll. Ezért a
+       számlálás és a betűre fordulás UGYANAZ a mozdulat: nincs elemcsere,
+       nincs újraépítés futás közben, csak egyetlen transform oszloponként. */
+    var WORD = ['K','O','R','SEAL','N','A'];
+    var Y0 = 1990;
+    var Y1 = Math.max(2026, new Date().getFullYear());
+    var cols = [];
+    var meas = document.createElement('canvas').getContext('2d');
+    function widthOf(ch, size){
+      meas.font = '400 ' + size + 'px "Archivo Black", Archivo, sans-serif';
+      return meas.measureText(ch).width;
+    }
+    WORD.forEach(function(ch, i){
+      var isDigit = (i >= 1 && i <= 4);           /* az évszám négy jegye a középső négy oszlop */
+      var col = document.createElement('div'); col.className = 'pre__col';
+      var strip = document.createElement('div'); strip.className = 'pre__strip';
+      for(var k = 0; k < 11; k++){
+        var cell = document.createElement('div'); cell.className = 'pre__cell';
+        cell.textContent = isDigit ? String(k % 10) : '';
+        strip.appendChild(cell);
+      }
+      var last = document.createElement('div'); last.className = 'pre__cell';
+      if(ch === 'SEAL'){ last.appendChild(seal); } else { last.textContent = ch; }
+      strip.appendChild(last);
+      col.appendChild(strip);
+      wordEl.appendChild(col);
+      cols.push({ el:col, strip:strip, isDigit:isDigit, ch:ch, pos:0, letterW:0 });
     });
 
+    /* ---- MÉRT ÁLLANDÓK ----
+       A pecsét NEM tölti ki a saját képfájlját, és nem is középen ül benne.
+       Az images/assets/logo-320.webp alfacsatornáján kimérve: a jel a kép
+       magasságának 78,13%-a, szélességének 77,19%-a, és a közepe a kép
+       közepe FÖLÖTT van 4,53%-nyival (fent 6,6%, lent 15,3% az üres sáv).
+       Emiatt látszott a jel kisebbnek a betűknél és ült magasabban.
+       Az Archivo Black verzálmagassága a betűméret 69%-a, és a verzál közepe
+       a cella közepe ALATT van 1,37%-nyival (mindkettő böngészőben mérve).
+       HA A LOGÓFÁJL CSERÉLŐDIK, ezeket az arányokat újra ki kell mérni. */
+    var SEAL_FILL_H = 0.7813, SEAL_FILL_W = 0.7719, SEAL_BIAS_Y = 0.0453;
+    var CAP_RATIO = 0.69, CAP_OFFSET = 0.0137;
+
+    var px = 0, cellH = 0, digitW = 0, TOP_A = 0, TOP_B = 0;
+    function layout(){
+      var W = window.innerWidth, H = window.innerHeight;
+      /* Két korlát közül a szűkebb dönt. Álló telefonon MINDIG a szélesség
+         (W*0.135) a szűk keresztmetszet, ezért a magassági szorzó emelése
+         ott nem változtat semmit — csak a széles képernyőkön nő a szó, ahol
+         eddig indokolatlanul sok üres hely maradt körülötte. */
+      px = Math.min(H * 0.215, W * 0.135);
+      cellH = px * 0.80;                          /* SZOROS vágás — ettől félbevágott a váltó jegy */
+      digitW = widthOf('0', px);
+      wordEl.style.height = cellH + 'px';
+      /* A jel LÁTHATÓ köre pontosan akkora magas legyen, mint a betűk verzálja.
+         Ehhez a képet nagyobbra kell venni, mert a jel csak a kép egy részét
+         tölti ki; a kilógó rész viszont átlátszó, tehát a vágás nem látszik. */
+      var capH = px * CAP_RATIO;
+      var imgH = capH / SEAL_FILL_H;
+      cols.forEach(function(c){
+        c.el.style.height = cellH + 'px';
+        /* A pecsét oszlopa a jel LÁTHATÓ szélességéhez igazodik, nem a képéhez
+           és nem a betűmérethez — plusz egy kis levegő oldalt. */
+        c.letterW = (c.ch === 'SEAL') ? imgH * SEAL_FILL_W * 1.12 : widthOf(c.ch, px);
+        for(var n = 0; n < c.strip.children.length; n++){
+          c.strip.children[n].style.height = cellH + 'px';
+          c.strip.children[n].style.fontSize = px + 'px';
+        }
+      });
+      seal.style.width  = imgH + 'px';
+      seal.style.height = imgH + 'px';
+      /* Két korrekció egyszerre: a jel a saját képén belül feljebb ül
+         (SEAL_BIAS_Y), a betűk verzálja pedig a cella közepe alatt
+         (CAP_OFFSET). Mindkettőt lefelé toljuk, így a jel közepe pontosan a
+         betűk közepére kerül. */
+      seal.style.transform = 'translateY(' + (imgH * SEAL_BIAS_Y + cellH * CAP_OFFSET) + 'px)';
+      TOP_A = H * 0.46; TOP_B = H * 0.50;
+      if(!exited) wordEl.style.top = TOP_A + 'px';
+      /* Az alcím a SZÓHOZ méretezve, nem a képernyőhöz: így a kettő aránya
+         mindenhol azonos marad. Az alsó korlát azért kell, mert telefonon a
+         szó eleve kicsi, és a puszta arány olvashatatlanul apró feliratot adna. */
+      subEl.style.fontSize = Math.max(11, px * 0.125) + 'px';
+      subEl.style.top = (TOP_B + cellH * 0.62 * 0.5 + Math.max(16, px * 0.30)) + 'px';
+    }
+
+    function setPos(c, p){ c.pos = p; c.strip.style.transform = 'translateY(' + (-p * cellH) + 'px)'; }
+    function smooth(x){ return x * x * (3 - 2 * x); }
+
+    /* Az évszám kiírása. Ez NEM fogaskerekes kilométeróra: ott a magasabb
+       helyiérték folyamatosan együtt fordulna az alacsonyabbal, és 1990-nél
+       az ezres kerék már majdnem 2-est mutatna. Digitális számláló kell,
+       ezért a gördülési ablak minden helyiértéken azonos ABSZOLÚT évhossz:
+       minden jegy éles marad, amíg rá nem kerül a sor. */
+    function setYear(v){
+      for(var i = 1; i <= 4; i++){
+        var place = Math.pow(10, 4 - i);
+        var q = v / place, d = Math.floor(q) % 10, f = q - Math.floor(q);
+        var w = 0.55 / place;
+        setPos(cols[i], d + (f > 1 - w ? smooth((f - (1 - w)) / w) : 0));
+      }
+    }
+    function setWidths(k){                        /* k=0: évszám szélessége, k=1: teljes szó */
+      cols.forEach(function(c){
+        var w0 = c.isDigit ? digitW : 0;
+        c.el.style.width = (w0 + (c.letterW - w0) * k) + 'px';
+      });
+    }
+
     var html  = document.documentElement;
-    var MIN   = reduce ? 300 : 2300;    /* legalább ennyi ideig fut a koreográfia */
+    var MIN   = reduce ? 300 : 1400;    /* legalább ennyi ideig fut a számlálás */
     var start = performance.now();
-    var loaded = false, exited = false;
+    var loaded = false, exited = false, wordLanded = false;
+
+    /* Újraméretezés a jelenlegi fázisnak megfelelő oszlopszélességekkel.
+       A puszta layout() nem elég: a szélességeket a fázis dönti el. */
+    function relayout(){ layout(); setWidths(wordLanded ? 1 : 0); }
+    function reveal(){ pre.classList.add('is-ready'); }
+
+    relayout();
+    setYear(Y0);
+    window.addEventListener('resize', function(){ if(!exited) relayout(); });
+
+    /* MÉRT HIBA: kemény újratöltés (Ctrl+F5) után a jegyek egymásra csúsztak,
+       sima F5 után nem. Oka: az oszlopszélességeket canvas measureText-tel
+       mérjük, és hidegen a betű még nincs meg — a böngésző a tartalék betűvel
+       mér, ami keskenyebb. Ezért megvárjuk a betűt, ÚJRAMÉRÜNK, és csak utána
+       mutatjuk meg a szót. A setTimeout biztosíték: ha a betű nem érkezik meg
+       (offline, blokkolt CDN), a szó akkor is megjelenik — inkább tartalék
+       betűvel, mint sehogy. */
+    if(document.fonts && document.fonts.load){
+      document.fonts.load('400 100px "Archivo Black"').then(function(){
+        if(!exited) relayout();
+        reveal();
+      }, reveal);
+    } else {
+      reveal();
+    }
+    setTimeout(reveal, 900);
 
     /* ---- MI SZÁMÍT "betöltöttnek"? ----
        NEM a window.load: az megvárja az oldal ÖSSZES képét, a videót és a 3D
@@ -3205,42 +3330,131 @@ html.dbg-nonav .nav{ display:none !important; }
     /* a window.load csak megerősítés — ha hamarabb jön, annál jobb */
     window.addEventListener('load', function(){ loaded = true; window.scrollTo(0,0); });
 
-    /* Kilépés három ütemben, hogy ne legyen ugrás:
-       0 ms    — a mag és a gyűrűk kihalványulnak
-       280 ms  — a két lap szétnyílik (CSS transition-delay), közben indul a hero animációja
-       1150 ms — feloldjuk a görgetést (a lapok ekkor már a képernyőn kívül vannak)
-       1700 ms — a preloader kikerül a DOM-ból                                        */
+    /* ---- KILÉPÉS ----
+       Fontos a sorrend: a szó a TÖMÖR zöld lapon fordul betűvé és ott is áll
+       meg egy ütemig. A hero csak ezután, egyetlen ferde éllel tárul fel —
+       nincs pillanat, amikor a szó a fotón lebegne.
+
+       Az évszám a MAI ÉVNÉL MEGÁLL — nem szalad tovább kitalált évekbe.
+       Megáll, egy pillanatra megül, és onnan fordulnak át a jegyek betűvé.
+
+       0 ms     — a jegyek a KORONA betűibe fordulnak, balról jobbra
+       +MORPH   — a szó lejjebb ül, kisebb lesz, megjön az alcím (tömör zöldön)
+       +SETTLE  — a teljes réteg elhúzódik, ekkor indulnak a hero animációi
+       +720     — görgetés felszabadítva
+       +SWEEP   — a preloader kikerül a DOM-ból                                 */
+    var MORPH = 760, SETTLE = 560, SWEEP = 1050;
+
+    /* ---- ÁTFORDULÁS ELŐKÉSZÍTÉSE ----
+       A célbetűt ODATESSZÜK a most látható jegy ALÁ, és onnan gördítjük egyet.
+       Enélkül a szalag a 12. cellában lévő betűig végigpörögne az összes
+       közbülső számjegyen, ami úgy néz ki, mintha az évszám mégis tovább
+       futna 2026 után. Így viszont a jegy KÖZVETLENÜL a betűre fordul. */
+    function armMorph(){
+      cols.forEach(function(c){
+        var d = Math.round(c.pos);
+        if(d > 10) d = 10;
+        var host = c.strip.children[d + 1];
+        if(c.ch === 'SEAL'){ host.textContent = ''; host.appendChild(seal); }
+        else { host.textContent = c.ch; }
+        c.from = c.pos; c.to = d + 1;
+      });
+    }
+    function landWord(){                      /* a szó végállapota, animáció nélkül */
+      cols.forEach(function(c){ setPos(c, c.to); });
+      setWidths(1);
+      wordLanded = true;                      /* egy késői relayout már a szó szélességeit használja */
+    }
+    function finish(){ pre.classList.add('is-gone'); }
+
     function exit(){
       if(exited) return; exited = true;
       window.scrollTo(0,0);
       pre.classList.add('is-exit');
 
-      setTimeout(function(){
-        html.classList.remove('is-intro');       /* hero animációk indulnak a nyíló lapok mögött */
-      }, 300);
+      /* MÉRT ESET: háttérben lévő fülön a requestAnimationFrame nem fut, így a
+         számláló el sem indul — a kilépést viszont a rAF-tól független poll
+         (vagy a vészfék) váltja ki. Ilyenkor az évszám még 1990-en áll, és a
+         szó abból fordulna betűvé. Ezért minden kilépési útvonalon ide tesszük
+         a mai évet, mielőtt az átfordulást előkészítenénk. */
+      setYear(Y1);
+      armMorph();
+
+      if(reduce){                             /* csökkentett mozgás: se pörgés, se söprés-dráma */
+        landWord();
+        pre.classList.add('is-settle');
+        setTimeout(function(){
+          pre.classList.add('is-sweep');
+          html.classList.remove('is-intro');
+        }, 260);
+        setTimeout(function(){
+          window.scrollTo(0,0);
+          html.classList.remove('is-locked');
+          window.scrollTo(0,0);
+          SCROLL.tick();
+        }, 400);
+        setTimeout(finish, 700);
+        return;
+      }
+
+      /* A jegyek onnan fordulnak betűvé, AHOL éppen állnak — vagyis a mai
+         évről. Nincs elszabadulás, nincs kitalált évszám. */
+      var t0 = performance.now();
+      (function step(ts){
+        var k = (ts - t0) / MORPH, live = false;
+        cols.forEach(function(c, i){
+          var kk = (k - i * 0.09) / 0.62;
+          kk = kk < 0 ? 0 : (kk > 1 ? 1 : kk);
+          kk = 1 - Math.pow(1 - kk, 3);        /* mindegyik betű külön ér földet, balról jobbra */
+          if(kk < 1) live = true;
+          setPos(c, c.from + (c.to - c.from) * kk);
+          var w0 = c.isDigit ? digitW : 0;
+          c.el.style.width = (w0 + (c.letterW - w0) * kk) + 'px';
+        });
+        if(live) requestAnimationFrame(step); else landWord();
+      })(performance.now());
+
+      setTimeout(function(){                  /* a szó a helyére ül — MÉG a tömör zöldön */
+        /* Biztosíték: a fenti átfordulás rAF-on fut, ami háttérfülön elakadhat.
+           Ez a setTimeout attól függetlenül lefut, így a szó akkor is a helyére
+           kerül, mielőtt a lap elhúzódna — nem söpörhet el félkész szót. */
+        landWord();
+        wordEl.style.top = TOP_B + 'px';
+        wordEl.style.transform = 'translate(-50%,-50%) scale(.62)';
+        pre.classList.add('is-settle');
+      }, MORPH + 120);
+
+      setTimeout(function(){                  /* és csak most jön a hero */
+        pre.classList.add('is-sweep');
+        html.classList.remove('is-intro');
+      }, MORPH + 120 + SETTLE);
 
       setTimeout(function(){
         window.scrollTo(0,0);
-        html.classList.remove('is-locked');      /* görgetés felszabadítva, a sáv helye végig foglalt volt */
+        html.classList.remove('is-locked');   /* görgetés felszabadítva, a sáv helye végig foglalt volt */
         window.scrollTo(0,0);
-        SCROLL.tick();                           /* a hero és a nav állapota frissüljön azonnal */
-      }, 1150);
+        SCROLL.tick();                        /* a hero és a nav állapota frissüljön azonnal */
+      }, MORPH + 120 + SETTLE + 720);
 
-      setTimeout(function(){ pre.classList.add('is-gone'); }, 1700);
+      setTimeout(finish, MORPH + 120 + SETTLE + SWEEP + 120);
     }
 
-    /* A kijelzett % a KETTŐ közül a lassabbat mutatja: a koreográfia haladását
-       és a képek tényleges betöltöttségét. Így a szám nem hazudik — ha a képek
-       lassan jönnek, a szám is lassabban kúszik, és 99-en vár rájuk. */
+    /* Az ÉVSZÁM a betöltés mértéke: 1990-től a mai évig. A kettő közül a
+       lassabbat követi — a koreográfia haladását és a képek tényleges
+       betöltöttségét —, így a szám nem hazudik: ha a képek lassan jönnek, az
+       évszám is lassabban kúszik, és megáll közvetlenül a mai év előtt. */
     function tick(ts){
       var pTime = Math.min(1, (ts - start) / MIN);
       var pLoad = done / total;
       var eased = 1 - Math.pow(1 - pTime, 2.4);
-      var shown = Math.round(Math.min(eased, pLoad) * 100);
-      if(!loaded) shown = Math.min(shown, 99);   /* 100 csak akkor, ha tényleg kész */
-      num.textContent = shown;
+      var p = Math.min(eased, pLoad);
+      if(!loaded) p = Math.min(p, 0.995);        /* a mai évre csak akkor lép, ha tényleg kész */
+      setYear(Y0 + (Y1 - Y0) * p);
       if(pTime < 1 || !loaded){ requestAnimationFrame(tick); }
-      else { num.textContent = 100; setTimeout(exit, 200); }
+      /* A mai évszám kapjon egy ütemet, mielőtt betűvé fordul: mostantól ez
+         AZ állókép, amin a szám tényleg olvasható. A korábbi 220 ms még az
+         „elszabaduló" változathoz volt méretezve, ahol a szám úgyis pörgött. */
+      else { setYear(Y1); setTimeout(exit, 480); }
     }
     requestAnimationFrame(tick);
 
