@@ -1971,6 +1971,28 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     filter:none;                                /* nincs képkockánkénti szűrő */
   }
 
+  /* ===== A KÉT FOLYAMATOSAN ÚJRAFESTŐ DEKOR-RÉTEG KI =====
+     Ezek nem görgetésre futnak, hanem MAGUKTÓL, végtelenítve, amíg a szekció
+     látszik — vagyis akkor is terhelnek, amikor meg sem mozdulsz.
+
+     .zoo__media::before — a keret körbefutó fénycsóvája. Egy forgó
+     kúp-gradiens (conic-gradient), amit KÉT egymásra maszkolt réteg vág
+     gyűrűvé (mask-composite). A kúp-gradiens és a maszk-kompozit is olyan
+     művelet, amit a böngésző nem tud a grafikus kártyára kiszervezni:
+     képkockánként újrarajzolja az egész keretet. Ráadásul a keret mérete
+     közben nő, tehát a gyorsítótárazott kép is folyton érvénytelen.
+
+     .zoo__glow — három nagy radiális gradiens egy teljes képernyős elemen,
+     aminek a background-position-je animálódik. A background-position
+     mozgatása nem eltolás, hanem ÚJRAFESTÉS: a teljes képernyőnyi
+     gradiens-réteg minden képkockában újra elkészül.
+
+     Mobilon mindkettő megy. A fénygyűrű eltűnik; a hangulatfény MEGMARAD,
+     csak nem sodródik (a 15 másodperces, néhány százalékos mozgását
+     telefonon úgysem venni észre). */
+  .zoo__media::before{ display:none; }
+  .zoo__glow{ animation:none !important; }
+
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
   .stage{ height:210vh; height:210lvh; }   /* lvh — lásd a .stage-nél az okot */
@@ -2478,7 +2500,12 @@ html.dbg-nonav .nav{ display:none !important; }
     </div>
 
     <div class="zoo__media" data-zoo-media>
-      <video autoplay muted loop playsinline preload="metadata">
+      <!-- A muted + playsinline az iOS automatikus indításának feltétele; a
+           preload="auto" azért kell, mert metadata mellett a Safari a lejátszás
+           kéréséig egyetlen képkockát sem tölt le, és a kérés ilyenkor gyakran
+           azonnal el is hasal. A tényleges indítást a JS is megkéri (lásd a
+           zoom-motort) — az autoplay önmagában iOS-en megbízhatatlan. -->
+      <video autoplay muted loop playsinline preload="auto">
         <source src="https://res.cloudinary.com/djrtrnpzn/video/upload/v1778829711/N%C3%A9vtelen_terv_8_usqoae.mp4" type="video/mp4">
       </video>
     </div>
@@ -3660,6 +3687,32 @@ html.dbg-nonav .nav{ display:none !important; }
       ioZoo.observe(sec);
     } else { pin.classList.add('is-in'); }
 
+    /* ===== A LEJÁTSZÁS MEGKÉRÉSE =====
+       Az autoplay attribútum iOS-en nem garancia: a Safari elutasíthatja, ha a
+       videó épp nincs a képen, ha kevés az adat, vagy ha energiatakarékos mód
+       van bekapcsolva. Elutasítás után magától SOSEM próbálkozik újra — ezért
+       marad némán az első képkockán.
+       Ezért: amint a szekció a közelbe ér, elkérjük a lejátszást, és ha
+       elhasal, az első érintésre/görgetésre újrapróbáljuk. A hibát elnyeljük,
+       mert energiatakarékos módban a felhasználó döntése az elsőbb. */
+    var zooVid = media.querySelector('video');
+    if (zooVid){
+      var tryPlay = function(){
+        if (!zooVid.paused) return;
+        var pr = zooVid.play();
+        if (pr && pr.catch) pr.catch(function(){ /* a felhasználó döntése erősebb */ });
+      };
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(function(en){
+          en.forEach(function(e){ if (e.isIntersecting) tryPlay(); });
+        }, { rootMargin:'300px' }).observe(sec);
+      } else { tryPlay(); }
+      /* tartalék: az első felhasználói mozdulat után a Safari már engedékenyebb */
+      ['touchstart','pointerdown','scroll'].forEach(function(ev){
+        window.addEventListener(ev, tryPlay, { passive:true, once:true });
+      });
+    }
+
     function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
     function smooth(t){ return t*t*(3-2*t); }
 
@@ -4159,8 +4212,14 @@ html.dbg-nonav .nav{ display:none !important; }
 
   var NL = String.fromCharCode(10);
 
+  /* Verzió-lenyomat. Többször előfordult, hogy a telefonon a régi, eltárolt
+     fájl futott, és a mérés emiatt mást mutatott, mint amit a kód csinál.
+     Ez a sor egyértelműen megmondja, melyik változat van a készüléken.
+     ÚJ VÁLTOZATNÁL LÉPTESD. */
+  var BUILD = 'b12 — kulcslyuk + beam/glow ki + play() + eumap v2';
+
   function tick(){
-    var sorok = ['koppints = nullaz', 'ertek  min..max  szoras'];
+    var sorok = [BUILD, 'koppints = nullaz', 'ertek  min..max  szoras'];
     for(var i=0;i<mertek.length;i++){
       var v = mertek[i][1]();
       if(min[i] === undefined || v < min[i]) min[i] = v;
@@ -4177,7 +4236,16 @@ html.dbg-nonav .nav{ display:none !important; }
 })();
 </script>
 
-<script src="assets/eumap-bg.js"></script>
-<script type="module" src="assets/eumap-scene.js"></script>
+<!-- ============================================================
+     VERZIÓS LENYOMAT A KÜLSŐ FÁJLOKON — ?v=...
+     Ezek KÜLÖN fájlok, nem az index.html része. Az oldal címéhez fűzött
+     gyorsítótár-kerülő (pl. ?v=11) tehát rájuk NEM vonatkozik: a böngésző
+     nyugodtan a régi, eltárolt változatot futtatja tovább. Emiatt fordulhatott
+     elő, hogy a 3D térképen végzett javítások el sem jutottak a készülékre.
+     Ha ezekben a fájlokban módosítasz, LÉPTESD a lenti számot — ettől lesz más
+     az URL, és tölti újra a böngésző.
+     ============================================================ -->
+<script src="assets/eumap-bg.js?v=2"></script>
+<script type="module" src="assets/eumap-scene.js?v=2"></script>
 </body>
 </html>
