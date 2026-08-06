@@ -439,7 +439,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .btn--lg{ padding:clamp(20px,2vw,26px) clamp(34px,3.4vw,50px); font-size:clamp(13px,1.15vw,16px); }
 
 /* ================== 1. STICKY HERO ================== */
-.stage{ position:relative; height:260vh; }
+/* ===== MIÉRT lvh ÉS NEM vh — MÉRT OK =====
+   Ez a szekció 2,6-szoros SZORZÓ a nézetmagasságra. Ha a nézetmagasság
+   megmozdul, a magassága 2,6-szor akkorát változik, és mivel a görgetési
+   pozíció közben helyben marad, a teljes alatta lévő tartalom kirántódik a
+   görgetés alól. Mérés 400px széles nézeten, 80px magasság-csökkenéssel:
+   a .stage 2211px -> 2003px (-208), és vele a .neon dokumentum-pozíciója is
+   -208px, változatlan scrollY mellett. Telefonon pontosan ezt látni, amikor
+   felfelé görgetve előjön a böngésző eszköztára — a hero alatt a
+   legfeltűnőbb. Telefonos A/B teszttel visszaigazolva (?off=vhpx).
+   Az lvh a NAGY nézetmagasság: definíció szerint azt az állapotot méri,
+   amikor a behúzható böngésző-felület be van húzva, tehát a sáv
+   megjelenésétől NEM változik. A sima vh csak tartaléknak marad elöl, a
+   régi motoroknak, amelyek az lvh-t nem ismerik. */
+.stage{ position:relative; height:260vh; height:260lvh; }
 .hero{ position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; --p:0; --reveal:0; }
 .hero{ background:var(--sand); }
 /* ===== APPLE-SZERŰ STACKELŐDÉS =====
@@ -995,7 +1008,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* ============================================================
    5. KOR(O)NA GOMBA — görgetésre kinövő videó a betű helyén
    ============================================================ */
-.zoo{ position:relative; height:330vh; background:var(--ink); }
+/* lvh, nem vh — 3,3-szoros szorzó a nézetmagasságra, lásd a .stage-nél
+   részletezett mérést és okot. */
+.zoo{ position:relative; height:330vh; height:330lvh; background:var(--ink); }
 .zoo__pin{ position:sticky; top:0; height:100vh; height:100lvh; background:var(--certs-bg);
   display:grid; place-items:center;
   /* Csak VÍZSZINTESEN vágunk (függőlegesen marad látható, hogy a kinyíló
@@ -1289,7 +1304,9 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    állomás alul kilógott. A --px/--py értékek ehhez a magassághoz vannak
    belőve — ha ezt átírod, az állomásokat és a szórt matricákat is ellenőrizd. */
 .tl__track{ position:relative; width:100%; margin:0 auto;
-  height:clamp(1440px, 150vh, 1980px); }
+  /* lvh — 1,5-szeres szorzó a nézetmagasságra, lásd a .stage-nél az okot */
+  height:clamp(1440px, 150vh, 1980px);
+  height:clamp(1440px, 150lvh, 1980px); }
 
 /* az útvonal */
 .tl__path{ position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; overflow:visible; }
@@ -1538,7 +1555,10 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 /* teljes szélességű, képernyő-magas színpad — a ScrollTrigger ezt pinneli,
    a canvas abszolút tölti ki */
 .eumap__stage{ position:relative; z-index:2; width:100vw; margin:0 calc(50% - 50vw);
-  height:100vh; }
+  /* lvh: ezt pinneli a ScrollTrigger, és az end:'+=185%' is ehhez mér — ha a
+     magassága az eszköztártól változna, a pin-spacer és vele a teljes
+     dokumentumhossz is elmozdulna. Lásd a .stage-nél a mérést. */
+  height:100vh; height:100lvh; }
 .eumap__canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:pan-y; }
 
 /* az egér/ujj alatti ország neve — buborék, közvetlenül a kurzor fölött */
@@ -1908,7 +1928,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   .hero{ scale:1; border-radius:0; }
   .hero__stack{ display:none; }
 
-  .zoo{ height:280vh; }
+  .zoo{ height:280vh; height:280lvh; }   /* lvh — lásd a .stage-nél az okot */
   /* "KORONA" / "GOMBA" 2 sorba törve (lásd .zoo__break) — mivel soronként
      kevesebb szélesség kell, jóval nagyobbra vehető, mint 1 sorban lenne.
      A margin-top kicsit lejjebb told a szöveget, hogy a kéz+fazék kép
@@ -1929,7 +1949,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
     translate:0 0; }
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
-  .stage{ height:210vh; }
+  .stage{ height:210vh; height:210lvh; }   /* lvh — lásd a .stage-nél az okot */
 
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
@@ -1963,7 +1983,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:620px){
   .brand{ padding:7px 15px 7px 8px; }
   .brand__logo{ width:42px; height:42px; }
-  .stage{ height:260vh; }  /* hosszabb görgetési táv, hogy a hero-jelenet ne fusson le túl gyorsan */
+  .stage{ height:260vh; height:260lvh; }  /* hosszabb görgetési táv, hogy a hero-jelenet ne fusson le túl gyorsan (lvh — lásd fent) */
 
   .lead{ font-size:14.5px; }
   .cta{ flex-direction:column; align-items:stretch; padding:0 14px; }
