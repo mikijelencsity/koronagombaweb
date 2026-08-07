@@ -54,7 +54,18 @@ const DELIVER = new Set(['Hungary', 'Slovakia', 'Austria', 'Romania', 'Croatia',
    helykitöltő — NEM valós adat. Cseréld le a végleges leírásokra; ahol nincs
    egyedi szöveg, a FALLBACK megy ki. */
 const COPY = {
-  /* pl.: Slovakia: 'Ide jön Szlovákia rövid bemutatása.', */
+  Hungary: 'A hazai piacon a legerősebb a jelenlétünk — a friss csiperke és a konzervsor minden második doboza itthon marad.',
+  Slovakia: 'Pozsonytól Kassáig hetente indul szállítmány, elsősorban friss csiperkéből és laskagombából.',
+  Austria: 'Ausztriába a konzerv- és savanyított termékek a legkeresettebbek — az egyik legrégebbi exportpiacunk.',
+  Romania: 'Erdélytől Bukarestig megtalálható a Korona konzervsor, heti több tonna gomba kel útra arrafelé.',
+  Croatia: 'Horvátországba nyáron nő meg igazán a kereslet — a tengerparti éttermek kedvence a friss laskagomba.',
+  Serbia: 'A határ közelsége miatt Szerbiába akár 24 órán belül friss gomba érkezik Demjénből.',
+  Slovenia: 'Szlovéniába kisebb, de rendszeres tételekben szállítunk — itt a feldolgozott, prémium termékkör a legkeresettebb.',
+  Czechia: 'Csehország az egyik legrégebbi exportkapcsolatunk, a konzervgomba piacán meghatározó beszállítók vagyunk.',
+  Poland: 'Lengyelország a legnagyobb külföldi felvevőpiacunk — évente több száz tonna konzerv- és fagyasztott gomba jut el oda.',
+  Ukraine: 'Ukrajnába a nehezebb időszakokban is folyamatos maradt a szállítás, elsősorban tartós konzervgombával.',
+  Germany: 'Németországban a legszigorúbb a minőségi elvárás — csak a válogatott, első osztályú tételek jutnak el odáig.',
+  'Bosnia and Herz.': 'Bosznia-Hercegovinába kisebb, de stabil tételekben szállítunk, elsősorban szarajevói nagykereskedőknek.',
 };
 const COPY_FALLBACK = 'Példaszöveg — ide jön a piac rövid bemutatása: mióta szállítunk oda, '
   + 'milyen termékkörrel és milyen partnerekkel. (A végleges szöveg még nincs megírva.)';
