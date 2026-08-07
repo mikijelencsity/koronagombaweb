@@ -289,6 +289,14 @@ html.no-js.is-intro .est{ animation-play-state:running; }
   font-family:var(--font-display); font-weight:400; line-height:1; }
 .pre__logo{ display:block; }
 
+/* A statikus boot-logó: azonnal látszik (JS/betű nélkül is), és amint a
+   JS-számláló kész, elhalványul. A pozíció a szó nyugalmi helyéhez (TOP_A =
+   46%) igazodik, hogy ne ugorjon, amikor a számláló átveszi. */
+.pre__boot{ position:absolute; left:50%; top:46%; z-index:3;
+  width:min(34vw,150px); height:auto; transform:translate(-50%,-50%);
+  transition:opacity .3s var(--ease); pointer-events:none; }
+.pre.is-ready .pre__boot{ opacity:0; }
+
 .pre__sub{ position:absolute; left:50%; z-index:4; transform:translateX(-50%); opacity:0;
   color:var(--n-lime); font-weight:700; letter-spacing:.3em; text-transform:uppercase;
   white-space:nowrap; transition:opacity .55s var(--ease); }
@@ -2239,6 +2247,14 @@ html.dbg-nonav .nav{ display:none !important; }
 
 <!-- ===================== PRELOADER ===================== -->
 <div class="pre" id="preloader">
+  <!-- STATIKUS BOOT-ÁLLAPOT: tisztán HTML+CSS, azonnal látszik az első
+       festéskor — JS és a Google Font betöltése NÉLKÜL is. Hideg cache-nél
+       (inkognitó, első töltés) eddig üres zöld képernyő volt, mert a szót/
+       számlálót a lap legvégén futó JS építi fel; amíg az le nem fut, nem
+       látszott semmi. Ez a logó (előtöltve, lásd a <head> preload-ját)
+       kitölti azt a rést, majd amint a JS-számláló kész (.is-ready),
+       elhalványul. -->
+  <img class="pre__boot" src="images/assets/logo-320.webp" alt="" aria-hidden="true">
   <div class="pre__word" id="preWord">
     <!-- A pecsét MÁR A HTML-BEN itt van, nem a JS hozza létre: így a böngésző
          a lap elemzésekor azonnal elindítja a letöltését, és ez az elem az,
