@@ -3385,22 +3385,27 @@ html.dbg-nonav .nav{ display:none !important; }
     setYear(Y0);
     window.addEventListener('resize', function(){ if(!exited) relayout(); });
 
-    /* A szót AZONNAL megmutatjuk — hideg cache-nél (pl. inkognitó, első
-       töltés) is, hogy a preloader SOHA ne legyen üres zöld képernyő. Ez volt
-       a hiba: korábban a szó a betű betöltéséig (vagy egy 900 ms-os fallbackig)
-       REJTVE maradt, és hideg cache-en a Google Font ennél tovább is jöhet —
-       addig semmi nem látszott.
-       Az oszlopszélességeket canvas measureText-tel mérjük; ha a betű még
-       nincs meg, tartalék betűvel mérünk ÉS azzal is rakjuk ki — konzisztens,
-       nem csúszik szét. Amint az Archivo Black megjön, ÚJRAMÉRÜNK (relayout),
-       így a végleges szélesség pontos lesz. (A régi Ctrl+F5-ös jegy-átfedés
-       csak a betűváltás egyetlen képkockájában lehetséges, az is alig látszik.) */
-    reveal();
+    /* A SZÁMLÁLÓT csak akkor mutatjuk meg, amikor az Archivo Black betű
+       TÉNYLEGESEN készen áll. Ez a kulcs az iOS-es "hidegen csak a logó
+       látszik, a számláló nem; frissítés után jó" hibához: hideg első
+       töltéskor a betű még nincs meg, ilyenkor a canvas measureText és a
+       szövegrenderelés megbízhatatlan → a számláló láthatatlan maradt.
+       Amíg a betű tölt, a BOOT-LOGÓ fedi a képernyőt (sosem üres zöld),
+       és csak a kész betűvel jelenik meg a pontosan mért számláló.
+       Tartalék: ha a betű 1,4 mp alatt nem jön meg (lassú/blokkolt CDN),
+       akkor is megmutatjuk (tartalék betűvel), majd a betű megjöttekor
+       újramérünk — így sosem ragad bent láthatatlanul. */
+    var shown = false;
+    function showWord(){ if(shown || exited) return; shown = true; relayout(); reveal(); }
     if(document.fonts && document.fonts.load){
       document.fonts.load('400 100px "Archivo Black"').then(function(){
-        if(!exited) relayout();
-      });
+        if(!exited){ relayout(); }   /* pontos mérés a kész betűvel */
+        showWord();
+      }, showWord);
+    } else {
+      showWord();
     }
+    setTimeout(showWord, 1400);      /* tartalék, ha a betű nem érkezne meg */
 
     /* ---- MI SZÁMÍT "betöltöttnek"? ----
        NEM a window.load: az megvárja az oldal ÖSSZES képét, a videót és a 3D
