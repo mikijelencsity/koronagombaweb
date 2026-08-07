@@ -289,13 +289,18 @@ html.no-js.is-intro .est{ animation-play-state:running; }
   font-family:var(--font-display); font-weight:400; line-height:1; }
 .pre__logo{ display:block; }
 
-/* A statikus boot-logó: azonnal látszik (JS/betű nélkül is), és amint a
-   JS-számláló kész, elhalványul. A pozíció a szó nyugalmi helyéhez (TOP_A =
-   46%) igazodik, hogy ne ugorjon, amikor a számláló átveszi. */
-.pre__boot{ position:absolute; left:50%; top:46%; z-index:3;
-  width:min(34vw,150px); height:auto; transform:translate(-50%,-50%);
-  transition:opacity .3s var(--ease); pointer-events:none; }
-.pre.is-ready .pre__boot{ opacity:0; }
+/* A statikus boot-logó: azonnal látszik (JS ÉS betű nélkül is), és VÉGIG
+   tartalékként szolgál — csak a kilépéskor (is-exit, a morphhal együtt)
+   halványul el. Feljebb és kisebben ül, mint a számláló (ami TOP_A=46%),
+   így a normál esetben tiszta "logó fönt, számláló alatta" elrendezés jön ki.
+   Ha viszont a JS-számláló bármi okból LÁTHATATLAN marad (pl. mobil
+   böngészőn a layout() 0 nézetmagasságot mért, és a cellák 0 méretűek
+   lettek), akkor ez a logó akkor is látszik — a preloader SOSEM lesz üres
+   zöld képernyő. */
+.pre__boot{ position:absolute; left:50%; top:31%; z-index:3;
+  width:min(24vw,96px); height:auto; transform:translate(-50%,-50%);
+  transition:opacity .4s var(--ease); pointer-events:none; }
+.pre.is-exit .pre__boot{ opacity:0; }
 
 .pre__sub{ position:absolute; left:50%; z-index:4; transform:translateX(-50%); opacity:0;
   color:var(--n-lime); font-weight:700; letter-spacing:.3em; text-transform:uppercase;
@@ -3267,7 +3272,13 @@ html.dbg-nonav .nav{ display:none !important; }
 
     var px = 0, cellH = 0, digitW = 0, TOP_A = 0, TOP_B = 0;
     function layout(){
-      var W = window.innerWidth, H = window.innerHeight;
+      /* VÉDELEM: némely mobil böngésző az első layoutkor 0 (vagy hibás)
+         window.innerHeight/innerWidth-et ad. Ha ebből számolnánk, px=0 lenne,
+         és a teljes számláló 0 méretű, tehát LÁTHATATLAN — ez okozta a "zöld
+         képernyő, semmi tartalom" hibát telefonon. Ezért sane tartalékokra
+         esünk vissza, ha a méretek nem használhatók. */
+      var W = window.innerWidth  || document.documentElement.clientWidth  || 390;
+      var H = window.innerHeight || document.documentElement.clientHeight || 780;
       /* A betűméretet nem találgatjuk, hanem KISZÁMOLJUK: megmérjük, hogy a
          teljes szó hány képpont széles 1 px-es betűmérethez, és abból adjuk
          meg azt a méretet, amivel a szó pontosan a képernyő 84%-át tölti ki.
@@ -3279,6 +3290,9 @@ html.dbg-nonav .nav{ display:none !important; }
         per += (c.ch === 'SEAL') ? SEAL_ADV : widthOf(c.ch, 100) / 100;
       });
       px = Math.min(H * 0.215, (W * 0.84) / per);
+      /* Utolsó biztosíték: ha px valamiért mégis 0/NaN maradna, adjunk neki
+         egy értelmes alsó határt, hogy a számláló sose tűnjön el teljesen. */
+      if(!(px > 4)) px = Math.min(H * 0.215 || 120, W * 0.135 || 52);
       cellH = px * 0.80;                          /* SZOROS vágás — ettől félbevágott a váltó jegy */
       digitW = widthOf('0', px);
       wordEl.style.height = cellH + 'px';
