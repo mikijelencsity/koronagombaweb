@@ -463,16 +463,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    amikor a behúzható böngésző-felület be van húzva, tehát a sáv
    megjelenésétől NEM változik. A sima vh csak tartaléknak marad elöl, a
    régi motoroknak, amelyek az lvh-t nem ismerik. */
-/* A magasság adja a hero-jelenet teljes görgetési útját: minél nagyobb,
-   annál tovább marad olvasható a teljesen feltárt cím+CTA (és a helyükre
-   ért gombák), mielőtt a .neon alulról rácsúszna (lásd heroRead — a
-   stackelődés a .neon saját pozíciójától függ, ami ebből a magasságból
-   következik). (Volt egy próbálkozás, ami a belépés sebességét külön
-   választotta volna az állóidőtől egy rögzített --reveal-vh-val — az
-   eredmény egy több képernyőnyi, teljesen néma szakasz lett a görgetésben,
-   ami üresjáratnak/akadásnak érződött. Visszaálltunk az egyszerű, egy
-   számmal vezérelt modellre.) */
-.stage{ position:relative; height:580vh; height:580lvh; }
+/* A .stage adja a hero-jelenet TELJES görgetési útját — de a --p (a
+   matricák 46-76%-os felugrása) tempóját NEM ehhez mérjük, hanem egy
+   rögzített 259vh-hoz (lásd heroRead: revealVh) — ez a legelső, sosem
+   megnyújtott tempó. A .stage-ben ezen felüli rész tiszta állóidő: a
+   KÉSZ hero egyszerűen tovább áll a képernyőn, mielőtt a .neon alulról
+   rácsúszna. Mértéktartóan indulunk (520vh = 259 belépés + kb. 259
+   állóidő) — ha ez is kevés, onnan még nyújtható. */
+.stage{ position:relative; height:520vh; height:520lvh; }
 .hero{ position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; --p:0; --reveal:0; }
 .hero{ background:var(--sand); }
 /* ===== APPLE-SZERŰ STACKELŐDÉS =====
@@ -2043,7 +2041,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
-  .stage{ height:530vh; height:530lvh; }   /* mint a többi nézeten — lásd a .stage-nél az okot */
+  .stage{ height:470vh; height:470lvh; }   /* mint a többi nézeten — lásd a .stage-nél az okot */
 
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
@@ -2077,7 +2075,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:620px){
   .brand{ padding:7px 15px 7px 8px; }
   .brand__logo{ width:42px; height:42px; }
-  .stage{ height:580vh; height:580lvh; }  /* hogy a helyükre ért gombák/cím tovább maradjon látható, mielőtt a következő szekció rácsúszik (lvh — lásd fent) */
+  .stage{ height:520vh; height:520lvh; }  /* 259 belépés + kb. 259 állóidő — lásd a .stage-nél az okot (lvh — lásd fent) */
 
   .lead{ font-size:14.5px; }
   .cta{ flex-direction:column; align-items:stretch; padding:0 14px; }
@@ -3616,10 +3614,29 @@ html.dbg-nonav .nav{ display:none !important; }
   var stackTo = document.getElementById('neon');
   var hE = 0, hR = 0, hSt = 0;
 
+  /* A belépés (--p) hossza rögzített, nézetenkénti vh-szám — a LEGELSŐ,
+     eredeti tempó (259/209vh), amit sosem nyújtottunk meg. FONTOS: a
+     gombák nagy része nem a --p-vel csúszik be — egy gyors popIn-nal
+     tűnnek fel betöltéskor —, a --p csak a két matrica (Saját komposzt/
+     12 ország export) 46-76%-os felugrását vezérli. Ha ezt a távot
+     megnyújtjuk (mint korábban, amikor a .stage teljes magasságához
+     mértük), a matricák feltűnéséig egy hosszú, látványilag NÉMA
+     görgetési szakasz keletkezik — az érződik "beragadásnak", nem a
+     hosszabb várakozásnak. Ez a szám ezért marad rövid, FÜGGETLENÜL
+     attól, mekkora a .stage (ami csak az utána jövő állóidőt adja).
+     Csak szélességváltozáskor frissül. */
+  var revealVh = 259;
+  function readRevealVh(){
+    var w = window.innerWidth;
+    revealVh = (w > 620 && w <= 900) ? 209 : 259;
+  }
+  readRevealVh();
+  onWidthResize(readRevealVh);
+
   /* MÉRÉS — csak olvas, semmit nem ír. */
   function heroRead(){
     var vh = pageVH();
-    var total = stage.offsetHeight - vh;
+    var total = revealVh * vh;
     var p = total > 0 ? -stage.getBoundingClientRect().top / total : 0;
     p = Math.min(1, Math.max(0, p));
     hE = 1 - Math.pow(1 - p, 1.6);
