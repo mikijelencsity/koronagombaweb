@@ -3596,6 +3596,16 @@ html.dbg-nonav .nav{ display:none !important; }
     var open = false;
     var links = menu.querySelectorAll('a, button');
 
+    /* MODALITÁS-KÖVETÉS: a menü nyitásakor/zárásakor a fókuszt csak akkor
+       mozgatjuk programozottan, ha a látogató BILLENTYŰZETET használ — ott
+       kell a fókusz-körvonal az akadálymentességhez. Érintésnél/egérnél a
+       programozott fókusz iOS Safari-n bent ragasztotta a sötét körvonalat
+       ("fekete keret" a menügombon a bezárás után) — ilyenkor inkább levesszük
+       a fókuszt, körvonal nélkül. */
+    var usedKeyboard = false;
+    window.addEventListener('keydown',    function(){ usedKeyboard = true;  }, true);
+    window.addEventListener('pointerdown', function(){ usedKeyboard = false; }, true);
+
     function setOpen(v){
       if(open === v) return;
       open = v;
@@ -3607,10 +3617,14 @@ html.dbg-nonav .nav{ display:none !important; }
       if(v){
         /* a menü elemei csak nyitva legyenek fókuszálhatók */
         links.forEach(function(el){ el.removeAttribute('tabindex'); });
-        setTimeout(function(){ if(open) links[0].focus({preventScroll:true}); }, 420);
+        if(usedKeyboard) setTimeout(function(){ if(open) links[0].focus({preventScroll:true}); }, 420);
       } else {
         links.forEach(function(el){ el.setAttribute('tabindex','-1'); });
-        btn.focus({preventScroll:true});
+        /* billentyűzetnél visszaadjuk a fókuszt a gombnak (látható körvonallal),
+           érintésnél/egérnél csak levesszük az aktuális fókuszt — így nem marad
+           fekete keret a gombon. */
+        if(usedKeyboard) btn.focus({preventScroll:true});
+        else if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
       }
     }
     links.forEach(function(el){ el.setAttribute('tabindex','-1'); });
