@@ -463,7 +463,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    amikor a behúzható böngésző-felület be van húzva, tehát a sáv
    megjelenésétől NEM változik. A sima vh csak tartaléknak marad elöl, a
    régi motoroknak, amelyek az lvh-t nem ismerik. */
-.stage{ position:relative; height:460vh; height:460lvh; }
+/* A .stage adja a hero-jelenet teljes görgetési útját. A gombák kicsúszása
+   (--p) EBBŐL csak az első 160vh-t használja (lásd heroRead: revealVh) —
+   rögzített, eredeti tempó. Az ezen felüli rész (kb. 140vh) tiszta tartás:
+   a gombák már kimentek oldalra, a cím áll, és csak EZUTÁN, később úszik fel
+   a .neon. */
+.stage{ position:relative; height:400vh; height:400lvh; }
 .hero{ position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; --p:0; --reveal:0; }
 .hero{ background:var(--sand); }
 /* ===== APPLE-SZERŰ STACKELŐDÉS =====
@@ -2034,7 +2039,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
-  .stage{ height:410vh; height:410lvh; }
+  .stage{ height:350vh; height:350lvh; }   /* 110 kicsúszás + kb. 140 tartás — lásd a .stage-nél */
 
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
@@ -2068,7 +2073,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:620px){
   .brand{ padding:7px 15px 7px 8px; }
   .brand__logo{ width:42px; height:42px; }
-  .stage{ height:460vh; height:460lvh; }
+  .stage{ height:400vh; height:400lvh; }   /* 160 kicsúszás + kb. 140 tartás — lásd a .stage-nél */
 
   .lead{ font-size:14.5px; }
   .cta{ flex-direction:column; align-items:stretch; padding:0 14px; }
@@ -3607,10 +3612,27 @@ html.dbg-nonav .nav{ display:none !important; }
   var stackTo = document.getElementById('neon');
   var hE = 0, hR = 0, hSt = 0;
 
+  /* A gombák kicsúszását (--p) egy RÖGZÍTETT görgetési távhoz mérjük, NEM a
+     .stage teljes magasságához — ez az EREDETI tempó (a régi .stage 260/210vh
+     mínusz egy nézetmagasság = 160/110vh). Így a .stage szabadon nyújtható
+     (hogy a következő szekció KÉSŐBB jöjjön fel), de a gombák ugyanolyan
+     gyorsan mennek ki oldalra, mint eddig — nem lassulnak le a hosszabb
+     görgetéstől. A stackelődés (.neon felúszása) továbbra is a .neon saját
+     pozíciójától függ, tehát az a .stage magasságából adódik = később jön be.
+     Csak szélességváltozáskor frissül. */
+  var revealVh = 160;
+  function readRevealVh(){
+    var w = window.innerWidth;
+    revealVh = (w > 620 && w <= 900) ? 110 : 160;
+  }
+  readRevealVh();
+  onWidthResize(readRevealVh);
+
   /* MÉRÉS — csak olvas, semmit nem ír. */
   function heroRead(){
     var vh = pageVH();
-    var total = stage.offsetHeight - vh;
+    /* revealVh SZÁZALÉKBAN van (160 = 160vh = 1.6 nézetmagasság), ezért /100 */
+    var total = revealVh / 100 * vh;
     var p = total > 0 ? -stage.getBoundingClientRect().top / total : 0;
     p = Math.min(1, Math.max(0, p));
     hE = 1 - Math.pow(1 - p, 1.6);
