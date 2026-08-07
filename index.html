@@ -464,12 +464,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    megjelenésétől NEM változik. A sima vh csak tartaléknak marad elöl, a
    régi motoroknak, amelyek az lvh-t nem ismerik. */
 /* A magasság adja a hero-jelenet teljes görgetési útját: minél nagyobb,
-   annál tovább marad olvasható a teljesen feltárt cím+CTA, mielőtt a
-   .neon alulról rácsúszna (lásd heroRead — a stackelődés a .neon saját
-   pozíciójától függ, ami ebből a magasságból következik). 260vh-nál a
-   teljes feltárás (p≈0.76) után csak ~60vh maradt olvasásra, mielőtt a
-   következő szekció elindult felfelé — 340vh-val ez ~140vh-ra nőtt. */
-.stage{ position:relative; height:340vh; height:340lvh; }
+   annál tovább marad olvasható a teljesen feltárt cím+CTA (és a helyükre
+   ért gombák), mielőtt a .neon alulról rácsúszna (lásd heroRead — a
+   stackelődés a .neon saját pozíciójától függ, ami ebből a magasságból
+   következik). 260vh-nál a teljes feltárás (p≈0.76) után csak ~60vh
+   maradt görgetésre, mielőtt a következő szekció elindult felfelé —
+   460vh-val ez ~260vh-ra nőtt. */
+.stage{ position:relative; height:460vh; height:460lvh; }
 .hero{ position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; --p:0; --reveal:0; }
 .hero{ background:var(--sand); }
 /* ===== APPLE-SZERŰ STACKELŐDÉS =====
@@ -2040,7 +2041,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
-  .stage{ height:290vh; height:290lvh; }   /* +80vh, mint a többi nézeten — lásd a .stage-nél az okot */
+  .stage{ height:410vh; height:410lvh; }   /* +200vh, mint a többi nézeten — lásd a .stage-nél az okot */
 
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
@@ -2074,7 +2075,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:620px){
   .brand{ padding:7px 15px 7px 8px; }
   .brand__logo{ width:42px; height:42px; }
-  .stage{ height:340vh; height:340lvh; }  /* +80vh, hogy a teljesen feltárt cím tovább maradjon olvasható, mielőtt a következő szekció rácsúszik (lvh — lásd fent) */
+  .stage{ height:460vh; height:460lvh; }  /* +200vh, hogy a helyükre ért gombák/cím tovább maradjon látható, mielőtt a következő szekció rácsúszik (lvh — lásd fent) */
 
   .lead{ font-size:14.5px; }
   .cta{ flex-direction:column; align-items:stretch; padding:0 14px; }
