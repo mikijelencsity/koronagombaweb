@@ -650,6 +650,15 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .neon__cta:hover{ box-shadow:var(--sh-btn-press) var(--ink); translate:2px 2px; }
 
 @media (max-width:640px){
+  /* A .neon alsó pereme közvetlenül a hullám-elválasztóra (.pdiv--top) ér,
+     mindkettő ugyanaz a --cream-deep. A .neon felső árnyéka (0 -30px 70px
+     -30px) viszont blur(70) - |spread(30)+offset(30)| = 10px-nyit MÉGIS
+     átlóg a doboz ALJÁN — ez adta a törésvonalat a hullám fölött: a
+     --cream-deep ott az árnyéktól besötétedve ütött el a felette lévő,
+     árnyéktalan résztől. Szűkebb spreaddel (45) az árnyék pont a doboz
+     alján belül marad, nem fest át a divider-re. */
+  .neon{ box-shadow:0 -30px 70px -45px rgba(22,17,13,.45); }
+
   /* egy nagy alapkép (p2), a másik kettő matricaként rárakva a sarkokba —
      így a fotók jóval nagyobbak, mint a korábbi három egyforma, apró kép.
      Több levegő fent/lent a szöveg és a CTA felé, a matricák pedig csak
@@ -2114,17 +2123,20 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      Cél: az oldalak mentén VÉGIG sorakozzanak, és jobban benyúlva
      takarják is a címet egy kicsit — mint gépen. */
 
-  /* --- BAL OSZLOP, fentről le (nagyobb gombák) --- */
-  .s1{ --x:-24vw !important; --yn:-4 !important; --w:52vw !important; --kx:-34 !important; --ky:-12 !important; }  /* óriás portobello, bal-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
-  .s5{ --x:-4vw  !important; --yn:27 !important; --w:32vw !important; --kx:-11 !important; }  /* benyúlik a cím bal szélére — görgetve kevésbé megy ki, jobban bent marad */
-  .s3{ --x:-3vw  !important; --yn:47 !important; --w:27vw !important; --kx:-10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
+  /* --- BAL OSZLOP, fentről le (nagyobb gombák) ---
+     s1 és s3 eddig ráült a cím betűinek a közepére (K, illetve a GOMBA sor
+     eleje), ettől nem lehetett elolvasni a szót. Kijjebb tolva és kicsit
+     kisebbre véve csak a betűk SZÉLÉT érintik, a közepük szabadon marad. */
+  .s1{ --x:-32vw !important; --yn:-4 !important; --w:44vw !important; --kx:-34 !important; --ky:-12 !important; }  /* óriás portobello, bal-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
+  .s5{ --x:-16vw !important; --yn:27 !important; --w:23vw !important; --kx:-24 !important; }  /* benyúlik a cím bal szélére, de nem a K tetejére — görgetve most már jobban kijjebb megy */
+  .s3{ --x:-12vw !important; --yn:47 !important; --w:22vw !important; --kx:-10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
   .s2{ --x:-12vw !important; --yn:76 !important; --w:46vw !important; }  /* bal-alsó sarok, óriás */
   .s4{ --x:20vw  !important; --yn:90 !important; --w:26vw !important; }  /* alsó rés */
 
   /* --- JOBB OSZLOP, fentről le (nagyobb gombák) --- */
-  .r1{ --x:-22vw !important; --yn:-5 !important; --w:50vw !important; --kx:34 !important; --ky:-12 !important; }  /* óriás gombacsokor, jobb-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
-  .r5{ --x:-4vw  !important; --yn:30 !important; --w:31vw !important; --kx:11 !important; }  /* benyúlik a cím jobb szélére — görgetve kevésbé megy ki, jobban bent marad */
-  .r3{ --x:-3vw  !important; --yn:50 !important; --w:26vw !important; --kx:10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
+  .r1{ --x:-38vw !important; --yn:-5 !important; --w:36vw !important; --kx:34 !important; --ky:-12 !important; }  /* óriás gombacsokor, jobb-felső sarok — görgetve jobban kijjebb megy, hogy az EST.1990 tábla előbukkanjon */
+  .r5{ --x:-16vw !important; --yn:30 !important; --w:23vw !important; --kx:11 !important; }  /* benyúlik a cím jobb szélére — görgetve kevésbé megy ki, jobban bent marad */
+  .r3{ --x:-18vw !important; --yn:50 !important; --w:18vw !important; --kx:10 !important; }  /* oldalsó, a cím alatti sáv — görgetve kevésbé megy ki, jobban bent marad */
   .r2{ --x:-12vw !important; --yn:74 !important; --w:48vw !important; }  /* jobb-alsó sarok, óriás */
   .r4{ --x:22vw  !important; --yn:88 !important; --w:25vw !important; }  /* alsó rés */
 
