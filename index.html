@@ -463,7 +463,13 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
    amikor a behúzható böngésző-felület be van húzva, tehát a sáv
    megjelenésétől NEM változik. A sima vh csak tartaléknak marad elöl, a
    régi motoroknak, amelyek az lvh-t nem ismerik. */
-.stage{ position:relative; height:260vh; height:260lvh; }
+/* A magasság adja a hero-jelenet teljes görgetési útját: minél nagyobb,
+   annál tovább marad olvasható a teljesen feltárt cím+CTA, mielőtt a
+   .neon alulról rácsúszna (lásd heroRead — a stackelődés a .neon saját
+   pozíciójától függ, ami ebből a magasságból következik). 260vh-nál a
+   teljes feltárás (p≈0.76) után csak ~60vh maradt olvasásra, mielőtt a
+   következő szekció elindult felfelé — 340vh-val ez ~140vh-ra nőtt. */
+.stage{ position:relative; height:340vh; height:340lvh; }
 .hero{ position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; --p:0; --reveal:0; }
 .hero{ background:var(--sand); }
 /* ===== APPLE-SZERŰ STACKELŐDÉS =====
@@ -590,9 +596,12 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
      stackelődést. A --stack pont ezt a felúszást méri. */
   margin-top:-100vh; margin-top:-100lvh;
   /* a felső kártya-él: lekerekített sarok + felfelé vetett árnyék, hogy a
-     felúszó lap tényleg lapnak lássék, ne egy felfelé csúszó háttérfoltnak */
+     felúszó lap tényleg lapnak lássék, ne egy felfelé csúszó háttérfoltnak.
+     A spread -85: enélkül (pl. -30) az árnyék a Gauss-elmosás miatt átlóg a
+     doboz ALJÁN is, és halványan besötétíti a Termékeink hullám fölötti
+     krémszínt — törésvonalnak látszik a divider fölött, minden nézeten. */
   border-radius:clamp(38px,5.5vw,96px) clamp(38px,5.5vw,96px) 0 0;
-  box-shadow:0 -30px 70px -30px rgba(22,17,13,.45); }
+  box-shadow:0 -30px 70px -85px rgba(22,17,13,.45); }
 .neon::before{ content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
   background: radial-gradient(ellipse 50% 44% at 12% 14%, rgba(61,163,93,.26) 0%, transparent 70%),
               radial-gradient(ellipse 42% 36% at 50% 46%, rgba(217,226,78,.14) 0%, transparent 72%); }
@@ -650,17 +659,6 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 .neon__cta:hover{ box-shadow:var(--sh-btn-press) var(--ink); translate:2px 2px; }
 
 @media (max-width:640px){
-  /* A .neon alsó pereme közvetlenül a hullám-elválasztóra (.pdiv--top) ér,
-     mindkettő ugyanaz a --cream-deep. A .neon felső árnyéka (0 -30px 70px
-     -30px) viszont átlógott a doboz ALJÁN is — ez adta a törésvonalat a
-     hullám fölött. Az első próbálkozás (spread:-45) a "blur = éles
-     levágás" feltevésre épült, de a böngésző Gauss-elmosása ennél messzebb
-     dereng: -45-tel MÉG mindig látszott egy halvány csík éles kijelzőn.
-     -85-tel az árnyék hatóköre bőven a doboz alján belül marad, nagy
-     ráhagyással — a látható (felső) rész változatlan, csak az addig
-     kihasználatlan alsó "levegő" tűnt el belőle. */
-  .neon{ box-shadow:0 -30px 70px -85px rgba(22,17,13,.45); }
-
   /* egy nagy alapkép (p2), a másik kettő matricaként rárakva a sarkokba —
      így a fotók jóval nagyobbak, mint a korábbi három egyforma, apró kép.
      Több levegő fent/lent a szöveg és a CTA felé, a matricák pedig csak
@@ -2042,7 +2040,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 
   /* (az overflow-x:clip átkerült a .zoo__pin alapszabályába — ott minden
      szélességen kell, a szétlökött mondat miatt) */
-  .stage{ height:210vh; height:210lvh; }   /* lvh — lásd a .stage-nél az okot */
+  .stage{ height:290vh; height:290lvh; }   /* +80vh, mint a többi nézeten — lásd a .stage-nél az okot */
 
   .s3,.s4,.r3,.r4{ display:none; }
   .l{ font-size:min(23vw,180px); -webkit-text-stroke-width:6px; }
@@ -2076,7 +2074,7 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:620px){
   .brand{ padding:7px 15px 7px 8px; }
   .brand__logo{ width:42px; height:42px; }
-  .stage{ height:260vh; height:260lvh; }  /* hosszabb görgetési táv, hogy a hero-jelenet ne fusson le túl gyorsan (lvh — lásd fent) */
+  .stage{ height:340vh; height:340lvh; }  /* +80vh, hogy a teljesen feltárt cím tovább maradjon olvasható, mielőtt a következő szekció rácsúszik (lvh — lásd fent) */
 
   .lead{ font-size:14.5px; }
   .cta{ flex-direction:column; align-items:stretch; padding:0 14px; }
