@@ -1907,6 +1907,16 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
   /* A termékblokk lejjebb került (lásd .slide__media margin-top), ezért a
      körnek is lejjebb kell ülnie, hogy a terméken maradjon. */
   .carousel{ --ring-y:42%; }
+
+  /* Termékszövegek térbeli dőlése görgetéskor: a --tilt-et a JS írja
+     (lásd a karusszel-modult a szkriptben), -1..1 között fut — 0, amikor a
+     karusszel közepe pontosan a képernyő közepén van (szemből néz), a
+     szélein enyhén hátradől, mintha távolodna/közeledne a nézőtől. A
+     perspective(...) a transformon belül ül, hogy csak erre a rétegre
+     hasson, a karusszel díszítő rétegeit (sugarak, körök) ne torzítsa. */
+  .slide.is-active .slide__body > *{
+    transform:perspective(700px) rotateX(calc(var(--tilt,0) * -12deg));
+  }
 }
 /* ===== HERO — 100% zoomon a 80%-os arány visszaállítása (CSAK desktop) =====
    Az oldalt 80% böngésző-zoomon terveztük; 100%-on a hero PX-alapú elemei
@@ -2902,6 +2912,7 @@ html.dbg-nonav .nav{ display:none !important; }
         ?off=tl        — az asztali idővonal (mobilon amúgy sem fut)
         ?off=blob      — a folyamatosan hullámzó SVG-sávok (nonstop rAF)
         ?off=eumap     — a 3D térkép ScrollTrigger pinje
+        ?off=tilt      — a termékszövegek térbeli dőlése görgetéskor (telefon)
      A JS-effektek kizárása után is maradt az ugrálás, ezért CSS/elrendezés
      szintű kapcsolók is kellenek:
         ?off=sticky    — a kitűzött (sticky) hero és videó-pin normál folyamba
@@ -3840,6 +3851,20 @@ html.dbg-nonav .nav{ display:none !important; }
 
   centerOn(track.children[1], false);
   paint();
+
+  /* Termékszövegek dőlése görgetéskor (lásd a CSS-ben a --tilt-et
+     használó szabályt, telefon nézetben). --tilt: -1 = a karusszel még
+     lejjebb van, mint a képernyő közepe (most jön szembe); 0 = pontosan
+     középen; +1 = már fölötte (kifelé dől, mintha távolodna). */
+  var tiltVal = 0;
+  function tiltRead(){
+    var r = carousel.getBoundingClientRect();
+    var vh = pageVH();
+    var raw = (r.top + r.height / 2 - vh / 2) / (vh / 2);
+    tiltVal = Math.min(1, Math.max(-1, raw));
+  }
+  function tiltWrite(){ carousel.style.setProperty('--tilt', tiltVal.toFixed(3)); }
+  if (!OFF('tilt')) SCROLL.add(tiltRead, tiltWrite);
 
 
   /* ============ 4b. HULLÁM — zselés, kevés kontrollponttal ============
