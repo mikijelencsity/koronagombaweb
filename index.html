@@ -652,12 +652,14 @@ body.menu-open .menu__foot{ opacity:1; transform:none;
 @media (max-width:640px){
   /* A .neon alsó pereme közvetlenül a hullám-elválasztóra (.pdiv--top) ér,
      mindkettő ugyanaz a --cream-deep. A .neon felső árnyéka (0 -30px 70px
-     -30px) viszont blur(70) - |spread(30)+offset(30)| = 10px-nyit MÉGIS
-     átlóg a doboz ALJÁN — ez adta a törésvonalat a hullám fölött: a
-     --cream-deep ott az árnyéktól besötétedve ütött el a felette lévő,
-     árnyéktalan résztől. Szűkebb spreaddel (45) az árnyék pont a doboz
-     alján belül marad, nem fest át a divider-re. */
-  .neon{ box-shadow:0 -30px 70px -45px rgba(22,17,13,.45); }
+     -30px) viszont átlógott a doboz ALJÁN is — ez adta a törésvonalat a
+     hullám fölött. Az első próbálkozás (spread:-45) a "blur = éles
+     levágás" feltevésre épült, de a böngésző Gauss-elmosása ennél messzebb
+     dereng: -45-tel MÉG mindig látszott egy halvány csík éles kijelzőn.
+     -85-tel az árnyék hatóköre bőven a doboz alján belül marad, nagy
+     ráhagyással — a látható (felső) rész változatlan, csak az addig
+     kihasználatlan alsó "levegő" tűnt el belőle. */
+  .neon{ box-shadow:0 -30px 70px -85px rgba(22,17,13,.45); }
 
   /* egy nagy alapkép (p2), a másik kettő matricaként rárakva a sarkokba —
      így a fotók jóval nagyobbak, mint a korábbi három egyforma, apró kép.
