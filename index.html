@@ -26,6 +26,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 
+<!-- A pecsét-logó az ELSŐ képen látszó, mindenütt használt kép (preloader,
+     nav, lábléc). Előtöltjük, hogy hideg cache-nél (pl. inkognitó) is azonnal
+     kéznél legyen, ne később ugorjon be. -->
+<link rel="preload" as="image" href="images/assets/logo-320.webp">
+<!-- A Gombahíradó videó a Cloudinaryről jön; a kapcsolatot már itt melegen
+     tartjuk, hogy a videó-szekcióhoz érve ne a TLS-kézfogásra kelljen várni. -->
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="dns-prefetch" href="https://res.cloudinary.com">
+
 <style>
 /* ============================================================
    KORONA GOMBA — v5
@@ -266,10 +275,10 @@ html.no-js.is-intro .est{ animation-play-state:running; }
 
 /* a szó: hat oszlop, mindegyik egy SZOROSAN vágott, gördülő szalag.
    A szoros vágás adja a jegyváltáskor látszó félbevágott alakot. */
-/* A szó addig REJTVE marad, amíg az Archivo Black tényleg be nem töltött.
-   Az oszlopszélességeket ugyanis canvas measureText-tel mérjük; ha a betű még
-   nincs meg, a böngésző a tartalék betűvel mér, az pedig keskenyebb — ettől
-   csúsztak egymásra a jegyek kemény újratöltés (Ctrl+F5) után. */
+/* A szó AZONNAL látszik (opacity:0 -> is-ready a JS-ben, rögtön), hogy hideg
+   cache-nél se legyen üres a preloader. Az oszlopszélességeket canvas
+   measureText-tel mérjük; ha a betű még nincs meg, tartalék betűvel mérünk és
+   rakjuk ki (konzisztens, nem csúszik), majd a betű megjöttekor újramérünk. */
 .pre__word{ position:absolute; left:50%; z-index:4; display:flex; align-items:center;
   color:#fff; transform:translate(-50%,-50%); transform-origin:50% 50%; opacity:0;
   transition:opacity .28s var(--ease), transform .72s var(--ease), top .72s var(--ease); }
@@ -3339,22 +3348,22 @@ html.dbg-nonav .nav{ display:none !important; }
     setYear(Y0);
     window.addEventListener('resize', function(){ if(!exited) relayout(); });
 
-    /* MÉRT HIBA: kemény újratöltés (Ctrl+F5) után a jegyek egymásra csúsztak,
-       sima F5 után nem. Oka: az oszlopszélességeket canvas measureText-tel
-       mérjük, és hidegen a betű még nincs meg — a böngésző a tartalék betűvel
-       mér, ami keskenyebb. Ezért megvárjuk a betűt, ÚJRAMÉRÜNK, és csak utána
-       mutatjuk meg a szót. A setTimeout biztosíték: ha a betű nem érkezik meg
-       (offline, blokkolt CDN), a szó akkor is megjelenik — inkább tartalék
-       betűvel, mint sehogy. */
+    /* A szót AZONNAL megmutatjuk — hideg cache-nél (pl. inkognitó, első
+       töltés) is, hogy a preloader SOHA ne legyen üres zöld képernyő. Ez volt
+       a hiba: korábban a szó a betű betöltéséig (vagy egy 900 ms-os fallbackig)
+       REJTVE maradt, és hideg cache-en a Google Font ennél tovább is jöhet —
+       addig semmi nem látszott.
+       Az oszlopszélességeket canvas measureText-tel mérjük; ha a betű még
+       nincs meg, tartalék betűvel mérünk ÉS azzal is rakjuk ki — konzisztens,
+       nem csúszik szét. Amint az Archivo Black megjön, ÚJRAMÉRÜNK (relayout),
+       így a végleges szélesség pontos lesz. (A régi Ctrl+F5-ös jegy-átfedés
+       csak a betűváltás egyetlen képkockájában lehetséges, az is alig látszik.) */
+    reveal();
     if(document.fonts && document.fonts.load){
       document.fonts.load('400 100px "Archivo Black"').then(function(){
         if(!exited) relayout();
-        reveal();
-      }, reveal);
-    } else {
-      reveal();
+      });
     }
-    setTimeout(reveal, 900);
 
     /* ---- MI SZÁMÍT "betöltöttnek"? ----
        NEM a window.load: az megvárja az oldal ÖSSZES képét, a videót és a 3D
