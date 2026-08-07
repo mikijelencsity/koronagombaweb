@@ -3236,7 +3236,14 @@ html.dbg-nonav .nav{ display:none !important; }
     var meas = document.createElement('canvas').getContext('2d');
     function widthOf(ch, size){
       meas.font = '400 ' + size + 'px "Archivo Black", Archivo, sans-serif';
-      return meas.measureText(ch).width;
+      var w = meas.measureText(ch).width;
+      /* VÉDELEM: hideg első töltéskor (mobil, a betűrendszer még nem áll
+         készen) a canvas measureText 0-t adhat vissza — ilyenkor az
+         oszlopszélességek 0-ra esnének, és a SZÁMLÁLÓ LÁTHATATLAN lenne
+         (csak a boot-logó látszana). Ez volt a "frissítés után egyből jó"
+         hiba oka. Ha 0-t kapunk, egy értelmes betűszélességre esünk vissza
+         (~0,6em); a betű megjöttekor a relayout() úgyis pontosan újramér. */
+      return w > 0 ? w : size * 0.6;
     }
     WORD.forEach(function(ch, i){
       var isDigit = (i >= 1 && i <= 4);           /* az évszám négy jegye a középső négy oszlop */
